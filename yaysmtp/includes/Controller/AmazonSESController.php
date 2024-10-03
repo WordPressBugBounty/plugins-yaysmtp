@@ -67,15 +67,15 @@ class AmazonSESController {
 			return $sent;
 
 		} catch ( \Exception $e ) {
-			$this->errMess = $e->getAwsErrorMessage();
+			$errMess = $e->getMessage();
 
 			if ( $this->use_fallback_smtp ) {
 				LogErrors::clearErrFallback();
-				LogErrors::setErrFallback( $this->errMess );
+				LogErrors::setErrFallback( $errMess );
 			} else {
 				LogErrors::clearErr();
 				LogErrors::setErr( 'Mailer: Amazon SES' );
-				LogErrors::setErr( $this->errMess );
+				LogErrors::setErr( $errMess );
 			}
 
 			return;

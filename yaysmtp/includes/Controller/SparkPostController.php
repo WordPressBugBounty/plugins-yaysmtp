@@ -175,11 +175,12 @@ class SparkPostController {
 				$this->body['content']['reply_to'] = implode( ',', $dataReplyTo );
 			}
 		}
-		
+
 		// Set attachments.
 		$attachments = $phpmailer->getAttachments();
 		if ( ! empty( $attachments ) ) { 
 			$attachData = [];
+
 			foreach ( $attachments as $attach ) {
 				if ( ! empty( $attach ) ) {
 					$fileType = str_replace( ';', '', trim( $attach[4] ) );

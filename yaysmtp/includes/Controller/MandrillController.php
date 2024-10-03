@@ -74,10 +74,13 @@ class MandrillController {
 
 		// Reply to
 		$replyToAddresses = $phpmailer->getReplyToAddresses();
-		if ( ! empty( $replyToAddresses[0] ) ) {
-			$addrReplyTo = isset( $replyToAddresses[0][0] ) ? $replyToAddresses[0][0] : false;
-			if ( ! empty( $addrReplyTo ) ) {
-				$this->body['message']['headers']['reply-to'] = $addrReplyTo;
+		if ( ! empty( $replyToAddresses ) ) {
+			$emailReplyTo = array_shift( $replyToAddresses );
+			if ( ! empty( $emailReplyTo ) && is_array( $emailReplyTo ) ) {
+				$addrReplyTo = isset( $emailReplyTo[0] ) ? $emailReplyTo[0] : false;
+				if ( ! empty( $addrReplyTo ) && filter_var( $addrReplyTo, FILTER_VALIDATE_EMAIL ) ) {
+					$this->body['message']['headers']['reply-to'] = trim($addrReplyTo);
+				}
 			}
 		}
 		// Set body - message - header - end

@@ -181,6 +181,40 @@ class SMTPcomController {
 				$this->body = array_merge( $this->body, array( 'originator' => array( 'reply_to' => $dataReplyTo ) ) );
 			}
 		}
+
+		// Set attachments.
+		// $attachments = $phpmailer->getAttachments();
+		// if ( ! empty( $attachments ) ) {
+		// 	$dataAttachs = [];
+		// 	foreach ( $attachments as $attach ) {
+		// 		$attachFile = false;
+		// 		try {
+		// 			if ( is_file( $attach[0] ) && is_readable( $attach[0] ) ) {
+		// 				$attachFile = file_get_contents( $attach[0] );
+		// 			}
+		// 		} catch ( \Exception $except ) {
+		// 			$attachFile = false;
+		// 		}
+
+		// 		if ( false === $attachFile ) {
+		// 			continue;
+		// 		}
+
+		// 		$filetype = str_replace( ';', '', trim( $attach[4] ) );
+		// 		$dataAttachs[] = [
+		// 			'content'     => base64_encode( $attachFile ), 
+		// 			'type'        => $filetype,
+		// 			'encoding'    => 'base64',
+		// 			'filename'    => $attach[2],
+		// 			'disposition' => in_array( $attach[6], [ 'inline', 'attachment' ], true ) ? $attach[6] : 'attachment', 
+		// 			'cid'         => empty( $attachment[7] ) ? '' : trim( (string) $attachment[7] ),
+		// 		];
+		// 	}
+
+		// 	if ( ! empty( $dataAttachs ) ) {
+		// 		$this->body  = array_merge( $this->body, array( 'body' => array( 'attachments' => $dataAttachs ) ) );
+		// 	}
+		// }
 	}
 
 	public function send() {

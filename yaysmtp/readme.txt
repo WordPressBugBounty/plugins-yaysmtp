@@ -4,7 +4,7 @@ Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
 Tested up to: 6.5.2
-Stable tag: 2.5.9
+Stable tag: 2.6.0
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -114,6 +114,10 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Oct 3, 2024 - Version 2.6.0 =
+- Added: Data Centers option for Zoho
+- Fixed: Issue with Reply To of Mandrill
 
 = Apr 23, 2024 - Version 2.5.9 =
 - Added: Note for Gmail

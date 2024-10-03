@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ZohoServiceVendController {
 	public $currentMailer = 'zoho';
+	private $auth_info = [];
 
 	public function updAuthCode( $code ) {
 		Utils::setYaySmtpSetting( 'auth_code', $code, $this->currentMailer );
@@ -26,6 +27,15 @@ class ZohoServiceVendController {
 			$this->auth_info = $this->get_auth_info();
 		}
 
+	}
+
+	public static function getDataCenter() {
+		$rst = 'zoho.com';
+		$data_center = self::getSetting('data_center');
+		if ( $data_center ) {
+			$rst = $data_center;
+		}
+		return $rst;
 	}
 
 	public static function getPluginAuthUrl() {
@@ -45,7 +55,7 @@ class ZohoServiceVendController {
 
 		$cl_id = self::getSetting( 'client_id' );
 
-		$apiLink = 'https://accounts.zoho.com/oauth/v2/auth';
+		$apiLink = 'https://accounts.' . self::getDataCenter() . '/oauth/v2/auth';
 
 		$scope = 'ZohoMail.accounts.READ,ZohoMail.messages.ALL';
 
@@ -66,7 +76,7 @@ class ZohoServiceVendController {
 
 		$redirect_uri = YAY_SMTP_SITE_URL . '/wp-admin/admin.php?page=yaysmtp';
 
-		$apiLink = 'https://accounts.zoho.com/oauth/v2/token';
+		$apiLink = 'https://accounts.' . self::getDataCenter() . '/oauth/v2/token';
 
 		$query = array(
 			'code'          => $this->getSetting( 'auth_code' ),
@@ -170,7 +180,7 @@ class ZohoServiceVendController {
 		} else {
 			if ( self::isExpired() ) {
 				if ( self::getSetting( 'refresh_token' ) ) {
-					$regenerate_url   = 'https://accounts.zoho.com/oauth/v2/token?';
+					$regenerate_url   = 'https://accounts.' . self::getDataCenter() . '/oauth/v2/token?';
 					$regenerate_url  .= 'refresh_token=' . self::getSetting( 'refresh_token' );
 					$regenerate_url  .= '&client_id=' . self::getSetting( 'client_id' );
 					$regenerate_url  .= '&client_secret=' . self::getSetting( 'client_secret' );

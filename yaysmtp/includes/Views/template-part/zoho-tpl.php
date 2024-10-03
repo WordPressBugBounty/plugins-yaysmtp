@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$dataCenter    = 'zoho.com';
 $clientId     = '';
 $clientSecret = '';
 $settings     = $params['params'];
@@ -14,10 +15,25 @@ $errorV       = '';
 $checkAccess  = false;
 $mailer       = 'zoho';
 
+$dataCenterArr = [
+	'zoho.com'     => 'United States (zoho.com)',
+	'zoho.eu'      => 'Europe (zoho.eu)',
+	'zoho.com.au'  => 'Australia (zoho.com.au)',
+	'zoho.jp'      => 'Japan (zoho.jp)',
+	'zoho.in'      => 'India (zoho.in)',
+	'zoho.com.cn'  => 'China (zoho.com.cn)',
+	'zoho.uk'      => 'United Kingdom (zoho.uk)',
+	'zohocloud.ca' => 'Canada (zohocloud.ca)',
+	'zoho.sa'      => 'Saudi Arabia (zoho.sa)'
+];
+
 $auth = new ZohoServiceVendController();
 
 if ( ! empty( $params ) ) {
 	if ( ! empty( $settings[ $mailer ] ) ) {
+		if ( isset( $settings[ $mailer ]['data_center'] ) ) {
+			$dataCenter = $settings[ $mailer ]['data_center'];
+		}
 		if ( isset( $settings[ $mailer ]['client_id'] ) ) {
 			$clientId = $settings[ $mailer ]['client_id'];
 		}
@@ -63,6 +79,27 @@ if ( ! empty( $params ) ) {
 	</div>
   </div>
   <div class="yay-smtp-card-body">
+  <div class="setting-el">
+	  <div class="setting-label">
+		<label>Data Center</label>
+	  </div>
+	  <div class="setting-field">
+		<select data-setting="data_center" class="yay-settings">
+		  <?php
+			foreach ( $dataCenterArr as $val => $text ) {
+				$selected = '';
+				if ( $val === $dataCenter ) {
+					$selected = 'selected';
+				}
+				echo '<option value="' . esc_attr( $val ) . '" ' . esc_attr( $selected ) . '>' . esc_attr( $text ) . '</option>';
+			}
+			?>
+		</select>
+		<p class="setting-description">
+			Where is your account hosted?
+		</p>
+	  </div>
+	</div>
 	<div class="setting-el">
 	  <div class="setting-label">
 		<label>Client ID</label>

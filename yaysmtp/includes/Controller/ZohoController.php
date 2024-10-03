@@ -10,14 +10,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class ZohoController {
-	public $apiLink = 'https://mail.zoho.com/api/accounts/6575615000000008002/messages';
+	public $apiLink = '';
 	public $smtpObj;
 	public $body = array();
+	private $headers = [];
+	private $data_center = 'zoho.com';
 
 	public function __construct( $smtpObj ) {
 		Utils::setFrom($smtpObj);
-
-		$this->smtpObj = $smtpObj;
+		$this->smtpObj     = $smtpObj;
+		$this->data_center = ZohoServiceVendController::getDataCenter(); 
+		$this->apiLink     = 'https://mail.' . $this->data_center . '/api/accounts/6575615000000008002/messages';
 	}
 
 	/**
@@ -27,7 +30,7 @@ class ZohoController {
 		$yst = Utils::getYaySmtpSetting();
 
 		$response = wp_remote_get(
-			'http://mail.zoho.com/api/accounts',
+			'https://mail.' . $this->data_center . '/api/accounts',
 			array(
 				'headers' => array(
 					'Authorization' => 'Zoho-oauthtoken ' . $yst['zoho']['access_token'],
@@ -55,9 +58,9 @@ class ZohoController {
 	public function setUrl( $account_id ) {
 
 		if ( '' !== $account_id && isset( $account_id ) ) {
-			$this->apiLink = 'https://mail.zoho.com/api/accounts/' . $account_id . '/messages';
+			$this->apiLink = 'https://mail.' . $this->data_center . '/api/accounts/' . $account_id . '/messages';
 		} else {
-			$this->apiLink = 'https://mail.zoho.com/api/accounts//messages';
+			$this->apiLink = 'https://mail.' . $this->data_center . '/api/accounts//messages';
 		}
 	}
 
@@ -78,7 +81,7 @@ class ZohoController {
 		if ( ZohoServiceVendController::isDiffInfo() ) {
 			ZohoServiceVendController::doResetToken();
 		} elseif ( ZohoServiceVendController::isExpired() ) {
-			$regenerate_url   = 'https://accounts.zoho.com/oauth/v2/token?';
+			$regenerate_url   = 'https://accounts.' . $this->data_center . '/oauth/v2/token?';
 			$regenerate_url  .= 'refresh_token=' . ZohoServiceVendController::getSetting( 'refresh_token' );
 			$regenerate_url  .= '&client_id=' . ZohoServiceVendController::getSetting( 'client_id' );
 			$regenerate_url  .= '&client_secret=' . ZohoServiceVendController::getSetting( 'client_secret' );

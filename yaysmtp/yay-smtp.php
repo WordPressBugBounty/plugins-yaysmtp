@@ -3,7 +3,7 @@
  * Plugin Name: YaySMTP 
  * Plugin URI: https://yaycommerce.com/yaysmtp
  * Description: This plugin helps you send emails from your WordPress website via your preferred SMTP server.
- * Version: 2.5.9
+ * Version: 2.6.0
  * Author: YayCommerce
  * Author URI: https://yaycommerce.com
  * Text Domain: yaysmtp
@@ -26,7 +26,7 @@ if ( ! defined( 'YAY_SMTP_PREFIX' ) ) {
 	define( 'YAY_SMTP_PREFIX', 'yay-smtp' );
 }
 if ( ! defined( 'YAY_SMTP_VERSION' ) ) {
-	define( 'YAY_SMTP_VERSION', '2.5.9' );
+	define( 'YAY_SMTP_VERSION', '2.6.0' );
 }
 
 if ( ! defined( 'YAY_SMTP_DOMAIN' ) ) {
