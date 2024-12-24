@@ -199,6 +199,12 @@ class ZohoController {
 		} elseif ( 500 == $response['response']['code'] ) {
 			LogErrors::clearErr();
 			LogErrors::setErr( 'Please use your Zoho mail to send email. We do not support this type of mail address' );
+
+			$extra_info               = Utils::getExtraInfo( $logId );
+			$extra_info['error_mess'] = 'Please use your Zoho mail to send email. We do not support this type of mail address';		
+			$updateData['extra_info'] = wp_json_encode($extra_info);
+			$updateData['id']         = $logId;
+			Utils::updateEmailLog( $updateData );
 		} else {
 			LogErrors::clearErr();
 			LogErrors::setErr( $error );
@@ -207,6 +213,13 @@ class ZohoController {
 				$updateData['id']           = $logId;
 				$updateData['date_time']    = current_time( 'mysql', true );
 				$updateData['reason_error'] = $error;
+
+				if ( ! empty( $error ) ) {
+					$extra_info               = Utils::getExtraInfo( $logId );
+					$extra_info['error_mess'] = $error;		
+					$updateData['extra_info'] = wp_json_encode($extra_info);
+				}
+
 				Utils::updateEmailLog( $updateData );
 			}
 		}

@@ -88,6 +88,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 		  </td>
 		</tr>
 	  </table>
+
+	  <div class="yaysmtp-error-detail-wrap" style="display: none;">
+		<div class="error-detail-content-title">Error Details</div>
+		<div class="error-detail-content">
+			<div class="error-detail-source">
+				<div class="error-detail-source-label">Debug source</div>
+				<div class="error-detail-source-content"></div>
+			</div>
+			<div class="error-detail-message">
+				<div class="error-detail-message-label">Error</div>
+				<div class="error-detail-message-content"></div>
+			</div>
+		</div>
+	  </div>
+
 	  <div class="mail-body-el" style="padding: 10px 15px; vertical-align: baseline;">
 		<div class="content-el">
 		  <span class="title">Email Body</span>

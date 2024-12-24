@@ -1842,6 +1842,43 @@
 .yaysmtp-export-log-search-key {
   width: 100%;
 }
+.yay-amazon-ses-des, 
+.yay-postmark-des,
+.yay-sparkpost-des,
+.yay-outlookms-des,
+.yay-gmail-des {
+  font-weight: bold;
+}
+.yaysmtp-error-detail-wrap {
+  padding: 10px 15px;
+  vertical-align: baseline;
+  border: 1px solid indianred;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.yaysmtp-error-detail-wrap .error-detail-content-title{
+  font-weight: 700;
+  font-size: 15px;
+}
+.yaysmtp-error-detail-wrap .error-detail-content {
+  margin-top: 20px;
+}
+.yaysmtp-error-detail-wrap .error-detail-source {
+  margin-bottom: 10px;
+}
+.yaysmtp-error-detail-wrap .error-detail-source-label,
+.yaysmtp-error-detail-wrap .error-detail-message-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.yaysmtp-error-detail-wrap .yaysmtp-source-root-name {
+  font-weight: 600;
+}
+.yaysmtp-error-detail-wrap .error-detail-message-content {
+  color: indianred;
+  font-weight: 600;
+}
 @media only screen and (max-width: 1280px) {
   .yay-smtp-wrap.mail-logs {
     padding: 15px 30px 15px 15px;

@@ -78,6 +78,16 @@ class AmazonSESController {
 				LogErrors::setErr( $errMess );
 			}
 
+			if ( ! empty( $logId ) ) {
+				$updateData['id'] = $logId;
+				if ( ! empty( $errMess ) ) {
+					$extra_info               = Utils::getExtraInfo( $logId );
+					$extra_info['error_mess'] = $errMess;		
+					$updateData['extra_info'] = wp_json_encode($extra_info);
+				}
+				Utils::updateEmailLog( $updateData );
+			}
+
 			return;
 		}
 	}

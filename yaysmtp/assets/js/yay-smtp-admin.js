@@ -708,6 +708,24 @@ var yaysmtp_mail_logs_endTime_picker = moment();
                     .html("");
                 }
 
+                if ( 0 === parseInt(data.status) && '' !== data.extra_info ) { 
+                  $('.yaysmtp-error-detail-wrap').show();
+                  const extraInfo = data.extra_info;
+                  if (typeof extraInfo.source !== "undefined") { 
+                    const sourceTrace = '<span class="yaysmtp-source-root-name">' + extraInfo.source.root_name + '</span>: ' + extraInfo.source.root_path;
+                    $(".yay-smtp-wrap.mail-logs")
+                    .find(".yay-smtp-mail-detail-drawer .error-detail-source-content")
+                    .html(sourceTrace);
+                  }
+                  if (typeof extraInfo.error_mess !== "undefined") { 
+                    $(".yay-smtp-wrap.mail-logs")
+                    .find(".yay-smtp-mail-detail-drawer .error-detail-message-content")
+                    .html(extraInfo.error_mess);
+                  }
+                } else {
+                  $('.yaysmtp-error-detail-wrap').hide();
+                }
+
                 if ( yaySmtpWpData.yaysmtpLogSettings.email_opened && 
                   'yes' === yaySmtpWpData.yaysmtpLogSettings.email_opened ) {
                     $(".yay-smtp-wrap.mail-logs")

@@ -248,8 +248,24 @@ class SendgridController {
 			if ( ! in_array( $code, $codeSucArrs ) && ! empty( $response['response'] ) ) {
 				$error   = $response['response'];
 				$message = '';
+				$message_extra = '';
 				if ( ! empty( $error ) ) {
-					$message = '[' . $error['code'] . ']: ' . $error['message'];
+					$message = '[' . sanitize_key( $error['code'] ) . ']: ' . $error['message'];
+
+					if ( ! empty( $response['body'] ) ) { // string or json string
+						$body_error = json_decode( $response['body'], true );
+						if ( $body_error && ! empty( $body_error['errors'] ) ) { 
+							if ( is_array( $body_error['errors'] ) ) {
+								$error_arr = $body_error['errors'][0];
+								if ( $error_arr && ! empty( $error_arr['message'] ) ) { 
+									$message_extra = '[' . sanitize_key( $error['code'] ) . ']: ' . $error_arr['message'];
+								}
+							} else if ( is_string( $body_error['errors'] ) ) {
+								$message_extra = '[' . sanitize_key( $error['code'] ) . ']: ' . $body_error['errors'];
+							}
+							
+						} 
+					}
 				}
 
 				if ( $this->use_fallback_smtp ) {
@@ -265,6 +281,13 @@ class SendgridController {
 					$updateData['id']           = $this->log_id;
 					$updateData['date_time']    = current_time( 'mysql', true );
 					$updateData['reason_error'] = $message;
+
+					if ( ! empty( $message_extra ) ) {
+						$extra_info               = Utils::getExtraInfo( $this->log_id );
+						$extra_info['error_mess'] = $message_extra;		
+						$updateData['extra_info'] = wp_json_encode($extra_info);
+					}
+
 					Utils::updateEmailLog( $updateData );
 				}
 			} else {

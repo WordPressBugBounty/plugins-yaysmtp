@@ -234,9 +234,19 @@ class MailjetController {
 			$errorBody     = $resp['body'];
 			$errorResponse = $resp['response'];
 			$message       = '';
+			$message_extra = '';
 
-			if ( ! empty( $errorBody ) ) {
-				$message = '[' . sanitize_key( $errorResponse['code'] ) . ']: ' . $errorBody;
+			if ( ! empty( $errorResponse ) && ! empty( $errorResponse['code'] ) ) {
+				$message = '[' . sanitize_key( $errorResponse['code'] ) . ']: ' . $errorResponse['message'];
+
+				if ( ! empty( $errorBody ) ) { // string or json string
+					$body_error = json_decode( $errorBody, true );
+					if ( $body_error && ! empty( $body_error['ErrorMessage'] ) ) { 
+						$message_extra = '[' . sanitize_key( $errorResponse['code'] ) . ']: ' . $body_error['ErrorMessage'];
+					} else {						
+						$message_extra = '[' . sanitize_key( $errorResponse['code'] ) . ']: ' . $errorBody;		
+					}
+				}
 			}
 			
 			if ( $this->use_fallback_smtp ) {
@@ -252,6 +262,13 @@ class MailjetController {
 				$updateData['id']           = $this->log_id;
 				$updateData['date_time']    = current_time( 'mysql', true );
 				$updateData['reason_error'] = $message;
+
+				if ( ! empty( $message_extra ) ) {
+					$extra_info               = Utils::getExtraInfo( $this->log_id );
+					$extra_info['error_mess'] = $message_extra;		
+					$updateData['extra_info'] = wp_json_encode($extra_info);
+				}
+
 				Utils::updateEmailLog( $updateData );
 			}
 

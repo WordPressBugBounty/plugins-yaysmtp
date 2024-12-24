@@ -207,6 +207,13 @@ class MandrillController {
 				$updateData['id']           = $this->log_id;
 				$updateData['date_time']    = current_time( 'mysql', true );
 				$updateData['reason_error'] = $message;
+
+				if ( ! empty( $message ) ) {
+					$extra_info               = Utils::getExtraInfo( $this->log_id );
+					$extra_info['error_mess'] = $message;		
+					$updateData['extra_info'] = wp_json_encode($extra_info);
+				}
+
 				Utils::updateEmailLog( $updateData );
 			}
 		} else {
@@ -232,6 +239,13 @@ class MandrillController {
 					$updateData['id']           = $this->log_id;
 					$updateData['date_time']    = current_time( 'mysql', true );
 					$updateData['reason_error'] = $message;
+
+					if ( ! empty( $message ) ) {
+						$extra_info               = Utils::getExtraInfo( $this->log_id );
+						$extra_info['error_mess'] = $message;		
+						$updateData['extra_info'] = wp_json_encode($extra_info);
+					}
+					
 					Utils::updateEmailLog( $updateData );
 				}
 			} else {

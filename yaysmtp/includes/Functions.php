@@ -724,6 +724,7 @@ class Functions {
 						'mail_source' 		  => ! empty( $resultQuery->root_name ) ? $resultQuery->root_name : __( 'Unknown', 'yay-smtp' ),
 						'email_opened' 		  => 'No',
 						'email_clicked_links' => 'No',
+						'extra_info'          => ! empty( $resultQuery->extra_info ) ? json_decode( $resultQuery->extra_info, true ) : '',
 					);
 
 					if ( ! empty( $resultQuery->content_type ) ) {

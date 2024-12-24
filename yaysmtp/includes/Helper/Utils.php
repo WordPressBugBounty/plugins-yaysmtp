@@ -493,6 +493,14 @@ class Utils {
 					} else {
 						$content['root_name'] = '[' . $root . '] - Development Mode';
 					}
+
+					$file_path_line = $filePath . ':' . $data['line'];
+					$content['extra_info'] = wp_json_encode([
+						'source' => [
+							'root_name' => $content['root_name'],
+							'root_path' => $file_path_line
+						]
+					]);
 					break;
 				}
 			}
@@ -515,6 +523,18 @@ class Utils {
 			unset( $data['id'] );
 			$wpdb->update( $tableName, $data, array( 'id' => $logId ) );
 		}
+	}
+
+	public static function getExtraInfo( $log_id = null ) {
+		$extra_info = [];
+		if ( ! empty( $log_id ) ) {
+			global $wpdb;
+			$result_query = $wpdb->get_row( $wpdb->prepare( "Select extra_info FROM {$wpdb->prefix}yaysmtp_email_logs WHERE id = %d", $log_id ) );
+			if ( ! empty( $result_query ) ) { 
+				$extra_info = json_decode( $result_query->extra_info, true );
+			}
+		}
+		return $extra_info;
 	}
 
 	public static function getRoot( $file ) {

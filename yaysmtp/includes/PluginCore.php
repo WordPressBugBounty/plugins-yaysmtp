@@ -22,7 +22,9 @@ class PluginCore {
 	private function doHooks() {
 		$this->getProcessor();
 		global $phpmailer;
-		$phpmailer = new PhpMailerExtends();//phpcs:ignore
+		if ( ! is_object( $phpmailer ) || is_a( $phpmailer, 'PHPMailer' ) ) {
+			$phpmailer = new PhpMailerExtends();//phpcs:ignore
+		} 
 		add_action( 'init', array( $this, 'actionForSmtpsHasAuth' ) );
 	}
 

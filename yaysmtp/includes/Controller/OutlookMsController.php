@@ -258,7 +258,7 @@ class OutlookMsController {
 			foreach ( $errors as $error ) {
 				LogErrors::setErr( $error );
 			}
-			return;
+			return false;
 		}
 
 		// var_dump($response);
@@ -266,7 +266,7 @@ class OutlookMsController {
 		if ( ! empty( $response['response'] ) && ! empty( $response['response']['code'] ) ) {
 			$code        = (int) $response['response']['code'];
 			$codeSucArrs = array( 200, 201, 202, 203, 204, 205, 206, 207, 208, 300, 301, 302, 303, 304, 305, 306, 307, 308 );
-			if ( ! in_array( $code, $codeSucArrs ) && ! empty( $response['response'] ) ) {
+			if ( ! in_array( $code, $codeSucArrs ) && ! empty( $response['body'] ) ) {
 				$errorBody = json_decode( $response['body'] );
 				$message   = '';
 				if ( ! empty( $errorBody ) ) {
@@ -280,6 +280,13 @@ class OutlookMsController {
 					$updateData['id']           = $this->log_id;
 					$updateData['date_time']    = current_time( 'mysql', true );
 					$updateData['reason_error'] = $message;
+
+					if ( ! empty( $message ) ) {
+						$extra_info               = Utils::getExtraInfo( $this->log_id );
+						$extra_info['error_mess'] = $message;		
+						$updateData['extra_info'] = wp_json_encode($extra_info);
+					}
+
 					Utils::updateEmailLog( $updateData );
 				}
 			} else {

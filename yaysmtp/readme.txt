@@ -1,28 +1,24 @@
-=== YaySMTP - WP SMTP Plugin with Full Email Log & 15+ SMTP Services ===
+=== YaySMTP - 15+ SMTP Services and Full Email Logs in One Plugin ===
 Contributors: YayCommerce
 Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
-Tested up to: 6.5.2
-Stable tag: 2.6.0
+Tested up to: 6.7
+Stable tag: 2.6.1
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
+Send WordPress emails successfully with WP Mail SMTP via your favorite mailer
 
 == Description ==
-**Send WordPress emails successfully with WP Mail SMTP via your favorite mailer**
 
-[DOCUMENTATION](https://yaycommerce.gitbook.io/yaysmtp/)  
+Easily send emails from your WordPress site using your preferred SMTP server. With YaySMTP, enjoy **unlimited email logging**, effortless migration from your previous SMTP plugin, and **tracking opened and clicked emails**. 
 
-[youtube https://youtu.be/J6crljFKwVA]
-
-🏆 [**Get YaySMTP Pro**](https://yaycommerce.com/yaysmtp-wordpress-mail-smtp/)
-
-YaySMTP - WP SMTP Plugin helps you send emails from your WordPress website via your chosen SMTP server. It comes with **unlimited email log**, migration from a previous SMTP plugin, and **tracking opened & clicked emails**.
+[Documentation](https://yaycommerce.gitbook.io/yaysmtp/) | [**Get YaySMTP Pro**](https://yaycommerce.com/yaysmtp-wordpress-mail-smtp/) 🏆
 
 ###⚡️ FEATURES
 
-YaySMTP is built with powerful options to connect via API of popular sending services, including Gmail SMTP, Sendinblue SMTP, Zoho SMTP, SendGrid SMTP, and so on.
+YaySMTP has powerful options to connect via API of popular sending services, including Gmail SMTP, Sendinblue SMTP, Zoho SMTP, SendGrid SMTP, and so on.
 
 3 steps to set up YaySMTP that lets you start sending emails in minutes:
 
@@ -30,9 +26,11 @@ YaySMTP is built with powerful options to connect via API of popular sending ser
 - Choose an email SMTP service provider as your mailer
 - Config settings with built-in fields
 
-Whether you're selling via your WooCommerce website or not, you should make sure your email notifications make it to your audience inboxes. Communication should not end up in spam folders or get lost on the way. 
+Whether you're selling via your WooCommerce website or not, you should ensure your email notifications make it to your audience inboxes. Communication should not end up in spam folders or get lost on the way. 
 
-Setting up your WordPress site to use a WP SMTP mailer helps you send through without paying for regular technical maintenance.
+Setting up your WordPress site to use a WP SMTP mailer helps you send through without paying for regular technical maintenance. 🙌
+
+[youtube https://youtu.be/J6crljFKwVA]
 
 ###🚀 MORE BENEFITS
 
@@ -114,6 +112,11 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Dec 24, 2024 - Version 2.6.1 =
+- Added: Error details for email logs
+- Improved: UI
+- Improved: Compatible with other SMTP services
 
 = Oct 3, 2024 - Version 2.6.0 =
 - Added: Data Centers option for Zoho
