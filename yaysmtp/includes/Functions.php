@@ -463,6 +463,7 @@ class Functions {
 				}
 
 				// Result ALL
+				$totalItems = 0;
 				if ( ! empty( $valSearch ) ) {
 					$subjectWhere = 'subject LIKE "%%' . $valSearch . '%%"';
 					$toEmailWhere = 'email_to LIKE "%%' . $valSearch . '%%"';
@@ -473,9 +474,9 @@ class Functions {
 						$whereQuery = '(' . $whereQuery . ') AND (' . $dateWhere . ')';
 					}
 
-					$sqlRepareAll = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
+					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
 					$sqlRepare    = $wpdb->prepare(
-						"SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery ORDER BY $sortField $sortVal LIMIT %d OFFSET %d",
+						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY $sortField $sortVal LIMIT %d OFFSET %d",
 						$limit,
 						$offset
 					);
@@ -485,16 +486,13 @@ class Functions {
 						$whereQuery = '(' . $statusWhere . ') AND (' . $dateWhere . ')';
 					}
 
-					$sqlRepareAll = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
+					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
 					$sqlRepare    = $wpdb->prepare(
-						"SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery ORDER BY $sortField $sortVal LIMIT %d OFFSET %d",
+						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY $sortField $sortVal LIMIT %d OFFSET %d",
 						$limit,
 						$offset
 					);
 				}
-
-				$resultQueryAll = $wpdb->get_results( $sqlRepareAll ); // phpcs:ignore
-				$totalItems     = ! empty( $resultQueryAll ) ? count( $resultQueryAll ) : 0;
 
 				// Result Custom
 				$results = $wpdb->get_results( $sqlRepare ); // phpcs:ignore

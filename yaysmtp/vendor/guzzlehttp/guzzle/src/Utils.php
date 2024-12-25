@@ -62,14 +62,13 @@ final class Utils {
    * @return resource
    */
   public static function debugResource($value = null) {
-    if (\is_resource($value)) {
+    if (is_resource($value)) {
       return $value;
-    }
-    if (\defined('STDOUT')) {
-      return \STDOUT;
+    } elseif (defined('STDOUT')) {
+        return STDOUT;
     }
 
-    return \Automattic\WooCommerce\GoogleListingsAndAds\Vendor\GuzzleHttp\Psr7\Utils::tryFopen('php://output', 'w');
+    return fopen('php://output', 'w');
   }
 
   /**
@@ -107,7 +106,13 @@ final class Utils {
    * Get the default User-Agent string to use with Guzzle.
    */
   public static function defaultUserAgent(): string {
-    return sprintf('GuzzleHttp/%d', ClientInterface::VERSION);
+    $guzzleVersion = null;
+    if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
+      $guzzleVersion = ClientInterface::MAJOR_VERSION;
+    } elseif (defined('\GuzzleHttp\ClientInterface::VERSION')) {
+      $guzzleVersion = (int)substr(ClientInterface::VERSION, 0, 1);
+    }
+    return sprintf('GuzzleHttp/%d', $guzzleVersion);
   }
 
   /**

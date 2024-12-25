@@ -99,14 +99,56 @@ class ZohoController {
 		$this->headers['accept']        = 'application/json';
 		$this->body                     = array_merge( $this->body, array( 'subject' => $this->smtpObj->Subject ) );
 		$this->body                     = array_merge( $this->body, array( 'fromAddress' => '"' . $this->smtpObj->FromName . '" <' . $this->smtpObj->From . '>' ) );
-		$this->body                     = array_merge( $this->body, array( 'ccAddress' => isset( $this->smtpObj->cc ) ? $this->smtpObj->cc : '' ) );
-		$this->body                     = array_merge( $this->body, array( 'bccAddress' => isset( $this->smtpObj->bcc ) ? $this->smtpObj->bcc : '' ) );
 		$this->body                     = array_merge( $this->body, array( 'content' => $this->smtpObj->Body ) );
 
 		update_option( 'Shrief', $this->smtpObj->getToAddresses() );
-
 		$optionShrief = get_option( 'Shrief' );
-		$this->body   = array_merge( $this->body, array( 'toAddress' => $optionShrief[0][0] ) );
+		if ( ! empty( $optionShrief ) && is_array( $optionShrief ) ) {
+			$dataTo = [];
+			foreach ( $optionShrief as $toEmail ) {
+				if ( empty( $toEmail[1] ) ) {
+					$dataTo[] = $toEmail[0];
+				} else {
+					$dataTo[] = sprintf( '%s <%s>', $toEmail[1], $toEmail[0] );
+				}
+			}
+
+			if ( ! empty( $dataTo ) ) {
+				$this->body   = array_merge( $this->body, array( 'toAddress' => implode( ",", $dataTo ) ) );
+			}
+		}
+
+		$ccAddresses = $this->smtpObj->getCcAddresses();
+		if ( ! empty( $ccAddresses ) && is_array( $ccAddresses ) ) {
+			$dataCc = [];
+			foreach ( $ccAddresses as $ccEmail ) {
+				if ( empty( $ccEmail[1] ) ) {
+					$dataCc[] = $ccEmail[0];
+				} else {
+					$dataCc[] = sprintf( '%s <%s>', $ccEmail[1], $ccEmail[0] );
+				}
+			}
+
+			if ( ! empty( $dataCc ) ) {
+				$this->body   = array_merge( $this->body, array( 'ccAddress' => implode( ",", $dataCc ) ) );
+			}
+		}
+
+		$bccAddresses = $this->smtpObj->getBccAddresses();
+		if ( ! empty( $bccAddresses ) && is_array( $bccAddresses ) ) {
+			$dataBcc = [];
+			foreach ( $bccAddresses as $bccEmail ) {
+				if ( empty( $bccEmail[1] ) ) {
+					$dataBcc[] = $bccEmail[0];
+				} else {
+					$dataBcc[] = sprintf( '%s <%s>', $bccEmail[1], $bccEmail[0] );
+				}
+			}
+			
+			if ( ! empty( $dataBcc ) ) {
+				$this->body   = array_merge( $this->body, array( 'bccAddress' => implode( ",", $dataBcc ) ) );
+			}
+		}
 
 		// Set attachments.
 		$attachments = $this->smtpObj->getAttachments();
