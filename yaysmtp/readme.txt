@@ -1,10 +1,10 @@
-=== YaySMTP - 15+ SMTP Services and Full Email Logs in One Plugin ===
+=== YaySMTP and Email Logs: Amazon SES, SendGrid, Outlook, Mailgun, Brevo, Google and Any SMTP Service ===
 Contributors: YayCommerce
 Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
-Tested up to: 6.7.1
-Stable tag: 2.6.2
+Tested up to: 6.7
+Stable tag: 2.6.3
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -69,8 +69,10 @@ YaySMTP - WP SMTP Plugin allows you to freely integrate the following email SMTP
 12. SendPulse
 13. Microsoft Outlook, Office 365, Microsoft Exchange Online
 14. Mandrill SMTP by Mailchimp
-15. Your hosting's email server
-16. And more! [Contact us](https://yaycommerce.com/contact/) to suggest your favorite mailer
+15. Yournotify
+16. IONOS
+17. Your hosting's email server
+18. And more! [Contact us](https://yaycommerce.com/contact/) to suggest your favorite mailer
 
 ###🎯 Why use YaySMTP?
 Customers who buy products from your website expect regular updates and follow-ups. That's why timely communication is crucial to your business.
@@ -81,8 +83,8 @@ Sending follow-up WordPress emails on time can bring customers back while buildi
 If you're having issues, do let us know, and we'll be [happy to help](https://yaycommerce.com/support/).
 
 ###♥️ Like this YaySMTP Plugin?
-- Rate us 5 stars on [WordPress.org](https://wordpress.org/support/plugin/yaysmtp/reviews/#new-post).
-- Check out our best-selling WordPress plugins: 
+👉 Rate us 5 stars on [WordPress.org](https://wordpress.org/support/plugin/yaysmtp/reviews/#new-post).
+✅ Check out our best-selling WordPress plugins: 
 - [YayMail - WooCommerce Email Customizer](https://yaycommerce.com/yaymail-woocommerce-email-customizer/)
 - [Email Customizer Addons](https://yaycommerce.com/yaymail-addons/)
 - [YayCurrency - WooCommerce Multi-Currency Switcher](https://yaycommerce.com/yaycurrency-woocommerce-multi-currency-switcher/)
@@ -113,9 +115,14 @@ You'll have our priority support for whatever issue you have with sending and re
 
 == Changelog ==
 
+= Feb 10, 2025 - Version 2.6.3 =
+- Improved: UI for WooCommerce email preview
+- Fixed: XSS (SMTP Sendinblue/Brevo, SMTP SendGrid, SMTP Amazon SES)
+- Fixed: XSS in body content mails of logs
+
 = Dec 25, 2024 - Version 2.6.2 =
+- Improved: Code for Guzzle HTTP library
 - Fixed: Load large log data
-- Fixed: Improve code for guzzlehttp library
 
 = Dec 24, 2024 - Version 2.6.1 =
 - Added: Error details for email logs

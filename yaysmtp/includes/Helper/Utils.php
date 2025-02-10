@@ -479,7 +479,7 @@ class Utils {
 
 			if ( 'basic_inf' !== $infTypeSetting ) {
 				$content['content_type'] = $data['content_type'];
-				$content['body_content'] = maybe_serialize( $data['body_content'] );
+				$content['body_content'] = self::wpKses( maybe_serialize( $data['body_content'] ));
 			}
 
 			// Get email source ( what plugin, theme, or wp core ? )
@@ -1369,4 +1369,29 @@ class Utils {
 		
 		return $only_first_email ? $matches[0][0] : $matches[0];
 	}
+
+	public static function wpKsesAllowedHtml( $cus_attr_tags = [] ) {
+        $allowed_html_tags           = wp_kses_allowed_html( 'post' );
+        $allowed_html_tags['style']  = true;
+        $allowed_html_tags['html']   = [];
+        $allowed_html_tags['header'] = [];
+        $allowed_html_tags['meta']   = [];
+        $allowed_html_attr           = $cus_attr_tags;
+
+        $allowed_html_attr ['charset']                   = true;
+        $allowed_html_attr ['http-equiv']                = true;
+        $allowed_html_attr ['content']                   = true;
+        $allowed_html_attr ['name']                      = true;
+        return array_map(
+            function ( $item ) use ( $allowed_html_attr ) {
+                return is_array( $item ) ? array_merge( $item, $allowed_html_attr ) : $item;
+            },
+            $allowed_html_tags
+        );
+    }
+
+	public static function wpKses( $html ) {
+        $allowed_html = self::wpKsesAllowedHtml();
+        return wp_kses( $html, $allowed_html );
+    }
 }

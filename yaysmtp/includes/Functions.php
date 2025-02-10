@@ -727,7 +727,7 @@ class Functions {
 
 					if ( ! empty( $resultQuery->content_type ) ) {
 						$resultArr['content_type'] = $resultQuery->content_type;
-						$resultArr['body_content'] = maybe_serialize( $resultQuery->body_content );
+						$resultArr['body_content'] = Utils::wpKses( maybe_serialize( $resultQuery->body_content ) );
 					}
 
 					if ( ! empty( $resultQuery->reason_error ) ) {

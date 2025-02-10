@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<ruleset name="PHP_CodeSniffer">
+    <description>PHP CodeSniffer Configuration</description>
+
+    <!-- Rules: Check PHP version compatibility -->
+	<!-- https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
+	<config name="testVersion" value="5.4-"/>
+	<!-- https://github.com/PHPCompatibility/PHPCompatibilityWP -->
+	<rule ref="PHPCompatibilityWP"/>
+
+    <!-- Rules: WordPress Coding Standards -->
+	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards -->
+	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
+	<config name="minimum_supported_wp_version" value="4.0"/>
+
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/vendor_amazon/*</exclude-pattern>
+    
+	<exclude-pattern>/apps/*</exclude-pattern>
+	<exclude-pattern>/assets/*</exclude-pattern>
+	<!-- Exclude the Node Modules directory. -->
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	​
+	<!-- Exclude minified Javascript files. -->
+	<exclude-pattern>*.min.js</exclude-pattern>
+
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter" />
+	<rule ref="Generic.Commenting.Todo" />
+​
+	<rule ref="WordPress">
+		<exclude name="WordPress.NamingConventions" />
+		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
+		<exclude name="Generic.Files.LineEndings.InvalidEOLChar" />
+		<exclude name="Squiz.Commenting" />
+		<exclude name="WordPress.Files.FileName" />
+		<exclude name="Squiz.PHP.CommentedOutCode" />
+		<exclude name="WordPress.PHP.StrictComparisons" />
+		<exclude name="WordPress.PHP.StrictInArray" />
+		<exclude name="WordPress.PHP.DevelopmentFunctions" />
+		<exclude name="WordPress.Security.ValidatedSanitizedInput.MissingUnslash" />
+		<exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found" />
+		<exclude name="WordPress.WP.AlternativeFunctions" />
+		<exclude name="WordPress.WP.I18n.TextDomainMismatch" />
+		<exclude name="WordPress.PHP.NoSilencedErrors" />
+		<exclude name="Generic.CodeAnalysis" />
+		<exclude name="PSR2.Methods" />
+		<exclude name="WordPress.Security.NonceVerification.Recommended" />
+		<exclude name="WordPress.DateTime.CurrentTimeTimestamp.Requested" />
+		
+		<exclude name="WordPress.WP.I18n.NonSingularStringLiteralText" />
+		<exclude name="WordPress.CodeAnalysis.AssignmentInCondition.Found" />
+	</rule>
+    <!-- <rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="bookster"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="bookster"/>
+			</property>
+		</properties>
+	</rule> -->
+</ruleset>
