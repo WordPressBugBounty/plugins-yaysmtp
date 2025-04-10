@@ -1391,7 +1391,27 @@ class Utils {
     }
 
 	public static function wpKses( $html ) {
+        // First, decode HTML entities to ensure we catch encoded XSS attempts
+        $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
+        // Remove any script tags and their content
+        $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
+        
+        // Remove any on* attributes that could execute JavaScript
+        $html = preg_replace('/\son\w+="[^"]*"/i', '', $html);
+        $html = preg_replace('/\son\w+=\'[^\']*\'/i', '', $html);
+        
         $allowed_html = self::wpKsesAllowedHtml();
-        return wp_kses( $html, $allowed_html );
+        $html = wp_kses($html, $allowed_html);
+       
+        return $html;
     }
+
+	public static function getHtmlContentTypes() {
+		return [
+			'text/html',
+			'multipart/alternative',
+			'multipart/mixed',
+		];	
+	}
 }

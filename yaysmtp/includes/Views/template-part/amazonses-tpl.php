@@ -29,6 +29,10 @@ $regionArr       = array(
 	'ap-northeast-3' => __( 'Asia Pacific (Osaka)', 'yay-smtp' ),
 	'sa-east-1'      => __( 'South America (São Paulo)', 'yay-smtp' ),
 	'me-south-1'     => __( 'Middle East (Bahrain)', 'yay-smtp' ),
+	'ap-southeast-3' => __( 'Asia Pacific (Jakarta)', 'yay-smtp' ),
+	'il-central-1'   => __( 'Israel (Tel Aviv)', 'yay-smtp' ),
+	'us-gov-east-1'  => __( 'AWS GovCloud (US-East)', 'yay-smtp' ),
+	'us-gov-west-1'  => __( 'AWS GovCloud (US-West)', 'yay-smtp' ),
 );
 
 if ( ! empty( $settings ) ) {

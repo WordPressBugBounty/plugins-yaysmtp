@@ -15,6 +15,7 @@ use YaySMTP\Aws3\Psr\Http\Message\RequestInterface;
  *
  * @property resource $_mh Internal use only. Lazy loaded multi-handle.
  */
+#[\AllowDynamicProperties]
 class CurlMultiHandler {
   /** @var CurlFactoryInterface */
   private $factory;

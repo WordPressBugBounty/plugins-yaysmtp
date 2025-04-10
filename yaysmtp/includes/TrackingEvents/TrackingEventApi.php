@@ -69,7 +69,8 @@ class TrackingEventApi extends \WP_REST_Controller {
 	}
 
 	public function inject_tracking_into_mail_content( $phpmailer, $log_id ) {
-		if ( 'text/html' === $phpmailer->ContentType && ! empty( $log_id ) ) { 
+		$htmlContentTypes = Utils::getHtmlContentTypes();
+		if ( in_array( $phpmailer->ContentType, $htmlContentTypes, true ) && ! empty( $log_id ) ) { 
 			$content = $phpmailer->Body;
 
 			if ( $this->email_opened->is_enable() ) {

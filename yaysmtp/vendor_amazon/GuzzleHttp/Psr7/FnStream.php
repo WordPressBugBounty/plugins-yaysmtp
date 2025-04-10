@@ -9,6 +9,7 @@ use YaySMTP\Aws3\Psr\Http\Message\StreamInterface;
  * Allows for easy testing and extension of a provided stream without needing
  * to create a concrete class for a simple extension point.
  */
+#[\AllowDynamicProperties]
 class FnStream implements \YaySMTP\Aws3\Psr\Http\Message\StreamInterface
 {
     /** @var array */

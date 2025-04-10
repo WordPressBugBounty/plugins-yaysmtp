@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\TransferStats;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Promise\Create;
 
 /**
  * Handler that returns responses or throw exceptions from a queue.
@@ -91,8 +92,8 @@ class MockHandler implements \Countable
         }
 
         $response = $response instanceof \Exception
-            ? \GuzzleHttp\Promise\rejection_for($response)
-            : \GuzzleHttp\Promise\promise_for($response);
+            ? Create::rejectionFor($response)
+            : Create::promiseFor($response);
 
         return $response->then(
             function ($value) use ($request, $options) {
@@ -120,7 +121,7 @@ class MockHandler implements \Countable
                 if ($this->onRejected) {
                     call_user_func($this->onRejected, $reason);
                 }
-                return \GuzzleHttp\Promise\rejection_for($reason);
+                return Create::rejectionFor($reason);
             }
         );
     }
