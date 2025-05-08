@@ -22,28 +22,12 @@ class Utils {
 		return sanitize_text_field( $val );
 	}
 
-	public static function saniValArray( $array ) {
-		$newArray = array();
-		foreach ( $array as $key => $val ) { // level 1
-			if ( is_array( $val ) ) {
-				foreach ( $val as $key_1 => $val_1 ) { // level 2
-					if ( is_array( $val_1 ) ) {
-						foreach ( $val_1 as $key_2 => $val_2 ) { // level 3
-							$newArray[ $key ][ $key_1 ][ $key_2 ] = ( isset( $array[ $key ][ $key_1 ][ $key_2 ] ) ) ? sanitize_text_field( $val_2 ) : '';
-						}
-					} else {
-						if ('pass' === $key_1) {
-							$newArray[ $key ][ $key_1 ] = ( isset( $array[ $key ][ $key_1 ] ) ) ? $val_1 : '';
-						} else {
-							$newArray[ $key ][ $key_1 ] = ( isset( $array[ $key ][ $key_1 ] ) ) ? sanitize_text_field( $val_1 ) : '';
-						}
-					}
-				}
-			} else {
-				$newArray[ $key ] = ( isset( $array[ $key ] ) ) ? sanitize_text_field( $val ) : '';
-			}
+	public static function saniValArray( $value ) {
+		if ( is_array( $value ) ) {
+			return array_map( 'self::saniValArray', $value );
+		} else {
+			return sanitize_text_field( wp_unslash($value) );
 		}
-		return $newArray;
 	}
 
 	public static function isJson( $string ) {
@@ -51,7 +35,7 @@ class Utils {
 	}
 
 	public static function checkNonce() {
-		$nonce = sanitize_text_field( $_POST['nonce'] ); //phpcs:ignore
+		$nonce = sanitize_text_field( wp_unslash( isset( $_POST['nonce'] ) ? $_POST['nonce'] : '' ) );
 		if ( ! wp_verify_nonce( $nonce, 'ajax-nonce' ) ) {
 			wp_send_json_error( array( 'mess' => 'Nonce is invalid' ) );
 		}

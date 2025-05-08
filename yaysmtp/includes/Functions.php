@@ -644,13 +644,17 @@ class Functions {
 				$params = Utils::saniValArray( $_POST['params'] );// phpcs:ignore
 				$ids    = isset( $params['ids'] ) ? $params['ids'] : ''; // '1,2,3'
 
+				$ids_array = explode( ',', (string) $ids );
+				$ids_array = array_map( 'intval', $ids_array );
+				$id_placeholders  = implode( ', ', array_fill( 0, count( $ids_array ), '%d' ) );
+
 				if ( empty( $ids ) ) {
 					wp_send_json_error( array( 'mess' => __( 'No email log id found.', 'yay-smtp' ) ) );
 				}
 
-				$deletedEmailLogs 		 = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_email_logs WHERE ID IN( $ids )" ) );
-				$deletedEmailClickedLink = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_event_email_clicked_link WHERE log_id IN( $ids )" ) );
-				$deletedEmailOpened 	 = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_event_email_opened WHERE log_id IN( $ids )" ) );
+				$deletedEmailLogs 		 = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_email_logs WHERE ID IN ( {$id_placeholders} )", $ids_array ) );
+				$deletedEmailClickedLink = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_event_email_clicked_link WHERE log_id IN ( {$id_placeholders} )", $ids_array ) );
+				$deletedEmailOpened 	 = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_event_email_opened WHERE log_id IN ( {$id_placeholders} )", $ids_array ) );
 
 				if ( '' !== $wpdb->last_error ) {
 					wp_send_json_error( array( 'mess' => $wpdb->last_error ) );

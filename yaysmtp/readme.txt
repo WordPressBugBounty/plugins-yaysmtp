@@ -3,8 +3,8 @@ Contributors: YayCommerce
 Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
-Tested up to: 6.7.2
-Stable tag: 2.6.4
+Tested up to: 6.8
+Stable tag: 2.6.5
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -114,6 +114,9 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= May 8, 2025 - Version 2.6.5 =
+- Improved: Delete Email Logs (Reported by ChuongVN)
 
 = Apr 10, 2025 - Version 2.6.4 =
 - Fixed: XSS with special character
