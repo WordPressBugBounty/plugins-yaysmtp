@@ -459,20 +459,19 @@ class Functions {
 					$startDate     = $startDateObj->format( 'Y-m-d' );
 					$endDate       = $endDateOrgObj->format( 'Y-m-d' );
 
-					$dateWhere = "DATE(date_time) >= '$startDate' AND DATE(date_time) <= '$endDate'";
+					$dateWhere = $wpdb->prepare( "DATE(date_time) >= %s AND DATE(date_time) <= %s", $startDate, $endDate );
 				}
 
 				// Result ALL
 				$totalItems = 0;
 				if ( ! empty( $valSearch ) ) {
-					$subjectWhere = 'subject LIKE "%%' . $valSearch . '%%"';
-					$toEmailWhere = 'email_to LIKE "%%' . $valSearch . '%%"';
-					$whereQuery   = "{$subjectWhere} OR {$toEmailWhere}";
-					$whereQuery   = '(' . $whereQuery . ') AND (' . $statusWhere . ')';
+					$subjectWhere = $wpdb->prepare( "subject LIKE %s", '%' . $wpdb->esc_like( $valSearch ) . '%' );
+					$toEmailWhere = $wpdb->prepare( "email_to LIKE %s", '%' . $wpdb->esc_like( $valSearch ) . '%' );
+					$whereQuery   = "({$subjectWhere} OR {$toEmailWhere}) AND ({$statusWhere})";
 
 					if ( ! empty( $dateWhere ) ) {
-						$whereQuery = '(' . $whereQuery . ') AND (' . $dateWhere . ')';
-					}
+						$whereQuery = "({$whereQuery}) AND ({$dateWhere})";
+					}	
 
 					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
 					$sqlRepare    = $wpdb->prepare(

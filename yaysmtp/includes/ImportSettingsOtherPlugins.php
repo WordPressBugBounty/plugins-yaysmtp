@@ -253,19 +253,24 @@ class ImportSettingsOtherPlugins {
 			$end_date_Obj    = new \DateTime( $params['to'] );
 			$start_date      = $start_date_obj->format( 'Y-m-d' );
 			$end_date        = $end_date_Obj->format( 'Y-m-d' );
-			$where_clause[]  = "DATE(date_time) >= '$start_date' AND DATE(date_time) <= '$end_date'";
+			$where_clause[]  = "DATE(date_time) >= %s AND DATE(date_time) <= %s";
+			$query_params[]  = $start_date;
+			$query_params[]  = $end_date;
 		}
 
 		// Search value
 		if ( ! empty( $params['searchValue'] ) && ! empty( $params['searchKey'] ) ) {
 			$search_key     = ( ! empty( $params['searchKey'] ) ) ? $params['searchKey'] : "";
 			$search_value   = ( ! empty( $params['searchValue'] ) ) ? $params['searchValue'] : "";
-			$where_clause[] = $search_key . ' LIKE "%%' . $search_value . '%%"';
+
+			$search_value = $wpdb->esc_like( $search_value );		
+			$where_clause[] = $search_key . ' LIKE %s';
+			$query_params[] = '%' . $search_value . '%';
 		}
 
 		if ( $where_clause ) {
 			$where_clause = implode(' AND ', $where_clause);
-			$sql_repare = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $where_clause" );
+			$sql_repare = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $where_clause", $query_params );
 		} else {
 			$sql_repare = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs" );
 		}
