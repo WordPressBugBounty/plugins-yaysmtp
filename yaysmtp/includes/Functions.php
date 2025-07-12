@@ -475,7 +475,7 @@ class Functions {
 
 					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
 					$sqlRepare    = $wpdb->prepare(
-						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY $sortField $sortVal LIMIT %d OFFSET %d",
+						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY " . sanitize_sql_orderby($sortField . ' ' . $sortVal) . " LIMIT %d OFFSET %d",
 						$limit,
 						$offset
 					);
@@ -487,7 +487,7 @@ class Functions {
 
 					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
 					$sqlRepare    = $wpdb->prepare(
-						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY $sortField $sortVal LIMIT %d OFFSET %d",
+						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY " . sanitize_sql_orderby($sortField . ' ' . $sortVal) . " LIMIT %d OFFSET %d",
 						$limit,
 						$offset
 					);
