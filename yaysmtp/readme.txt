@@ -4,7 +4,7 @@ Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
 Tested up to: 6.8
-Stable tag: 2.6.7
+Stable tag: 2.6.8
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -114,6 +114,9 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Aug 18, 2025 - Version 2.6.8 =
+- Updated: New Content for Test Email
 
 = Jul 12, 2025 – Version 2.6.7 =
 - Improved: Email logs query

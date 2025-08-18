@@ -24,7 +24,7 @@ class Utils {
 
 	public static function saniValArray( $value ) {
 		if ( is_array( $value ) ) {
-			return array_map( 'self::saniValArray', $value );
+			return array_map( [self::class, 'saniValArray'], $value );
 		} else {
 			return sanitize_text_field( wp_unslash($value) );
 		}

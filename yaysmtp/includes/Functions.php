@@ -240,7 +240,7 @@ class Functions {
 				}
 
 				$headers      = "Content-Type: text/html\r\n";
-				$subjectEmail = __( 'YaySMTP - Test email sent successfully!', 'yay-smtp' );
+				$subjectEmail = __( '✅ Your test email worked! Here\'s what\'s next…', 'yay-smtp' );
 				$html         = Utils::getTemplateHtml(
 					'test-mail',
 					YAY_SMTP_PLUGIN_PATH . 'includes/Views/template-mail'
@@ -295,7 +295,7 @@ class Functions {
 				}
 
 				$headers      = "Content-Type: text/html\r\n";
-				$subjectEmail = __( 'YaySMTP - Fallback test email sent successfully!', 'yay-smtp' );
+				$subjectEmail = __( '✅ Your fallback test email worked! Here\'s what\'s next…', 'yay-smtp' );
 				$html         = Utils::getTemplateHtml(
 					'test-mail',
 					YAY_SMTP_PLUGIN_PATH . 'includes/Views/template-mail'
@@ -473,7 +473,8 @@ class Functions {
 						$whereQuery = "({$whereQuery}) AND ({$dateWhere})";
 					}	
 
-					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
+					$totalItemsPrepare = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
+					$totalItems = (int) $wpdb->get_var( $totalItemsPrepare );
 					$sqlRepare    = $wpdb->prepare(
 						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY " . sanitize_sql_orderby($sortField . ' ' . $sortVal) . " LIMIT %d OFFSET %d",
 						$limit,
@@ -485,7 +486,8 @@ class Functions {
 						$whereQuery = '(' . $statusWhere . ') AND (' . $dateWhere . ')';
 					}
 
-					$totalItems = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
+					$totalItemsPrepare = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
+					$totalItems = (int) $wpdb->get_var( $totalItemsPrepare );
 					$sqlRepare    = $wpdb->prepare(
 						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY " . sanitize_sql_orderby($sortField . ' ' . $sortVal) . " LIMIT %d OFFSET %d",
 						$limit,
