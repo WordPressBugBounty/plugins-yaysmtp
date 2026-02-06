@@ -87,7 +87,7 @@ class AmazonSESController {
 				}
 				Utils::updateEmailLog( $updateData );
 			}
-
+			
 			return;
 		}
 	}

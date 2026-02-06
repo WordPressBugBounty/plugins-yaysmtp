@@ -87,6 +87,7 @@ class Google_Service_Gmail extends Google_Service
   public $users_settings_sendAs;
   public $users_settings_sendAs_smimeInfo;
   public $users_threads;
+  public $serviceName;
 
   /**
    * Constructs the internal representation of the Gmail service.

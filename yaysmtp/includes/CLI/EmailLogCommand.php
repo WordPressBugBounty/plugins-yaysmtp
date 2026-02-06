@@ -21,8 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  *     # List email logs with specific status
  *     $ wp yaysmtp-email-log list --status=success
- *     $ wp yaysmtp-email-log list --status=failed
- * 
+ *
  *     # List email logs with date range
  *     $ wp yaysmtp-email-log list --from=2024-01-01 --to=2024-03-20
  *

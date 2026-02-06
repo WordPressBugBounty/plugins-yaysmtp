@@ -1,0 +1,28 @@
+
+/* Hide other notice in YaySMTP page */
+.yaycommerce_page_yaysmtp .yaysmtp-import-settings-notice {
+  display: none;
+}
+.yaycommerce_page_yaysmtp .notice:not(.yaysmtp-import-settings-notice) {
+  display: none;
+}
+.yaysmtp-import-settings-notice .yaysmtp-notices-title {
+  font-size: 14px;
+}
+.yaysmtp-import-settings-notice .yaysmtp-mess-notices {
+  margin-bottom: 1em;
+}
+.yaysmtp-import-settings-notice .yaysmtp-mess-notices p {
+  padding: unset;
+}
+.yaysmtp-import-settings-notice .button-primary {
+  margin-right: 10px;
+  margin-bottom: 11px;
+}
+.yaysmtp-report-performed-cl,
+.yaysmtp-group-content-wrap,
+.yaysmtp-group-content-item
+{
+  display: inline-flex !important;
+}
+

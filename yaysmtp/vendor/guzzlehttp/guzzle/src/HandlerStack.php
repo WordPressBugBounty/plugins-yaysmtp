@@ -36,7 +36,7 @@ class HandlerStack {
    *
    * @return HandlerStack
    */
-  public static function create(callable $handler = null) {
+  public static function create(?callable $handler = null) {
     // $stack = new self($handler ?: choose_handler());
     $stack = new self($handler ?: Utils::chooseHandler());
     $stack->push(Middleware::httpErrors(), 'http_errors');
@@ -50,7 +50,7 @@ class HandlerStack {
   /**
    * @param callable $handler Underlying HTTP handler.
    */
-  public function __construct(callable $handler = null) {
+  public function __construct(?callable $handler = null) {
     $this->handler = $handler;
   }
 

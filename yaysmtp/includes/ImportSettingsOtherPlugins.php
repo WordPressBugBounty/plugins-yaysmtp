@@ -29,14 +29,6 @@ class ImportSettingsOtherPlugins {
 		add_action( 'admin_notices', array( $this, 'popupImportSmtpSettings' ) );
 	}
 
-	// public function adminMenuSettings() {
-	// 	add_options_page( __( 'YaySMTP Setting', 'yay-smtp' ), __( 'YaySMTP', 'yay-smtp' ), 'manage_options', 'yaysmtp_settings', array( $this, 'yaysmtpSettingOther' ) );
-	// }
-
-	// public function yaysmtpSettingOther() {
-	// 	include YAY_SMTP_PLUGIN_PATH . '/includes/Views/yaysmtp-settings-other.php';
-	// }
-
 	public function popupImportSmtpSettings() {
 		$flagImported         = $this->getFlagImportSettsSmtpPopup();
 		$yaysmtpImportPlugins = Utils::getYaysmtpImportPlugins();
@@ -59,8 +51,7 @@ class ImportSettingsOtherPlugins {
 	public function popupSmtpNotices() {
 		$link = add_query_arg(
 			array(
-				'page'   => 'yaysmtp',
-				'tab'    => 'additional-setting',
+				'page'   => 'yaysmtp#/tools'
 			),
 			admin_url( 'admin.php' )
 		);
@@ -69,7 +60,7 @@ class ImportSettingsOtherPlugins {
 		$html .= '<h2 class="yaysmtp-notices-title">' . esc_html__( 'Import SMTP settings to YaySMTP', 'yay-smtp' ) . '</h2>';
 		$html .= '<div>';
 		$html .= '<div class="yaysmtp-mess-notices">';
-		$html .= '<p>We found previous SMTP settings from other plugins on your site. Would you like to import it to YaySMTP now? You can import later from WordPress: <b>Settings > YaySMTP</b>.</p>';
+		$html .= '<p>We found previous SMTP settings from other plugins on your site. Would you like to import it to YaySMTP now? You can import later from YayCommerce: <b>YaySMTP > Tools</b>.</p>';
 		$html .= '</div>';
 		$html .= '<div>';
 		$html .= '<a href="' . $link . '" class="button button-primary">' . esc_html__( 'Go to Import', 'yay-smtp' ) . '</a>';
@@ -111,13 +102,12 @@ class ImportSettingsOtherPlugins {
 					$this->importSettingsOfPostSMTP();
 				}
 
-				wp_send_json_success(
-					array(
-						'mess' => __( 'Import SMTP Settings successful.', 'yay-smtp' ),
-					)
-				);
+				$respData = [
+					'yaysmtpSettings' => Utils::getYaySmtpSetting(),
+				];
+				
+				wp_send_json_success( array( 'mess' => __( 'Import SMTP Settings successful.', 'yay-smtp' ), 'respData' => $respData ) );
 			}
-			wp_send_json_error( array( 'mess' => __( 'Please choose a SMTP plugin to import', 'yay-smtp' ) ) );
 
 		} catch ( \Exception $e ) {
 			wp_send_json_error( array( 'mess' => $e->getMessage() ) );
@@ -144,6 +134,7 @@ class ImportSettingsOtherPlugins {
 
 				wp_send_json_success(
 					array(
+						'respData' => Utils::getImportedLogPluginSetting(),
 						'mess' => __( 'Import email logs successful.', 'yay-smtp' ),
 					)
 				);
@@ -253,6 +244,7 @@ class ImportSettingsOtherPlugins {
 			$end_date_Obj    = new \DateTime( $params['to'] );
 			$start_date      = $start_date_obj->format( 'Y-m-d' );
 			$end_date        = $end_date_Obj->format( 'Y-m-d' );
+
 			$where_clause[]  = "DATE(date_time) >= %s AND DATE(date_time) <= %s";
 			$query_params[]  = $start_date;
 			$query_params[]  = $end_date;
@@ -262,8 +254,7 @@ class ImportSettingsOtherPlugins {
 		if ( ! empty( $params['searchValue'] ) && ! empty( $params['searchKey'] ) ) {
 			$search_key     = ( ! empty( $params['searchKey'] ) ) ? $params['searchKey'] : "";
 			$search_value   = ( ! empty( $params['searchValue'] ) ) ? $params['searchValue'] : "";
-
-			$search_value = $wpdb->esc_like( $search_value );		
+			$search_value   = $wpdb->esc_like( $search_value );		
 			$where_clause[] = $search_key . ' LIKE %s';
 			$query_params[] = '%' . $search_value . '%';
 		}
@@ -305,9 +296,9 @@ class ImportSettingsOtherPlugins {
 	// Easy Wp Mail
 	public function importSettingsOfEasyWpSmtp() {
 		$settingAlls = get_option( 'easy_wp_smtp', array() );
-	
+
 		if ( ! empty( $settingAlls ) ) {
-			
+
 			// General Settings
 			if ( ! empty( $settingAlls['mail'] ) ) {
 				$generalSetts = $settingAlls['mail'];
@@ -466,7 +457,6 @@ class ImportSettingsOtherPlugins {
 			}
 		}
 	}
-
 
 	// Wp Mail SMTP
 	public function importSettingsOfWpMailSmtp() {
@@ -989,7 +979,7 @@ class ImportSettingsOtherPlugins {
 					$migrateLogId = intval($result->id);
 					$emailFrom = Utils::getPeopleOfWpMailSmtp('from', $result->people);
 					$emailTo   = Utils::getPeopleOfWpMailSmtp('to', $result->people);
-					
+
 					$mailer = $result->mailer;
 					if ( 'outlook' == $mailer ) {
 						$mailer = 'outlookms';
@@ -1012,7 +1002,7 @@ class ImportSettingsOtherPlugins {
 					} elseif ( 'smtp' == $mailer ) {
 						$mailer = 'smtp';
 					}
-	
+
 					// Insert to yaysmtp_email_logs table
 					$content = [
 						'subject'      => wp_kses_post( $result->subject ),
@@ -1028,7 +1018,7 @@ class ImportSettingsOtherPlugins {
 					];
 					$wpdb->insert( $wpdb->prefix . 'yaysmtp_email_logs', $content );
 					$log_id = $wpdb->insert_id;
-					
+
 					$tableEmailTrackingEventsExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'wpmailsmtp_email_tracking_events"');
 					if( $log_id && !empty( $tableEmailTrackingEventsExist ) ) {
 						// Insert to yaysmtp_event_email_clicked_link table
@@ -1043,7 +1033,7 @@ class ImportSettingsOtherPlugins {
 							];
 							$wpdb->insert( $wpdb->prefix . 'yaysmtp_event_email_clicked_link', $dataEmailClickedLink, [ '%d', '%s', '%d', '%s' ] );
 						}
-	
+
 						// Insert to wp_yaysmtp_event_email_opened table
 						$sqlRepareO = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wpmailsmtp_email_tracking_events WHERE email_log_id = %d AND event_type=%s", $migrateLogId, 'open-email');
 						$resultQueryO = $wpdb->get_row( $sqlRepareO );
@@ -1053,7 +1043,7 @@ class ImportSettingsOtherPlugins {
 								'count'     => 1,
 								'date_time' => $resultQueryO->date_created
 							];
-					
+
 							$wpdb->insert( $wpdb->prefix . 'yaysmtp_event_email_opened', $dataEmailOpened, array( '%d', '%d', '%s' ) );
 						}
 					}
@@ -1061,7 +1051,7 @@ class ImportSettingsOtherPlugins {
 
 				Utils::setImporttedLogPlugin($plugin);
 			}
-			
+
 		}
 	}
 
@@ -1095,7 +1085,7 @@ class ImportSettingsOtherPlugins {
 
 				Utils::setImporttedLogPlugin($plugin);
 			}
-			
+
 		}
 	}
 
@@ -1111,9 +1101,9 @@ class ImportSettingsOtherPlugins {
 			if( !empty($resultQuery) ) {
 				foreach ( $resultQuery as $result ) {
 					$emailTo = is_array( maybe_unserialize($result->original_to) ) ? maybe_unserialize($result->original_to) : [maybe_unserialize($result->original_to)];
-					
+
 					$mailer = !empty($result->transport_uri) ? $result->transport_uri : '';
-					
+
 					// Insert to yaysmtp_email_logs table
 					$contentType = str_contains($result->original_headers, 'text/html') ? 'text/html' : 'text/plain';
 
@@ -1134,7 +1124,7 @@ class ImportSettingsOtherPlugins {
 
 				Utils::setImporttedLogPlugin($plugin);
 			}
-			
+
 		}
 	}
 
@@ -1171,7 +1161,7 @@ class ImportSettingsOtherPlugins {
 
 				Utils::setImporttedLogPlugin($plugin);
 			}
-			
+
 		}
 	}
 
@@ -1189,7 +1179,7 @@ class ImportSettingsOtherPlugins {
 					$migrateLogId = intval($result->id);
 					$emailFrom = Utils::getPeopleOfWpMailSmtp('from', $result->people);
 					$emailTo   = Utils::getPeopleOfWpMailSmtp('to', $result->people);
-					
+
 					$mailer = $result->mailer;
 					if ( 'outlook' == $mailer ) {
 						$mailer = 'outlookms';
@@ -1210,7 +1200,7 @@ class ImportSettingsOtherPlugins {
 					} elseif ( 'smtp' == $mailer ) {
 						$mailer = 'smtp';
 					}
-	
+
 					// Insert to yaysmtp_email_logs table
 					$content = [
 						'subject'      => wp_kses_post( $result->subject ),
@@ -1226,7 +1216,7 @@ class ImportSettingsOtherPlugins {
 					];
 					$wpdb->insert( $wpdb->prefix . 'yaysmtp_email_logs', $content );
 					$log_id = $wpdb->insert_id;
-					
+
 					$tableEmailTrackingEventsExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'easywpsmtp_email_tracking_events"');
 					if( $log_id && !empty( $tableEmailTrackingEventsExist ) ) {
 						// Insert to yaysmtp_event_email_clicked_link table
@@ -1241,7 +1231,7 @@ class ImportSettingsOtherPlugins {
 							];
 							$wpdb->insert( $wpdb->prefix . 'yaysmtp_event_email_clicked_link', $dataEmailClickedLink, [ '%d', '%s', '%d', '%s' ] );
 						}
-	
+
 						// Insert to wp_yaysmtp_event_email_opened table
 						$sqlRepareO = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}easywpsmtp_email_tracking_events WHERE email_log_id = %d AND event_type=%s", $migrateLogId, 'open-email');
 						$resultQueryO = $wpdb->get_row( $sqlRepareO );
@@ -1251,7 +1241,7 @@ class ImportSettingsOtherPlugins {
 								'count'     => 1,
 								'date_time' => $resultQueryO->date_created
 							];
-					
+
 							$wpdb->insert( $wpdb->prefix . 'yaysmtp_event_email_opened', $dataEmailOpened, array( '%d', '%d', '%s' ) );
 						}
 					}
@@ -1259,7 +1249,7 @@ class ImportSettingsOtherPlugins {
 
 				Utils::setImporttedLogPlugin($plugin);
 			}
-			
+
 		}
 	}
 }

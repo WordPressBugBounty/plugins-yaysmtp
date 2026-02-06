@@ -234,7 +234,7 @@ class PostmarkController {
 					$extra_info['error_mess'] = $message;		
 					$updateData['extra_info'] = wp_json_encode($extra_info);
 				}
-
+				
 				Utils::updateEmailLog( $updateData );
 			}
 

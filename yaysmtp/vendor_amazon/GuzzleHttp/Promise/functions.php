@@ -19,7 +19,7 @@ namespace YaySMTP\Aws3\GuzzleHttp\Promise;
  *
  * @return TaskQueueInterface
  */
-function queue(\YaySMTP\Aws3\GuzzleHttp\Promise\TaskQueueInterface $assign = null)
+function queue(?\YaySMTP\Aws3\GuzzleHttp\Promise\TaskQueueInterface $assign = null)
 {
     static $queue;
     if ($assign) {
@@ -301,7 +301,7 @@ function settle($promises)
  *
  * @return PromiseInterface
  */
-function each($iterable, callable $onFulfilled = null, callable $onRejected = null)
+function each($iterable, ?callable $onFulfilled = null, ?callable $onRejected = null)
 {
     return (new \YaySMTP\Aws3\GuzzleHttp\Promise\EachPromise($iterable, ['fulfilled' => $onFulfilled, 'rejected' => $onRejected]))->promise();
 }
@@ -320,7 +320,7 @@ function each($iterable, callable $onFulfilled = null, callable $onRejected = nu
  *
  * @return PromiseInterface
  */
-function each_limit($iterable, $concurrency, callable $onFulfilled = null, callable $onRejected = null)
+function each_limit($iterable, $concurrency, ?callable $onFulfilled = null, ?callable $onRejected = null)
 {
     return (new \YaySMTP\Aws3\GuzzleHttp\Promise\EachPromise($iterable, ['fulfilled' => $onFulfilled, 'rejected' => $onRejected, 'concurrency' => $concurrency]))->promise();
 }
@@ -335,7 +335,7 @@ function each_limit($iterable, $concurrency, callable $onFulfilled = null, calla
  *
  * @return PromiseInterface
  */
-function each_limit_all($iterable, $concurrency, callable $onFulfilled = null)
+function each_limit_all($iterable, $concurrency, ?callable $onFulfilled = null)
 {
     return each_limit($iterable, $concurrency, $onFulfilled, function ($reason, $idx, \YaySMTP\Aws3\GuzzleHttp\Promise\PromiseInterface $aggregate) {
         $aggregate->reject($reason);

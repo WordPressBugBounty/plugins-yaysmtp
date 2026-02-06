@@ -38,7 +38,7 @@ class ZohoController {
 			)
 		);
 
-		$response_body = json_decode( $response['body'] );
+		$response_body = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( 200 !== $response_body->status->code ) {
 
@@ -144,7 +144,7 @@ class ZohoController {
 					$dataBcc[] = sprintf( '%s <%s>', $bccEmail[1], $bccEmail[0] );
 				}
 			}
-			
+
 			if ( ! empty( $dataBcc ) ) {
 				$this->body   = array_merge( $this->body, array( 'bccAddress' => implode( ",", $dataBcc ) ) );
 			}

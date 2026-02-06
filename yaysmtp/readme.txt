@@ -3,8 +3,8 @@ Contributors: YayCommerce
 Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
-Tested up to: 6.8
-Stable tag: 2.6.8
+Tested up to: 6.9
+Stable tag: 2.7.2
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -114,6 +114,29 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Jan 5, 2026 – Version 2.7.2 =
+- Improved: Masked Hidden Key Input.
+- Improved: Email Logs UI.
+- Improved: Zoho processing.
+- Fixed: Notices issues with PHP 8.4.
+
+= Oct 28, 2025 – Version 2.7.1 =
+- Improved: Data processing
+- Improved: UI 
+- Fixed: Forward to license page issue
+- Fixed: PHP Notice - Function wpdb::prepare was called incorrectly for PHP version >= 8.2
+- Fixed: Log details style 
+- Added: Review at footer
+
+= Oct 15, 2025 - Version 2.7.0 =
+- Improved: Redesigned UI to enhance user experience.
+
+= Oct 14, 2025 - Version 2.6.10 =
+- Fixed: ChartJS loading issue.
+
+= Aug 28, 2025 - Version 2.6.9 =
+- Fixed: Not save email logs when Send test email (emojis in email content)
 
 = Aug 18, 2025 - Version 2.6.8 =
 - Updated: New Content for Test Email

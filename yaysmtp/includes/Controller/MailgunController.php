@@ -161,14 +161,14 @@ class MailgunController {
 					];
 				}
 			}
-
+	
 			if ( ! empty( $attachData ) ) {
 				$boundary = sha1(uniqid('', true));
-
+	
 				$payload = $this->buildPayloadFromBody( $this->body, $boundary);			
 				$payload .= $this->buildAttachsPayload( $attachData, $boundary);
 				$payload .= '--' . $boundary . '--';
-
+	
 				$this->body = $payload;
 				$this->headers['Content-Type'] = 'multipart/form-data; boundary=' . $boundary;
 			}
@@ -245,7 +245,7 @@ class MailgunController {
 						$extra_info['error_mess'] = $message_extra;		
 						$updateData['extra_info'] = wp_json_encode($extra_info);
 					}
-
+					
 					Utils::updateEmailLog( $updateData );
 				}
 			} else {
@@ -333,7 +333,7 @@ class MailgunController {
 		} elseif ( is_file( $attachFile[0] ) && is_readable( $attachFile[0] ) ) {
 			$result = file_get_contents( $attachFile[0] );
 		}
-
+	
 		return $result;
 	}
 

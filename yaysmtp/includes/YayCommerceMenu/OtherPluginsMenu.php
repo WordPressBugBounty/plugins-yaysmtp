@@ -281,6 +281,15 @@ class OtherPluginsMenu {
 				'type'              => array( 'marketing' ),
 				'version'           => 0,
 			),
+			'yayreviews'        => [
+                'slug'              => 'yay-customer-reviews-woocommerce',
+                'name'              => 'YayReviews – Advanced Customer Reviews for WooCommerce',
+                'short_description' => 'Collect more customer reviews through automated reminders and rewards.',
+                'icon'              => 'https://ps.w.org/yay-customer-reviews-woocommerce/assets/icon-256x256.png?rev=3340109',
+                'download_link'     => 'https://downloads.wordpress.org/plugin/yay-customer-reviews-woocommerce.zip',
+                'type'              => [ 'woocommerce' ],
+                'version'           => 0,
+            ],
 		);
 	}
 
@@ -528,6 +537,15 @@ class OtherPluginsMenu {
 		if ( 'wp-whatsapp' === $pluginDetail['slug'] ) {
 			$existProVer = array_key_exists( 'whatsapp-for-wordpress/whatsapp.php', $allPlugin ) === true ? 'whatsapp-for-wordpress/whatsapp.php' : false;
 		}
+		if ( 'yay-customer-reviews-woocommerce' === $pluginDetail['slug'] ) {
+            if ( array_key_exists( 'yayreviews-pro/yay-customer-reviews-woocommerce.php', $allPlugin ) ) {
+                $existProVer = 'yayreviews-pro/yay-customer-reviews-woocommerce.php';
+            } elseif ( array_key_exists( 'yay-customer-reviews-woocommerce/yay-customer-reviews-woocommerce.php', $allPlugin ) ) {
+                $existProVer = 'yay-customer-reviews-woocommerce/yay-customer-reviews-woocommerce.php';
+            } elseif ( array_key_exists( 'yayreviews/yay-customer-reviews-woocommerce.php', $allPlugin ) ) {
+                $existProVer = 'yayreviews/yay-customer-reviews-woocommerce.php';
+            }
+        }
 		return $existProVer;
 	}
 }

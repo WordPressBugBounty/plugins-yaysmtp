@@ -79,10 +79,11 @@ class Schedule {
 		return $schedules;
 	}
 
-	public function delete_email_log_schedule( $days_setting = 0 ) {
+	public function delete_email_log_schedule( $days_setting = 0) {
 		$days_setting = Utils::getDeleteDatetimeSetting();
-		if ( 0 !== $days_setting ) { // "Forever" Save Logs
-	    	Utils::deleteAllEmailLogs();
+		if ( 0 !== $days_setting ) { // !"Forever" Save Logs
+			$deleteDatetimeSetting = Utils::getDeleteDatetimeSetting();
+	    	Utils::deleteAllEmailLogsWithCondition($deleteDatetimeSetting, $deleteDatetimeSetting);
 		}
 	}
 

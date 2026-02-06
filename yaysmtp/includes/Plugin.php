@@ -27,6 +27,7 @@ class Plugin {
 		Page\Settings::getInstance();
 		PluginCore::getInstance();
 		Functions::getInstance();
+		Engines\Registries\RegisterFacade::getInstance();
 	}
 
 	private function __construct() {}

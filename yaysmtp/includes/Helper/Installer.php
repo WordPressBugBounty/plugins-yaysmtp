@@ -40,6 +40,11 @@ class Installer {
 
 	public function createYaySMTPEmailLogs() {
 		global $wpdb;
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+        $charset_collate = $wpdb->get_charset_collate();
+		
 		$table = $wpdb->prefix . 'yaysmtp_email_logs';
 		$sql   = "CREATE TABLE $table (
       `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -54,10 +59,16 @@ class Installer {
       `reason_error` varchar(300) DEFAULT NULL,
       `flag_delete` int(1) DEFAULT 0,
       PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    ) ENGINE=InnoDB $charset_collate;";
 
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) != $table ) {
 			dbDelta( $sql );
+		} else {
+			$table_status = $wpdb->get_row( $wpdb->prepare( "SHOW TABLE STATUS LIKE %s", $table ) );
+
+			if ( $table_status && strpos( strtolower( $table_status->Collation ), 'utf8mb3' ) === 0 ) {
+				$wpdb->query( "ALTER TABLE $table CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci" );
+			}
 		}
 	}
 

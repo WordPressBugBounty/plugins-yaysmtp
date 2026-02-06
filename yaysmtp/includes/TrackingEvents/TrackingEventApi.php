@@ -115,8 +115,11 @@ class TrackingEventApi extends \WP_REST_Controller {
 						$redirect = new \WP_REST_Response();
 						$redirect->header( 'Cache-Control', 'must-revalidate, no-cache, no-store, max-age=0, no-transform' );
 						$redirect->header( 'Pragma', 'no-cache' );
-						$redirect->header( 'Location', urldecode( $data['url'] ) );
-						return $redirect;					
+
+						header("Location: " . urldecode($data['url']));
+						exit;
+						// $redirect->header( 'Location', urldecode( $data['url'] ) );
+						// return $redirect;					
 					} 
 				}
 			}

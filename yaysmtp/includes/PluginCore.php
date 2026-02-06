@@ -38,8 +38,9 @@ class PluginCore {
 
 	public function actionForSmtpsHasAuth() {
 		if ( is_admin() ) {
-			$currentEmail = Utils::getCurrentMailer();
-			if ( 'gmail' === $currentEmail ) {
+			$currentEmail 		  = Utils::getCurrentMailer();
+			$currentEmailFallback = Utils::getCurrentMailerFallback();
+			if ( 'gmail' === $currentEmail || 'gmail' === $currentEmailFallback ) {
 				$gmailService = new GmailServiceVendController();
 				$gmailService->processAuthorizeServive();
 			} elseif ( 'zoho' === $currentEmail ) {
@@ -80,7 +81,7 @@ class PluginCore {
 	public function getFromName( $name ) {
 		$nameDefault   = 'WordPress';
 		$forceFromName = Utils::getForceFromName();
-		if ( 0 === $forceFromName && $name !== $nameDefault ) {
+		if ( $forceFromName == 0 && $name !== $nameDefault ) {
 			return $name;
 		}
 

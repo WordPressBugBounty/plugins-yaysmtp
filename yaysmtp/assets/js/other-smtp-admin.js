@@ -12,11 +12,11 @@
         yay_smtp_char_obj.destroy();
       }
       $.ajax({
-        url: yaySmtpWpData.YAY_ADMIN_AJAX,
+        url: yaySmtpWpOtherData.YAY_ADMIN_AJAX,
         type: "POST",
         data: {
           action: "yaysmtp_overview_chart",
-          nonce: yaySmtpWpData.ajaxNonce,
+          nonce: yaySmtpWpOtherData.ajaxNonce,
           params: {
             from: fromDate.format("YYYY-MM-DD"),
             to: toDate.format("YYYY-MM-DD")
@@ -107,8 +107,8 @@
     }
 
     if( 
-      window.location.href === yaySmtpWpData.DASHBOARD_URL 
-      || window.location.href === yaySmtpWpData.DASHBOARD_URL + 'index.php'
+      window.location.href === yaySmtpWpOtherData.DASHBOARD_URL 
+      || window.location.href === yaySmtpWpOtherData.DASHBOARD_URL + 'index.php'
     ) {
       yaysmtp_input_daterangepicker(
         yaysmtp_startTime_picker,
@@ -262,169 +262,44 @@
       }
     }
 
-    $("body").on(
-      "click",
-      ".yaysmtp-import-settings-notice .close-btn",
-      function() {
-        $(".yaysmtp-import-settings-notice").remove();
-        $.ajax({
-          url: yaySmtpWpData.YAY_ADMIN_AJAX,
-          type: "POST",
-          data: {
-            action: "yaysmtp_close_popup_import_smtp_settings",
-            nonce: yaySmtpWpData.ajaxNonce
-          },
-          success: function(result) {}
-        });
-      }
-    );
-
-    // $(".yaysmtp-import-settings-btn").prop(
-    //   "disabled",
-    //   true
-    // );
-
-    // $(".yay-smtper-plugin").click(function() {
-    //   $(this).addClass("active");
-    //   let pluginEls = $(this).siblings(".yay-smtper-plugin");
-    //   $.each(pluginEls, function() {
-    //     $(this).removeClass("active");
-    //   });
-
-    //   let pluginName = $(this).attr("data-plugin");
-    //   $(".yaysmtp-import-plugin-choose").val(pluginName);
-
-    //   $(".yaysmtp-import-settings-btn").prop(
-    //     "disabled",
-    //     false
-    //   );
-    // });
-
-    $(".yaysmtp-import-settings-btn").click(
-      function() {
-        let pluginName = $("#yaysmtp_settings_plugin_import").val();
-        if ("" != pluginName) {
-          $.ajax({
-            url: yaySmtpWpData.YAY_ADMIN_AJAX,
-            type: "POST",
-            data: {
-              action: "yaysmtp_import_smtp_settings",
-              nonce: yaySmtpWpData.ajaxNonce,
-              plugin_name: pluginName
-            },
-            beforeSend: function() {
-              yaySMTPspinner("yay-smtp-wrap", true);
-            },
-            success: function(result) {
-              if(result.success){
-                yaySMTPNotification(result.data.mess, "yay-smtp-wrap", true);
-              }else{
-                yaySMTPNotification(result.data.mess, "yay-smtp-wrap", false);
-              }
-
-              yaySMTPspinner("yay-smtp-wrap", false);
-            }
-          });
-        }
-      }
-    );
-
-    $(".yaysmtp-import-email-logs-btn").click(
-      function() {
-        let pluginName = $("#yaysmtp_email_logs_plugin_import").val();
-        if ("" != pluginName) {
-          $.ajax({
-            url: yaySmtpWpData.YAY_ADMIN_AJAX,
-            type: "POST",
-            data: {
-              action: "yaysmtp_import_smtp_email_logs",
-              nonce: yaySmtpWpData.ajaxNonce,
-              plugin_name: pluginName
-            },
-            beforeSend: function() {
-              yaySMTPspinner("yay-smtp-wrap", true);
-            },
-            success: function(result) {
-              if(result.success){
-                $("#yaysmtp_email_logs_plugin_import option:selected").prop('disabled', true);
-                yaySMTPNotification(result.data.mess, "yay-smtp-wrap", true);
-              }else{
-                yaySMTPNotification(result.data.mess, "yay-smtp-wrap", false);
-              }
-              yaySMTPspinner("yay-smtp-wrap", false);
-            }
-          });
-        }
-      }
-    );
-
-    $(".yaysmtp-export-email-log-btn").click(
-      function() {
-        let fieldsDisplay = [];
-        const fieldInputs = $('.yaysmtp-export-log-general-field-input, .yaysmtp-export-log-additional-field-input');
-        $.each(fieldInputs, function() { 
-          if ($(this).is(":checked")) {
-            const fieldDisplay = $(this).val();
-            fieldsDisplay.push(fieldDisplay);
-          }
-        });
-     
-        let from = "";
-        let to   = "";
-        if( $('#yaysmtp_daterangepicker_export_mail_logs').val() ) {
-          from = yaysmtp_export_mail_log_startTime_picker.format("YYYY-MM-DD");
-          to   = yaysmtp_export_mail_log_endTime_picker.format("YYYY-MM-DD");
-        }
-
-        let searchKey   = $('.yaysmtp-export-log-search-key').val();
-        let searchValue = $('.yaysmtp-export-log-search-value').val();
-
-        const paramValues = {
-          'fieldsDisplay' : fieldsDisplay,
-          'from'          : from,
-          'to'            : to,
-          'searchKey'     : searchKey,
-          'searchValue'   : searchValue
-        }
-
-        $.ajax({
-          url: yaySmtpWpData.YAY_ADMIN_AJAX,
-          type: "POST",
-          data: {
-            action: "yaysmtp_export_email_log",
-            nonce: yaySmtpWpData.ajaxNonce,
-            params: paramValues
-          },
-          beforeSend: function() {
-            yaySMTPspinner("yay-smtp-wrap", true);
-          },
-          success: function(response) {
-            if( response ) {
-              if( typeof response === 'object' && ! response.success ) {
-                yaySMTPNotification( response.data.mess, "yay-smtp-wrap", false);
-              } else {
-                var blob = new Blob( [ response ], { type: 'application/octetstream' } );
-
-                var a = document.createElement( 'a' );
-                a.href = window.URL.createObjectURL( blob );
-                a.download = 'yaysmtp-email-log-' + moment().format("YYYYMMDDHHmmss") + '.csv';
-        
-                document.body.appendChild( a );
-                a.click();
-                document.body.removeChild( a );
-                window.URL.revokeObjectURL( a.href );
-  
-                yaySMTPNotification("Export email logs successful.", "yay-smtp-wrap", true);
-              }
-            } else {
-              yaySMTPNotification('Data is empty.', "yay-smtp-wrap", false);
-            }
-            
-            yaySMTPspinner("yay-smtp-wrap", false);
-          }
-        });
-
-      }
-    );
   });
 })(window.jQuery);
+
+function yaySMTPspinner(containerClass, isShow) {
+  let spinnerHtml = '<div class="yay-smtp-spinner">';
+  spinnerHtml +=
+    '<svg class="woocommerce-spinner" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">';
+  spinnerHtml +=
+    '<circle class="woocommerce-spinner__circle" fill="none" stroke-width="5" stroke-linecap="round" cx="50" cy="50" r="30"></circle>';
+  spinnerHtml += "/<svg>";
+  spinnerHtml += "</div>";
+  if (isShow) {
+    jQuery("." + containerClass).append(spinnerHtml);
+  } else {
+    jQuery(".yay-smtp-spinner").remove();
+  }
+}
+
+function yaySMTPNotification(messages, containerClass, success) {
+  let icon =
+    '<div class="icon"><svg viewBox="64 64 896 896" data-icon="check-circle" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" class=""><path d="M699 353h-46.9c-10.2 0-19.9 4.9-25.9 13.3L469 584.3l-71.2-98.8c-6-8.3-15.6-13.3-25.9-13.3H325c-6.5 0-10.3 7.4-6.5 12.7l124.6 172.8a31.8 31.8 0 0 0 51.7 0l210.6-292c3.9-5.3.1-12.7-6.4-12.7z"></path><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path></svg></div>';
+
+  if (!success) {
+    icon =
+      '<div class="icon"><svg viewBox="64 64 896 896" data-icon="close-circle" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" class=""><path d="M685.4 354.8c0-4.4-3.6-8-8-8l-66 .3L512 465.6l-99.3-118.4-66.1-.3c-4.4 0-8 3.5-8 8 0 1.9.7 3.7 1.9 5.2l130.1 155L340.5 670a8.32 8.32 0 0 0-1.9 5.2c0 4.4 3.6 8 8 8l66.1-.3L512 564.4l99.3 118.4 66 .3c4.4 0 8-3.5 8-8 0-1.9-.7-3.7-1.9-5.2L553.5 515l130.1-155c1.2-1.4 1.8-3.3 1.8-5.2z"></path><path d="M512 65C264.6 65 64 265.6 64 513s200.6 448 448 448 448-200.6 448-448S759.4 65 512 65zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path></svg></div>';
+  }
+
+  let notifyHtml =
+    '<div class="yay-smtp-notification"><div class="yay-smtp-notification-content">' +
+    icon +
+    '<div class="content">' +
+    messages +
+    "<div>" +
+    "</div></div>";
+
+  jQuery("." + containerClass).after(notifyHtml);
+  setTimeout(function() {
+    jQuery(".yay-smtp-notification").addClass("NslideDown");
+    jQuery(".yay-smtp-notification").remove();
+  }, 1500);
+}

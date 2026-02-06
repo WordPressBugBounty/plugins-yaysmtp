@@ -28,6 +28,7 @@ class Utils {
 		} else {
 			return sanitize_text_field( wp_unslash($value) );
 		}
+
 	}
 
 	public static function isJson( $string ) {
@@ -274,6 +275,53 @@ class Utils {
 		return $rst;
 	}
 
+	public static function getPublicYaySmtpSetting( $forceChildSite = false ) {
+		$rst = self::getYaySmtpSetting( $forceChildSite );
+
+
+		if ( ! empty( $rst['gmail'] ) ) {
+			if ( ! empty( $rst['gmail']['gmail_access_token'] ) ) {
+				$rst['gmail']['gmail_access_token'] = true;
+			}
+
+			if ( ! empty( $rst['gmail']['gmail_refresh_token'] ) ) {
+				$rst['gmail']['gmail_refresh_token'] = true;
+			}
+		}
+
+		if ( ! empty( $rst['fallback_service_provider_mailer_settings'] ) && ! empty( $rst['fallback_service_provider_mailer_settings']['gmail'] ) ) {
+			if ( ! empty( $rst['fallback_service_provider_mailer_settings']['gmail']['gmail_access_token'] ) ) {
+				$rst['fallback_service_provider_mailer_settings']['gmail']['gmail_access_token'] = true;
+			}
+
+			if ( ! empty( $rst['fallback_service_provider_mailer_settings']['gmail']['gmail_refresh_token'] ) ) {
+				$rst['fallback_service_provider_mailer_settings']['gmail']['gmail_refresh_token'] = true;
+			}
+		}
+
+		if ( ! empty( $rst['outlookms'] ) ) {
+			if ( ! empty( $rst['outlookms']['outlookms_access_token'] ) ) {
+				$rst['outlookms']['outlookms_access_token'] = true;
+			}
+
+			if ( ! empty( $rst['outlookms']['outlookms_refresh_token'] ) ) {
+				$rst['outlookms']['outlookms_refresh_token'] = true;
+			}
+		}
+
+		if ( ! empty( $rst['zoho'] ) ) {
+			if ( ! empty( $rst['zoho']['access_token'] ) ) {
+				$rst['zoho']['access_token'] = true;
+			}
+
+			if ( ! empty( $rst['zoho']['refresh_token'] ) ) {
+				$rst['zoho']['refresh_token'] = true;
+			}
+		}
+
+		return $rst;
+	}
+
 	public static function getImportedLogPluginSetting( $forceChildSite = false ) {
 		$rst = array();
 
@@ -414,6 +462,11 @@ class Utils {
         return json_encode($data);
     }
 
+	public static function isEncrypted($jsonStr) {
+		$json = json_decode($jsonStr, true);
+		return isset($json["s"]) && isset($json["iv"]) && isset($json["ct"]);
+	}
+
     public static function decrypt ($jsonStr, $passphrase = '') {
         $json = json_decode($jsonStr, true);
 		
@@ -520,7 +573,7 @@ class Utils {
 		}
 		return $extra_info;
 	}
-
+	
 	public static function getRoot( $file ) {
 		$cacheData = get_transient( 'YAYSMTP_ROOT' );
 		$cacheData = isset( $cacheData ) ? $cacheData : array();
@@ -1151,10 +1204,10 @@ class Utils {
 	
 	public static function deleteAllEmailLogsWithCondition( $days_setting = null, $days_param = null ) {
 		global $wpdb;
-		if ( !empty( $days_setting ) && !empty( $days_param ) && ( intval($days_setting) > intval($days_param) ) ) {
+		if ( !empty( $days_setting ) && !empty( $days_param ) && ( intval($days_setting) >= intval($days_param) ) ) {
 			$period_day_not_delete = intval( $days_param );
 			$current_time_gmt      = current_time( 'mysql', true );
-
+			 
 			$datetime_obj = new \DateTime( $current_time_gmt );
 			$datetime_obj->modify( '-' . intval( $period_day_not_delete ) . ' days' );
 			$datetime_not_delete = $datetime_obj->format( 'Y-m-d H:i:s' );
@@ -1167,7 +1220,7 @@ class Utils {
 			));
 		}
 	}
-	
+
 	public static function getFullUrl() {
 		$http        = isset( $_SERVER['HTTPS'] ) && ( 'on' === $_SERVER['HTTPS'] ) ? 'https' : 'http';
 		$http_host   = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( $_SERVER['HTTP_HOST'] ) : '';
@@ -1291,6 +1344,49 @@ class Utils {
 		);
 	}
 
+	public static function getAmazonSesRegions() {
+		return [
+			'us-east-1'      => __( 'US East (N. Virginia)', 'yay-smtp' ),
+			'us-east-2'      => __( 'US East (Ohio)', 'yay-smtp' ),
+			'us-west-1'      => __( 'US West (N. California)', 'yay-smtp' ),
+			'us-west-2'      => __( 'US West (Oregon)', 'yay-smtp' ),
+			'af-south-1'     => __( 'Cape Town South Africa', 'yay-smtp' ),
+			'ca-central-1'   => __( 'Canada (Central)', 'yay-smtp' ),
+			'eu-west-1'      => __( 'EU (Ireland)', 'yay-smtp' ),
+			'eu-west-2'      => __( 'EU (London)', 'yay-smtp' ),
+			'eu-west-3'      => __( 'EU (Paris)', 'yay-smtp' ),
+			'eu-central-1'   => __( 'EU (Frankfurt)', 'yay-smtp' ),
+			'eu-south-1'     => __( 'EU (Milan)', 'yay-smtp' ),
+			'eu-north-1'     => __( 'EU (Stockholm)', 'yay-smtp' ),
+			'ap-south-1'     => __( 'Asia Pacific (Mumbai)', 'yay-smtp' ),
+			'ap-northeast-2' => __( 'Asia Pacific (Seoul)', 'yay-smtp' ),
+			'ap-southeast-1' => __( 'Asia Pacific (Singapore)', 'yay-smtp' ),
+			'ap-southeast-2' => __( 'Asia Pacific (Sydney)', 'yay-smtp' ),
+			'ap-northeast-1' => __( 'Asia Pacific (Tokyo)', 'yay-smtp' ),
+			'ap-northeast-3' => __( 'Asia Pacific (Osaka)', 'yay-smtp' ),
+			'sa-east-1'      => __( 'South America (São Paulo)', 'yay-smtp' ),
+			'me-south-1'     => __( 'Middle East (Bahrain)', 'yay-smtp' ),
+			'ap-southeast-3' => __( 'Asia Pacific (Jakarta)', 'yay-smtp' ),
+			'il-central-1'   => __( 'Israel (Tel Aviv)', 'yay-smtp' ),
+			'us-gov-east-1'  => __( 'AWS GovCloud (US-East)', 'yay-smtp' ),
+			'us-gov-west-1'  => __( 'AWS GovCloud (US-West)', 'yay-smtp' ),
+		];
+	}
+
+	public static function getZohoRegions() {
+		return [
+			'zoho.com'     => 'United States (zoho.com)',
+			'zoho.eu'      => 'Europe (zoho.eu)',
+			'zoho.com.au'  => 'Australia (zoho.com.au)',
+			'zoho.jp'      => 'Japan (zoho.jp)',
+			'zoho.in'      => 'India (zoho.in)',
+			'zoho.com.cn'  => 'China (zoho.com.cn)',
+			'zoho.uk'      => 'United Kingdom (zoho.uk)',
+			'zohocloud.ca' => 'Canada (zohocloud.ca)',
+			'zoho.sa'      => 'Saudi Arabia (zoho.sa)'
+		];
+	}
+
 	public static function getTrackingEmailOpenedByLogId( $logId ) {
 		global $wpdb;
 		$result = $wpdb->get_row( $wpdb->prepare( "Select * FROM {$wpdb->prefix}yaysmtp_event_email_opened WHERE log_id = %d", $logId ) );
@@ -1350,22 +1446,21 @@ class Utils {
 	public static function getEmailFromString( $string='', $only_first_email = true) {
 		$pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
 		preg_match_all($pattern, $string, $matches);
-		
+
 		return $only_first_email ? $matches[0][0] : $matches[0];
 	}
 
 	public static function wpKsesAllowedHtml( $cus_attr_tags = [] ) {
-        $allowed_html_tags           = wp_kses_allowed_html( 'post' );
-        $allowed_html_tags['style']  = true;
-        $allowed_html_tags['html']   = [];
-        $allowed_html_tags['header'] = [];
-        $allowed_html_tags['meta']   = [];
-        $allowed_html_attr           = $cus_attr_tags;
-
-        $allowed_html_attr ['charset']                   = true;
-        $allowed_html_attr ['http-equiv']                = true;
-        $allowed_html_attr ['content']                   = true;
-        $allowed_html_attr ['name']                      = true;
+        $allowed_html_tags           	  = wp_kses_allowed_html( 'post' );
+        $allowed_html_tags['style']  	  = true;
+        $allowed_html_tags['html']   	  = [];
+        $allowed_html_tags['header'] 	  = [];
+        $allowed_html_tags['meta']   	  = [];
+        $allowed_html_attr                = $cus_attr_tags;
+        $allowed_html_attr ['charset']    = true;
+        $allowed_html_attr ['http-equiv'] = true;
+        $allowed_html_attr ['content']    = true;
+        $allowed_html_attr ['name']       = true;
         return array_map(
             function ( $item ) use ( $allowed_html_attr ) {
                 return is_array( $item ) ? array_merge( $item, $allowed_html_attr ) : $item;
@@ -1397,5 +1492,64 @@ class Utils {
 			'multipart/alternative',
 			'multipart/mixed',
 		];	
+	}
+
+	public static function getGmailAuthUrl( $is_fallback = false ) {
+		$auth             = new \YaySMTP\Controller\GmailServiceVendController( $is_fallback );
+		$clientWebService = $auth->getclientWebService( $is_fallback );
+
+		$urlAuth = '#';
+		if ( class_exists( '\Google_Client', false ) && $clientWebService instanceof \Google_Client && ! empty( $clientWebService ) ) {
+			$urlAuth = filter_var( $clientWebService->createAuthUrl(), FILTER_SANITIZE_URL );
+		}
+
+		return $urlAuth;
+	}
+
+	public static function getOutlookMsAuthUrl() {
+		$auth             = new \YaySMTP\Controller\OutlookMsServicesController();
+		$clientWebService = $auth->getclientWebService();
+
+		$urlAuth = '#';
+		if ( ! empty( $clientWebService ) && class_exists( '\League\OAuth2\Client\Provider\GenericProvider', false ) && $clientWebService instanceof \League\OAuth2\Client\Provider\GenericProvider ) {
+			$urlAuth = $clientWebService->getAuthorizationUrl(
+				[
+					'state' => wp_create_nonce( 'yaysmtp_outlookms_client_state' ),
+					'scope' => [
+						'https://graph.microsoft.com/mail.send',
+						'https://graph.microsoft.com/mail.send.shared',
+						'https://graph.microsoft.com/user.read',
+						'offline_access',
+					],
+				]
+			);
+		}
+
+		return $urlAuth;
+	}
+
+	public static function getZohoAuthUrl() {
+		return \YaySMTP\Controller\ZohoServiceVendController::generate_auth_code_url();
+	}
+
+	public static function checkExistPhpMailerDefault() {
+		global $phpmailer;
+		echo "<h4>🚀 PHPMailer Configuration:</h4>";
+		if (isset($phpmailer) && is_object($phpmailer)) {
+			echo "✅ PHPMailer Instance: EXISTS<br>";
+			echo "📧 Mailer Type: " . $phpmailer->Mailer . "<br>";
+			echo "🌐 SMTP Host: " . $phpmailer->Host . "<br>";
+			echo "🔌 SMTP Port: " . $phpmailer->Port . "<br>";
+			echo "🔐 SMTP Auth: " . ($phpmailer->SMTPAuth ? 'YES' : 'NO') . "<br>";
+			echo "🔒 SMTPSecure: " . $phpmailer->SMTPSecure . "<br>";
+			
+			if ($phpmailer->Mailer == 'smtp') {
+				echo "🎉 <strong>SMTP IS ACTIVE</strong><br>";
+			} else {
+				echo "ℹ️ Using default PHP mail()<br>";
+			}
+		} else {
+			echo "❌ PHPMailer not initialized<br>";
+		}
 	}
 }

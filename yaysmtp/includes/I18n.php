@@ -28,4 +28,16 @@ class I18n {
 		load_textdomain( 'yay-smtp', YAY_SMTP_PLUGIN_PATH . '/i18n/languages/yay-smtp-' . $locale . '.mo' );
 		load_plugin_textdomain( 'yay-smtp', false, YAY_SMTP_PLUGIN_PATH . '/i18n/languages/' );
 	}
+
+	public static function getTranslation() {
+		$translations = get_translations_for_domain( 'yay-smtp' );
+        $messages     = [];
+
+        $entries = $translations->entries;
+        foreach ( $entries as $key => $entry ) {
+            $messages[ $entry->singular ] = $entry->translations;
+        }
+
+		return $messages;
+	}
 }

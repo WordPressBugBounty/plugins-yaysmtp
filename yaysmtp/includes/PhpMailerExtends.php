@@ -2,10 +2,17 @@
 namespace YaySMTP;
 
 use YaySMTP\Helper\Utils;
+use YaySMTP\Helper\LogErrors;
 
 defined( 'ABSPATH' ) || exit;
 
 class PhpMailerExtends extends \PHPMailer\PHPMailer\PHPMailer {
+	/**
+	 * Explicitly declare properties to avoid PHP 8.2+ dynamic property deprecation
+	 * These properties are inherited from PHPMailer but we redeclare them for compatibility
+	 */
+	public $SMTPSecure = '';
+
 	public function send() {
 		$currentMailer 			 = Utils::getCurrentMailer();
 		$currentMailerFallback   = Utils::getCurrentMailerFallback();
@@ -91,7 +98,12 @@ class PhpMailerExtends extends \PHPMailer\PHPMailer\PHPMailer {
 		} else {
 			if ( 'mail' === $currentMailer || 'smtp' === $currentMailer ) {
 				try {
-					$result = $this->postSend();
+					try {
+						$result = $this->postSend();
+					} catch ( \Exception $exc ) { 
+						$errors = $exc->getMessage();
+					}
+					
 
 					if ( true === $result && ! empty( $logId )) {
 						$updateData['id']        = $logId;
@@ -108,6 +120,10 @@ class PhpMailerExtends extends \PHPMailer\PHPMailer\PHPMailer {
 						$updateData['extra_info'] = wp_json_encode($extra_info);
 						$updateData['id']         = $logId;
 						Utils::updateEmailLog( $updateData );
+
+						LogErrors::clearErr();
+						LogErrors::setErr( 'Mailer: ' . $mailer_list[$currentMailer] );
+						LogErrors::setErr( $error_mess );
 					}
 
 					return $result;

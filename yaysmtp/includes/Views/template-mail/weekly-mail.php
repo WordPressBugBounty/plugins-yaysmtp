@@ -51,7 +51,7 @@ $yaysmtpMailFailedPercent = Utils::percentClass( $mailReportData['failed_mail'],
   <p>Howdy,</p>
   <div>
 	<p>Here’s the summary of <?php echo wp_kses_post( get_bloginfo( 'name' ) ); ?> email deliverability with YaySMTP.</p>
-	<div style="<?php echo esc_attr( $yaysmtp_report_performed_cl ); ?>">
+	<div class="yaysmtp-report-performed-cl" style="<?php echo esc_attr( $yaysmtp_report_performed_cl ); ?>">
 	  <div style="<?php echo esc_attr( $yaysmtp_mail_wrap ); ?>">
 		<div style="<?php echo esc_attr( $yaysmtp_mail_icon ); ?>">
 		  <img src="<?php echo esc_attr( YAY_SMTP_PLUGIN_URL ) . 'assets/img/mail-icon.png'; ?>" height="25" width="32">
@@ -122,9 +122,9 @@ $yaysmtpMailFailedPercent = Utils::percentClass( $mailReportData['failed_mail'],
 				$total_mail   = $total_sent + $total_failed;
 				if ( 0 < intval( $total_sent ) ) {
 					?>
-				<div style="<?php echo esc_attr( $yaysmtp_group_content_wrap ); ?>">
+				<div class="yaysmtp-group-content-wrap" style="<?php echo esc_attr( $yaysmtp_group_content_wrap ); ?>">
 				  <div style="<?php echo esc_attr( $yaysmtp_group_title ); ?>"><?php echo esc_attr( $groupTitle ); ?></div>
-				  <div style="<?php echo esc_attr( $yaysmtp_group_content_item ); ?>">
+				  <div class="yaysmtp-group-content-item" style="<?php echo esc_attr( $yaysmtp_group_content_item ); ?>">
 					<div style="<?php echo esc_attr( $yaysmtp_group_content_item_icon ); ?>">
 					  <img src="<?php echo esc_attr( YAY_SMTP_PLUGIN_URL ) . 'assets/img/sent-icon.png'; ?>" height="22" width="22">
 					</div>

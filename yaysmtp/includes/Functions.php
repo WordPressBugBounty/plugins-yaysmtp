@@ -38,6 +38,8 @@ class Functions {
 		add_action( 'wp_ajax_yaysmtp_delete_all_email_logs', array( $this, 'deleteAllEmailLogs' ) );
 		add_action( 'wp_ajax_yaysmtp_detail_email_logs', array( $this, 'getEmailLog' ) );
 		add_action( 'wp_ajax_yaysmtp_overview_chart', array( $this, 'getEmailChart' ) );
+		add_action( 'wp_ajax_yaysmtp_mark_reviewed', array( $this, 'markReviewed' ) );
+		// Utils::checkExistPhpMailerDefault();
 	}
 
 	private function __construct() {}
@@ -45,8 +47,8 @@ class Functions {
 	public function saveSettings() {
 		try {
 			Utils::checkNonce();
-			if ( isset( $_POST['settings'] ) ) {
-				$settings          = Utils::saniValArray( $_POST['settings'] ); //phpcs:ignore
+			if ( isset( $_POST['params'] ) ) {
+				$settings          = Utils::saniValArray( $_POST['params'] ); //phpcs:ignore
 				$yaysmtpSettingsDB = Utils::getYaySmtpSetting();
 
 				$yaysmtpSettings = array();
@@ -56,7 +58,7 @@ class Functions {
 					// Update "succ_sent_mail_last" option to SHOW/HIDE Debug Box on main page.
 					if ( isset( $yaysmtpSettings['currentMailer'] ) ) {
 						$currentMailerDB = $yaysmtpSettings['currentMailer'];
-						if ( ! empty( $currentMailerDB ) && $currentMailerDB != $settings['mailerProvider'] ) {
+						if ( ! empty( $currentMailerDB ) && $currentMailerDB != $settings['currentMailer'] ) {
 							$yaysmtpSettings['succ_sent_mail_last'] = true;
 						}
 					}
@@ -67,16 +69,25 @@ class Functions {
 				$yaysmtpSettings['forceFromEmail'] = $settings['forceFromEmail'];
 				$yaysmtpSettings['forceFromName']  = $settings['forceFromName'];
 
-				$yaysmtpSettings['currentMailer'] = $settings['mailerProvider'];
-				if ( ! empty( $settings['mailerProvider'] ) ) {
+				$yaysmtpSettings['currentMailer'] = $settings['currentMailer'];
+				if ( ! empty( $settings['currentMailer'] ) ) {
 					$mailerSettings = ! empty( $settings['mailerSettings'] ) ? $settings['mailerSettings'] : array();
 
-					if ( ! empty( $mailerSettings ) ) {
+					if ( ! empty( $mailerSettings ) && is_array( $mailerSettings ) ) {
 						foreach ( $mailerSettings as $key => $val ) {
-							if ( 'pass' === $key ) {
-								$yaysmtpSettings[ $settings['mailerProvider'] ][ $key ] = Utils::encrypt( $val, 'smtppass' );
+							if ( 'smtp' === $settings['currentMailer'] && 'pass' === $key ) {
+								if ( ! empty($yaysmtpSettings['smtp']) && 
+									! empty($yaysmtpSettings['smtp']['pass']) 
+								) {
+									if ( Utils::isEncrypted($val) && $yaysmtpSettings['smtp']['pass'] === $val) {
+										continue;
+									} else if ( ! Utils::isEncrypted($val) && $yaysmtpSettings['smtp']['pass'] === Utils::encrypt( $val, 'smtppass' )) {
+										continue;
+									} 
+								}
+								$yaysmtpSettings[ $settings['currentMailer'] ][ $key ] = Utils::encrypt( $val, 'smtppass' );
 							} else {
-								$yaysmtpSettings[ $settings['mailerProvider'] ][ $key ] = $val;
+								$yaysmtpSettings[ $settings['currentMailer'] ][ $key ] = $val;
 							}
 						}
 					}
@@ -135,7 +146,20 @@ class Functions {
 						  update_option( 'yaysmtp_settings', $yaysmtpSettings );
 				}
 
-				wp_send_json_success( array( 'mess' => __( 'Settings saved!', 'yay-smtp' ) ) );
+				$respData = [];
+				if ( 'outlookms' === $settings['currentMailer'] ) {
+					$respData['authUrl']['outlookms'] = Utils::getOutlookMsAuthUrl();
+				} else if ( 'gmail' === $settings['currentMailer'] ) {
+					$respData['authUrl']['gmail'] = Utils::getGmailAuthUrl();
+				} else if ( 'zoho' === $settings['currentMailer'] ) {
+					$respData['authUrl']['zoho'] = Utils::getZohoAuthUrl();
+				}
+
+				if ( ! empty($settings['allowMultisite']) ) {
+					$respData['is_multisite_mode'] = Utils::getMainSiteMultisiteSetting();
+				}
+
+				wp_send_json_success( array( 'mess' => __( 'Settings saved.', 'yay-smtp' ), 'respData' => $respData ) );
 			}
 			wp_send_json_error( array( 'mess' => __( 'Failed to save settings.', 'yay-smtp' ) ) );
 		} catch ( \Exception $ex ) {
@@ -152,6 +176,9 @@ class Functions {
 				$params = Utils::saniValArray( $_POST['params'] ); // phpcs:ignore
 				$mailerProvider = !empty($params['fallback_mailer_provider']) ? $params['fallback_mailer_provider'] : 'smtp';
 				$isNetworkAdmin = (int) $params['isNetworkAdmin'];
+
+				$settingsDB = Utils::getYaySmtpSetting();
+
 				unset( $params['isNetworkAdmin'] );
 				// Handle for multisite or Not
 				if ( is_multisite() && ( 1 == $isNetworkAdmin ) ) {
@@ -168,12 +195,20 @@ class Functions {
 							// Update new settings
 							foreach ( $params as $key => $val ) {
 								if ( 'fallback_smtp_pass' == $key ) {
+									if ( ! empty($settingsDB['fallback_smtp_pass']) ) {
+										if ( Utils::isEncrypted($val) && $settingsDB['fallback_smtp_pass'] === $val) {
+											continue;
+										} else if ( ! Utils::isEncrypted($val) && $settingsDB['fallback_smtp_pass'] === Utils::encrypt( $val, 'smtppass' )) {
+											continue;
+										} 
+									}
+
 									$valPass = Utils::encrypt( $val, 'smtppass' );
 									Utils::setYaySmtpSettingFallback( $key, $valPass );
 								} else {
 									if ( 'fallback_service_provider_mailer_settings' == $key ) {
 										$mailerSettings = $val;
-										if ( ! empty( $mailerSettings ) ) {
+										if ( ! empty( $mailerSettings ) && is_array( $mailerSettings ) ) {
 											$mailerSetDBs = [];
 											foreach ( $mailerSettings as $key1 => $val1 ) {
 												$mailerSetDBs[ $mailerProvider ][ $key1 ] = $val1;
@@ -194,12 +229,20 @@ class Functions {
 				} else {
 					foreach ( $params as $key => $val ) {
 						if ( 'fallback_smtp_pass' == $key ) {
+							if ( ! empty($settingsDB['fallback_smtp_pass']) ) {
+								if ( Utils::isEncrypted($val) && $settingsDB['fallback_smtp_pass'] === $val) {
+									continue;
+								} else if ( ! Utils::isEncrypted($val) && $settingsDB['fallback_smtp_pass'] === Utils::encrypt( $val, 'smtppass' )) {
+									continue;
+								} 
+							}
+
 							$valPass = Utils::encrypt( $val, 'smtppass' );
 							Utils::setYaySmtpSettingFallback( $key, $valPass );
 						} else {
 							if ( 'fallback_service_provider_mailer_settings' == $key ) {
 								$mailerSettings = $val;
-								if ( ! empty( $mailerSettings ) ) {
+								if ( ! empty( $mailerSettings ) && is_array( $mailerSettings ) ) {
 									$mailerSetDBs = [];
 									foreach ( $mailerSettings as $key1 => $val1 ) {
 										$mailerSetDBs[ $mailerProvider ][ $key1 ] = $val1;
@@ -215,11 +258,12 @@ class Functions {
 					}
 				}
 
-				wp_send_json_success(
-					array(
-						'mess' => __( 'Settings saved!', 'yay-smtp' ),
-					)
-				);
+				$respData = [];
+				if ( 'gmail' === $mailerProvider ) {
+					$respData['authUrl']['gmail_fallback'] = Utils::getGmailAuthUrl(true);
+				} 
+
+				wp_send_json_success( array( 'mess' => __( 'Settings saved.', 'yay-smtp' ), 'respData' => $respData ) );
 			}
 			wp_send_json_error( array( 'mess' => __( 'Failed to save settings.', 'yay-smtp' ) ) );
 		} catch ( \Exception $ex ) {
@@ -232,8 +276,8 @@ class Functions {
 	public function sendTestMail() {
 		try {
 			Utils::checkNonce();
-			if ( isset( $_POST['emailAddress'] ) ) {
-				$emailAddress = sanitize_email( $_POST['emailAddress'] );
+			if ( isset( $_POST['params'] ) && isset( $_POST['params']['emailAddress'] ) ) {
+				$emailAddress = sanitize_email( $_POST['params']['emailAddress'] );
 				// check email
 				if ( ! is_email( $emailAddress ) ) {
 					wp_send_json_error( array( 'mess' => __( 'Invalid email format.', 'yay-smtp' ) ) );
@@ -286,8 +330,8 @@ class Functions {
 		Utils::setYaySmtpSetting( 'flag_test_mail_fallback', 'no' );
 		try {
 			Utils::checkNonce();
-			if ( isset( $_POST['emailAddress'] ) ) {
-				$emailAddress = sanitize_email( $_POST['emailAddress'] );
+			if ( isset( $_POST['params'] ) && isset( $_POST['params']['emailAddress'] ) ) {
+				$emailAddress = sanitize_email( $_POST['params']['emailAddress'] );
 				// check email
 				if ( ! is_email( $emailAddress ) ) {
 					Utils::setYaySmtpSetting( 'flag_test_mail_fallback', 'no' );
@@ -384,7 +428,6 @@ class Functions {
 
 			Utils::setYaySmtpSetting( 'outlookms', $oldSetting );
 		}
-
 	}
 
 	public function yohoRemoveAuth() {
@@ -402,7 +445,7 @@ class Functions {
 			}
 
 			Utils::setYaySmtpSetting( 'zoho', $oldSetting );
-
+			
 		}
 	}
 
@@ -451,49 +494,49 @@ class Functions {
 					$statusWhere = 'status = 1 OR status = 0 OR status = 2';
 				}
 
-				// Seach base on From date and To date
-				$dateWhere = 'TRUE';
+				// Build WHERE clause and parameters array
+				$whereConditions = array();
+				$prepareArgs = array();
+				
+				// Status condition
+				$whereConditions[] = "({$statusWhere})";
+				
+				// Search condition
+				if ( ! empty( $valSearch ) ) {
+					$searchPattern = '%' . $wpdb->esc_like( $valSearch ) . '%';
+					$whereConditions[] = "(subject LIKE %s OR email_to LIKE %s)";
+					$prepareArgs[] = $searchPattern;
+					$prepareArgs[] = $searchPattern;
+				}
+				
+				// Date range condition
 				if ( ! empty( $params['from'] ) && ! empty( $params['to'] ) ) {
 					$startDateObj  = new \DateTime( $params['from'] );
 					$endDateOrgObj = new \DateTime( $params['to'] );
 					$startDate     = $startDateObj->format( 'Y-m-d' );
 					$endDate       = $endDateOrgObj->format( 'Y-m-d' );
-
-					$dateWhere = $wpdb->prepare( "DATE(date_time) >= %s AND DATE(date_time) <= %s", $startDate, $endDate );
+					
+					$whereConditions[] = "(DATE(date_time) >= %s AND DATE(date_time) <= %s)";
+					$prepareArgs[] = $startDate;
+					$prepareArgs[] = $endDate;
 				}
-
-				// Result ALL
-				$totalItems = 0;
-				if ( ! empty( $valSearch ) ) {
-					$subjectWhere = $wpdb->prepare( "subject LIKE %s", '%' . $wpdb->esc_like( $valSearch ) . '%' );
-					$toEmailWhere = $wpdb->prepare( "email_to LIKE %s", '%' . $wpdb->esc_like( $valSearch ) . '%' );
-					$whereQuery   = "({$subjectWhere} OR {$toEmailWhere}) AND ({$statusWhere})";
-
-					if ( ! empty( $dateWhere ) ) {
-						$whereQuery = "({$whereQuery}) AND ({$dateWhere})";
-					}	
-
-					$totalItemsPrepare = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
-					$totalItems = (int) $wpdb->get_var( $totalItemsPrepare );
-					$sqlRepare    = $wpdb->prepare(
-						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY " . sanitize_sql_orderby($sortField . ' ' . $sortVal) . " LIMIT %d OFFSET %d",
-						$limit,
-						$offset
-					);
-				} else {
-					$whereQuery = "{$statusWhere}";
-					if ( ! empty( $dateWhere ) ) {
-						$whereQuery = '(' . $statusWhere . ') AND (' . $dateWhere . ')';
-					}
-
-					$totalItemsPrepare = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $whereQuery" );
-					$totalItems = (int) $wpdb->get_var( $totalItemsPrepare );
-					$sqlRepare    = $wpdb->prepare(
-						"SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE $whereQuery ORDER BY " . sanitize_sql_orderby($sortField . ' ' . $sortVal) . " LIMIT %d OFFSET %d",
-						$limit,
-						$offset
-					);
+				
+				// Combine all WHERE conditions
+				$whereQuery = implode( ' AND ', $whereConditions );
+				
+				// Get total count
+				$countQuery = "SELECT COUNT(*) FROM {$wpdb->prefix}yaysmtp_email_logs WHERE {$whereQuery}";
+				if ( ! empty( $prepareArgs ) ) {
+					$countQuery = $wpdb->prepare( $countQuery, $prepareArgs );
 				}
+				$totalItems = (int) $wpdb->get_var( $countQuery );
+				
+				// Get results with pagination
+				$orderBy = sanitize_sql_orderby( $sortField . ' ' . $sortVal );
+				$selectQuery = "SELECT l.id, l.subject, l.email_from, l.email_to, l.mailer, l.date_time, l.status, l.root_name FROM {$wpdb->prefix}yaysmtp_email_logs AS l WHERE {$whereQuery} ORDER BY {$orderBy} LIMIT %d OFFSET %d";
+				
+				$selectArgs = array_merge( $prepareArgs, array( $limit, $offset ) );
+				$sqlRepare = $wpdb->prepare( $selectQuery, $selectArgs );
 
 				// Result Custom
 				$results = $wpdb->get_results( $sqlRepare ); // phpcs:ignore
@@ -621,7 +664,7 @@ class Functions {
 
 				wp_send_json_success(
 					array(
-						'mess' => __( 'Settings saved!', 'yay-smtp' ),
+						'mess' => __( 'Settings saved!', 'yay-smtp' )
 					)
 				);
 			}
@@ -732,7 +775,7 @@ class Functions {
 
 					if ( ! empty( $resultQuery->content_type ) ) {
 						$resultArr['content_type'] = $resultQuery->content_type;
-						$resultArr['body_content'] = Utils::wpKses( maybe_serialize( $resultQuery->body_content ) );
+						$resultArr['body_content'] = Utils::wpKses( maybe_serialize( $resultQuery->body_content ));
 					}
 
 					if ( ! empty( $resultQuery->reason_error ) ) {
@@ -884,6 +927,24 @@ class Functions {
 				array(
 					'mess' => __( 'Successful.', 'yay-smtp' ),
 					'data' => $response,
+				)
+			);
+		} catch ( \Exception $ex ) {
+			LogErrors::getMessageException( $ex, true );
+		} catch ( \Error $ex ) {
+			LogErrors::getMessageException( $ex, true );
+		}
+	}
+
+	public function markReviewed() {
+		try {
+			Utils::checkNonce();
+	
+			update_option( 'yaysmtp_reviewed', true );
+	
+			wp_send_json_success(
+				array(
+					'mess' => __( 'Mark reviewed successful.', 'yay-smtp' ),
 				)
 			);
 		} catch ( \Exception $ex ) {

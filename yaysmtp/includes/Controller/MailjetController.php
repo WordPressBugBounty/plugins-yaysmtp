@@ -238,7 +238,7 @@ class MailjetController {
 
 			if ( ! empty( $errorResponse ) && ! empty( $errorResponse['code'] ) ) {
 				$message = '[' . sanitize_key( $errorResponse['code'] ) . ']: ' . $errorResponse['message'];
-
+				
 				if ( ! empty( $errorBody ) ) { // string or json string
 					$body_error = json_decode( $errorBody, true );
 					if ( $body_error && ! empty( $body_error['ErrorMessage'] ) ) { 
@@ -268,7 +268,7 @@ class MailjetController {
 					$extra_info['error_mess'] = $message_extra;		
 					$updateData['extra_info'] = wp_json_encode($extra_info);
 				}
-
+				
 				Utils::updateEmailLog( $updateData );
 			}
 

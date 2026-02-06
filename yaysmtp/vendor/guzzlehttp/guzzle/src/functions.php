@@ -41,7 +41,6 @@ function uri_template($template, array $variables)
 function describe_type($input)
 {
     return Utils::describeType($input);
-   
 }
 
 /**
@@ -65,7 +64,7 @@ function headers_from_lines($lines)
  */
 function debug_resource($value = null)
 {
-    Utils::debugResource($value );
+    Utils::debugResource($value);
 }
 
 /**

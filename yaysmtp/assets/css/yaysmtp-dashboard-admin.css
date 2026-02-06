@@ -1,0 +1,42 @@
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap table .table-header {
+  padding: 8px 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-align: left;
+  background-color: #f8f9fa;
+}
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap table .table-item {
+  font-size: 0.8125rem;
+  border-bottom: 1px solid #e2e4e7;
+  padding: 10px 13px;
+}
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap .top-mail-title {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+#dashboard-widgets
+  .yaysmtp-analytics-email-wrap
+  .top-mail-table-wrap
+  .top-mail-title
+  h3 {
+  font-weight: 500;
+}
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap .top-mail-table,
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap .top-mail-table-empty {
+  display: none;
+}
+.yaysmtp-analytics-email-wrap .top-mail-table-wrap .top-mail-table-empty p {
+  color: #646970;
+  font-size: 16px;
+  text-align: center;
+}
+
+
+
+
+
+

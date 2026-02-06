@@ -236,7 +236,7 @@ class PepiPostController {
 						$extra_info['error_mess'] = $message_extra;		
 						$updateData['extra_info'] = wp_json_encode($extra_info);
 					}
-
+					
 					Utils::updateEmailLog( $updateData );
 				}
 			} else {
