@@ -21,12 +21,12 @@ trait MessageTrait
     /** @var StreamInterface|null */
     private $stream;
 
-    public function getProtocolVersion()
+    public function getProtocolVersion() : string
     {
         return $this->protocol;
     }
 
-    public function withProtocolVersion($version)
+    public function withProtocolVersion($version) : self
     {
         if ($this->protocol === $version) {
             return $this;
@@ -37,17 +37,17 @@ trait MessageTrait
         return $new;
     }
 
-    public function getHeaders()
+    public function getHeaders() : array
     {
         return $this->headers;
     }
 
-    public function hasHeader($header)
+    public function hasHeader($header) : bool
     {
         return isset($this->headerNames[strtolower($header)]);
     }
 
-    public function getHeader($header)
+    public function getHeader($header) : array
     {
         $header = strtolower($header);
 
@@ -60,12 +60,12 @@ trait MessageTrait
         return $this->headers[$header];
     }
 
-    public function getHeaderLine($header)
+    public function getHeaderLine($header) : string
     {
         return implode(', ', $this->getHeader($header));
     }
 
-    public function withHeader($header, $value)
+    public function withHeader($header, $value) : self
     {
         $this->assertHeader($header);
         $value = $this->normalizeHeaderValue($value);
@@ -81,7 +81,7 @@ trait MessageTrait
         return $new;
     }
 
-    public function withAddedHeader($header, $value)
+    public function withAddedHeader($header, $value) : self
     {
         $this->assertHeader($header);
         $value = $this->normalizeHeaderValue($value);
@@ -99,7 +99,7 @@ trait MessageTrait
         return $new;
     }
 
-    public function withoutHeader($header)
+    public function withoutHeader($header) : self
     {
         $normalized = strtolower($header);
 
@@ -115,7 +115,7 @@ trait MessageTrait
         return $new;
     }
 
-    public function getBody()
+    public function getBody() : StreamInterface
     {
         if (!$this->stream) {
             $this->stream = Utils::streamFor('');
@@ -124,7 +124,7 @@ trait MessageTrait
         return $this->stream;
     }
 
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body) : self
     {
         if ($body === $this->stream) {
             return $this;
@@ -135,7 +135,7 @@ trait MessageTrait
         return $new;
     }
 
-    private function setHeaders(array $headers)
+    private function setHeaders(array $headers) : void
     {
         $this->headerNames = $this->headers = [];
         foreach ($headers as $header => $value) {
@@ -162,7 +162,7 @@ trait MessageTrait
      *
      * @return string[]
      */
-    private function normalizeHeaderValue($value)
+    private function normalizeHeaderValue($value) : array
     {
         if (!is_array($value)) {
             return $this->trimAndValidateHeaderValues([$value]);
@@ -189,7 +189,7 @@ trait MessageTrait
      *
      * @see https://tools.ietf.org/html/rfc7230#section-3.2.4
      */
-    private function trimAndValidateHeaderValues(array $values)
+    private function trimAndValidateHeaderValues(array $values) : array
     {
         return array_map(function ($value) {
             if (!is_scalar($value) && null !== $value) {
@@ -213,7 +213,7 @@ trait MessageTrait
      *
      * @return void
      */
-    private function assertHeader($header)
+    private function assertHeader($header) : void
     {
         if (!is_string($header)) {
             throw new \InvalidArgumentException(sprintf(
@@ -250,7 +250,7 @@ trait MessageTrait
      * obs-text       = %x80-FF
      * obs-fold       = CRLF 1*( SP / HTAB )
      */
-    private function assertValue($value)
+    private function assertValue($value) : void
     {
         // The regular expression intentionally does not support the obs-fold production, because as
         // per RFC 7230#3.2.4:

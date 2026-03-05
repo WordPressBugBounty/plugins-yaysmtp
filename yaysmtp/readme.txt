@@ -4,7 +4,7 @@ Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
 Tested up to: 6.9
-Stable tag: 2.7.2
+Stable tag: 2.7.3
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -114,6 +114,11 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Mar 5, 2026 – Version 2.7.3 =
+- Improved: Outlook MS processing.
+- Fixed: Bugs about GuzzleHttp Library.
+- Fixed: Resolving PHP 8.2+ deprecation warnings (SMTPSecure and mb_convert_encoding)
 
 = Jan 5, 2026 – Version 2.7.2 =
 - Improved: Masked Hidden Key Input.

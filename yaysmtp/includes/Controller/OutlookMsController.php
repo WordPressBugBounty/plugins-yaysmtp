@@ -62,19 +62,13 @@ class OutlookMsController {
 		}
 
 		$userFrom      = $this->getUserInf();
-		$email_address = array(
-			'emailAddress' => array(
-				'name'    => isset( $userFrom['name'] ) ? sanitize_text_field( $userFrom['name'] ) : '',
-				'address' => isset( $userFrom['email'] ) ? $userFrom['email'] : '',
-			),
-		);
 
 		// Set wp_mail_from && wp_mail_from_name - start
 		$currentFromEmail = Utils::getCurrentFromEmail();
 		$currentFromName  = Utils::getCurrentFromName();
 		if ( ! empty( $userFrom['email'] ) ) {
-			$smtpObj->From   = $userFrom['email'];
-			$smtpObj->Sender = $userFrom['email'];
+			$smtpObj->From   = sanitize_text_field( $userFrom['email'] );
+			$smtpObj->Sender = sanitize_text_field( $userFrom['email'] );
 		}
 
 		if ( Utils::getForceFromEmail() == 1 ) {
@@ -84,6 +78,8 @@ class OutlookMsController {
 
 		if ( Utils::getForceFromName() == 1 ) {
 			$smtpObj->FromName = $currentFromName;
+		} else {
+			$smtpObj->FromName = isset( $userFrom['name'] ) ? sanitize_text_field( $userFrom['name'] ) : '';
 		}
 		// Set wp_mail_from && wp_mail_from_name - end
 
@@ -92,6 +88,13 @@ class OutlookMsController {
 		$this->log_id         = Utils::insertEmailLogs( $dataLogsDB );
 
 		do_action('yaysmtp_send_before', $smtpObj, $this->log_id);
+
+		$email_address = array(
+			'emailAddress' => array(
+				'name'    => $smtpObj->FromName,
+				'address' => !empty($smtpObj->From) ? $smtpObj->From : '',
+			),
+		);
 
 		$this->body['message']['from']   = $email_address;
 		$this->body['message']['sender'] = $email_address;

@@ -32,7 +32,7 @@ class EmailClickedLink {
 		$html_content 		 = make_clickable( $mail_content );
 
 		if ( mb_detect_encoding($html_content, "UTF-8", true) ) {
-			$html_content = mb_convert_encoding($html_content, "HTML-ENTITIES", "UTF-8");
+			$html_content = html_entity_decode($html_content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 		}
 
 		$domDoc->loadHTML( $html_content );

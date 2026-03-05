@@ -371,12 +371,12 @@ class Uri implements UriInterface
         return $uri;
     }
 
-    public function getScheme()
+    public function getScheme() : string
     {
         return $this->scheme;
     }
 
-    public function getAuthority()
+    public function getAuthority() : string
     {
         $authority = $this->host;
         if ($this->userInfo !== '') {
@@ -390,37 +390,37 @@ class Uri implements UriInterface
         return $authority;
     }
 
-    public function getUserInfo()
+    public function getUserInfo() : string
     {
         return $this->userInfo;
     }
 
-    public function getHost()
+    public function getHost() : string
     {
         return $this->host;
     }
 
-    public function getPort()
+    public function getPort() : ?int
     {
         return $this->port;
     }
 
-    public function getPath()
+    public function getPath() : string
     {
         return $this->path;
     }
 
-    public function getQuery()
+    public function getQuery() : string
     {
         return $this->query;
     }
 
-    public function getFragment()
+    public function getFragment() : string
     {
         return $this->fragment;
     }
 
-    public function withScheme($scheme)
+    public function withScheme($scheme) : UriInterface
     {
         $scheme = $this->filterScheme($scheme);
 
@@ -436,7 +436,7 @@ class Uri implements UriInterface
         return $new;
     }
 
-    public function withUserInfo($user, $password = null)
+    public function withUserInfo($user, $password = null) : UriInterface
     {
         $info = $this->filterUserInfoComponent($user);
         if ($password !== null) {
@@ -454,7 +454,7 @@ class Uri implements UriInterface
         return $new;
     }
 
-    public function withHost($host)
+    public function withHost($host) : UriInterface
     {
         $host = $this->filterHost($host);
 
@@ -469,7 +469,7 @@ class Uri implements UriInterface
         return $new;
     }
 
-    public function withPort($port)
+    public function withPort($port) : UriInterface
     {
         $port = $this->filterPort($port);
 
@@ -485,7 +485,7 @@ class Uri implements UriInterface
         return $new;
     }
 
-    public function withPath($path)
+    public function withPath($path) : UriInterface
     {
         $path = $this->filterPath($path);
 
@@ -500,7 +500,7 @@ class Uri implements UriInterface
         return $new;
     }
 
-    public function withQuery($query)
+    public function withQuery($query) : UriInterface
     {
         $query = $this->filterQueryAndFragment($query);
 
@@ -514,7 +514,7 @@ class Uri implements UriInterface
         return $new;
     }
 
-    public function withFragment($fragment)
+    public function withFragment($fragment) : UriInterface
     {
         $fragment = $this->filterQueryAndFragment($fragment);
 
@@ -533,7 +533,7 @@ class Uri implements UriInterface
      *
      * @param array $parts Array of parse_url parts to apply.
      */
-    private function applyParts(array $parts)
+    private function applyParts(array $parts) : void
     {
         $this->scheme = isset($parts['scheme'])
             ? $this->filterScheme($parts['scheme'])
@@ -570,7 +570,7 @@ class Uri implements UriInterface
      *
      * @throws \InvalidArgumentException If the scheme is invalid.
      */
-    private function filterScheme($scheme)
+    private function filterScheme($scheme) : string
     {
         if (!is_string($scheme)) {
             throw new \InvalidArgumentException('Scheme must be a string');
@@ -586,7 +586,7 @@ class Uri implements UriInterface
      *
      * @throws \InvalidArgumentException If the user info is invalid.
      */
-    private function filterUserInfoComponent($component)
+    private function filterUserInfoComponent($component) : string
     {
         if (!is_string($component)) {
             throw new \InvalidArgumentException('User info must be a string');
@@ -606,7 +606,7 @@ class Uri implements UriInterface
      *
      * @throws \InvalidArgumentException If the host is invalid.
      */
-    private function filterHost($host)
+    private function filterHost($host) : string
     {
         if (!is_string($host)) {
             throw new \InvalidArgumentException('Host must be a string');
@@ -622,7 +622,7 @@ class Uri implements UriInterface
      *
      * @throws \InvalidArgumentException If the port is invalid.
      */
-    private function filterPort($port)
+    private function filterPort($port) : ?int
     {
         if ($port === null) {
             return null;
@@ -644,7 +644,7 @@ class Uri implements UriInterface
      * 
      * @return array
      */
-    private static function getFilteredQueryString(UriInterface $uri, array $keys)
+    private static function getFilteredQueryString(UriInterface $uri, array $keys) : array
     {
         $current = $uri->getQuery();
 
@@ -665,7 +665,7 @@ class Uri implements UriInterface
      * 
      * @return string
      */
-    private static function generateQueryString($key, $value)
+    private static function generateQueryString($key, $value) : string
     {
         // Query string separators ("=", "&") within the key or value need to be encoded
         // (while preventing double-encoding) before setting the query string. All other
@@ -679,7 +679,7 @@ class Uri implements UriInterface
         return $queryString;
     }
 
-    private function removeDefaultPort()
+    private function removeDefaultPort() : void
     {
         if ($this->port !== null && self::isDefaultPort($this)) {
             $this->port = null;
@@ -695,7 +695,7 @@ class Uri implements UriInterface
      *
      * @throws \InvalidArgumentException If the path is invalid.
      */
-    private function filterPath($path)
+    private function filterPath($path) : string
     {
         if (!is_string($path)) {
             throw new \InvalidArgumentException('Path must be a string');

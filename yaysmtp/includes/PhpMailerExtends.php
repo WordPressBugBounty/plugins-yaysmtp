@@ -6,13 +6,9 @@ use YaySMTP\Helper\LogErrors;
 
 defined( 'ABSPATH' ) || exit;
 
+#[\AllowDynamicProperties]
 class PhpMailerExtends extends \PHPMailer\PHPMailer\PHPMailer {
-	/**
-	 * Explicitly declare properties to avoid PHP 8.2+ dynamic property deprecation
-	 * These properties are inherited from PHPMailer but we redeclare them for compatibility
-	 */
-	public $SMTPSecure = '';
-
+	
 	public function send() {
 		$currentMailer 			 = Utils::getCurrentMailer();
 		$currentMailerFallback   = Utils::getCurrentMailerFallback();

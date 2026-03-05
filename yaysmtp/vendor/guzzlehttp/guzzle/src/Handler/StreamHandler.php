@@ -103,7 +103,7 @@ class StreamHandler
         $ver = explode('/', $parts[0])[1];
         $status = $parts[1];
         $reason = isset($parts[2]) ? $parts[2] : null;
-        $headers = \GuzzleHttp\headers_from_lines($hdrs);
+        $headers = Utils::headersFromLines($hdrs);
         list($stream, $headers) = $this->checkDecode($options, $headers, $stream);
         $stream = Psr7\stream_for($stream);
         $sink = $stream;
