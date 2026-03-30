@@ -4,7 +4,7 @@ Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
 Tested up to: 6.9
-Stable tag: 2.7.3
+Stable tag: 2.7.4
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -14,7 +14,7 @@ Send WordPress emails successfully with WP Mail SMTP via your favorite mailer
 
 Easily send emails from your WordPress site using your preferred SMTP server. With YaySMTP, enjoy **unlimited email logging**, effortless migration from your previous SMTP plugin, and **tracking opened and clicked emails**. 
 
-[Documentation](https://yaycommerce.gitbook.io/yaysmtp/) | [**Get YaySMTP Pro**](https://yaycommerce.com/yaysmtp-wordpress-mail-smtp/) 🏆
+[Documentation](https://docs.yaycommerce.com/yaysmtp/email-log) | [**Get YaySMTP Pro**](https://yaycommerce.com/yaysmtp-wordpress-mail-smtp/) 🏆
 
 ###⚡️ FEATURES
 
@@ -84,13 +84,21 @@ If you're having issues, do let us know, and we'll be [happy to help](https://ya
 
 ###♥️ Like this YaySMTP Plugin?
 👉 Rate us 5 stars on [WordPress.org](https://wordpress.org/support/plugin/yaysmtp/reviews/#new-post).
+
 ✅ Check out our best-selling WordPress plugins: 
+
 - [YayMail - WooCommerce Email Customizer](https://yaycommerce.com/yaymail-woocommerce-email-customizer/)
 - [Email Customizer Addons](https://yaycommerce.com/yaymail-addons/)
 - [YayCurrency - WooCommerce Multi-Currency Switcher](https://yaycommerce.com/yaycurrency-woocommerce-multi-currency-switcher/)
 - [YayPricing - WooCommerce Dynamic Pricing And Discounts](https://yaycommerce.com/yaypricing-woocommerce-dynamic-pricing-and-discounts/)
 - [YayExtra - WooCommerce Extra Product Options](https://yaycommerce.com/yayextra-woocommerce-extra-product-options/)
-- [YaySwatches – Variation Swatches for WooCommerce](https://yaycommerce.com/yayswatches-variation-swatches-for-woocommerce/)
+- [YaySwatches - Variation Swatches for WooCommerce](https://yaycommerce.com/yayswatches-variation-swatches-for-woocommerce/)
+
+✅ Plugins to boost conversions and increase AOV in WooCommerce:
+
+- [YayReviews - Advanced Customer Reviews with AI Summary](https://yaycommerce.com/yayreviews-advanced-customer-reviews-for-woocommerce/) ✨
+- [YayBoost - Sales Booster for WooCommerce](https://yaycommerce.com/yayboost-sales-booster-for-woocommerce/)
+- [Yay Wholesale B2B](https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/)
 
 == Frequently Asked Questions ==
 
@@ -114,6 +122,10 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Mar 30, 2026 – Version 2.7.4 =
+- Improved: Modify Brevo's API creation link.
+- Improved: Change a few Sendpulse labels.
 
 = Mar 5, 2026 – Version 2.7.3 =
 - Improved: Outlook MS processing.
