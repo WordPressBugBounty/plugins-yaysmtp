@@ -576,7 +576,9 @@ class Utils {
 	
 	public static function getRoot( $file ) {
 		$cacheData = get_transient( 'YAYSMTP_ROOT' );
-		$cacheData = isset( $cacheData ) ? $cacheData : array();
+		if ( ! is_array( $cacheData ) ) {
+			$cacheData = array();
+		}
 
 		if ( ! empty( $cacheData[ $file ] ) ) {
 			return $cacheData[ $file ];
@@ -700,6 +702,87 @@ class Utils {
 		return $data;
 	}
 
+	public static function getReportsData( $groupBy = 'day', $year = '', $start = '', $end = '', $subject = '' ) {
+		global $wpdb;
+
+		$startDate   = isset( $_POST['start_date'] ) ? sanitize_text_field( $_POST['start_date'] ) : $start;
+		$endDate     = isset( $_POST['end_date'] ) ? sanitize_text_field( $_POST['end_date'] ) : $end;
+		$currentYear = gmdate( 'Y' );
+
+		if ( ! $startDate ) {
+			$startDate = gmdate( 'Y-m-d', strtotime( gmdate( 'Ym', current_time( 'timestamp' ) ) . '01' ) );
+
+			if ( 'year' === $groupBy ) {
+				$startDate = $year . '-01-01';
+			}
+		}
+
+		if ( ! $endDate ) {
+			$endDate = gmdate( 'Y-m-d', current_time( 'timestamp' ) );
+
+			if ( 'year' === $groupBy && ( $year < $currentYear ) ) {
+				$endDate = $year . '-12-31';
+			}
+		}
+
+		$groupByClause = ( 'day' == $groupBy )
+			? 'YEAR(el.date_time), MONTH(el.date_time), DAY(el.date_time)'
+			: 'YEAR(el.date_time), MONTH(el.date_time)';
+
+		// Optional subject filter applies to the chart's per-date data only (table keeps all rows).
+		$subjectSql = ! empty( $subject ) ? ' AND el.subject = %s' : '';
+
+		// Per-date sent/fail counts (status 1 = sent, 0 = failed).
+		$statusQuery = function ( $status ) use ( $wpdb, $startDate, $endDate, $subject, $subjectSql, $groupByClause ) {
+			$sql  = "SELECT
+				COUNT(el.id) as total_emails,
+				el.date_time as date_time
+				FROM {$wpdb->prefix}yaysmtp_email_logs el
+				WHERE el.status = %d
+				AND DATE(el.date_time) >= %s AND DATE(el.date_time) <= %s{$subjectSql}
+				GROUP BY {$groupByClause}";
+			$args = array( $status, $startDate, $endDate );
+			if ( ! empty( $subject ) ) {
+				$args[] = $subject;
+			}
+			return $wpdb->get_results( $wpdb->prepare( $sql, $args ) );
+		};
+
+		$mailSuccessData = $statusQuery( 1 );
+		$mailFailData    = $statusQuery( 0 );
+
+		// Per-date opened/clicked totals (counts live in separate event tables joined by log_id).
+		$openedClickedSql = "SELECT
+			el.date_time as date_time,
+			SUM( COALESCE( eo.total_opened, 0 ) ) as total_opened,
+			SUM( COALESCE( cl.total_clicked, 0 ) ) as total_clicked
+			FROM {$wpdb->prefix}yaysmtp_email_logs el
+			LEFT JOIN (
+				SELECT log_id, SUM( count ) as total_opened
+				FROM {$wpdb->prefix}yaysmtp_event_email_opened
+				GROUP BY log_id
+			) eo ON el.id = eo.log_id
+			LEFT JOIN (
+				SELECT log_id, SUM( count ) as total_clicked
+				FROM {$wpdb->prefix}yaysmtp_event_email_clicked_link
+				GROUP BY log_id
+			) cl ON el.id = cl.log_id
+			WHERE DATE(el.date_time) >= %s AND DATE(el.date_time) <= %s{$subjectSql}
+			GROUP BY {$groupByClause}";
+		$openedClickedArgs = array( $startDate, $endDate );
+		if ( ! empty( $subject ) ) {
+			$openedClickedArgs[] = $subject;
+		}
+		$mailOpenedClickedData = $wpdb->get_results( $wpdb->prepare( $openedClickedSql, $openedClickedArgs ) );
+
+		$data = array(
+			'successData'       => $mailSuccessData,
+			'failData'          => $mailFailData,
+			'openedClickedData' => $mailOpenedClickedData,
+		);
+		return $data;
+	}
+
 	public static function getMailBankSettingsTable() {
 		global $wpdb;
 		
@@ -807,7 +890,7 @@ class Utils {
 		$wpMailSmtpExist    = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'wpmailsmtp_emails_log"');
 		if( !empty($wpMailSmtpExist) ) {
 			$wpMailSmtpSettings = $wpdb->get_var(
-				$wpdb->prepare("SELECT id FROM {$wpdb->prefix}wpmailsmtp_emails_log LIMIT 1")
+				"SELECT id FROM {$wpdb->prefix}wpmailsmtp_emails_log LIMIT 1"
 			);
 		}
 		if ( ! empty( $wpMailSmtpSettings ) ) {
@@ -824,7 +907,7 @@ class Utils {
 		$wpSmtpExist    = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'wpsmtp_logs"');
 		if( !empty($wpSmtpExist) ) {
 			$wpSmtpSettings = $wpdb->get_var(
-				$wpdb->prepare("SELECT mail_id FROM {$wpdb->prefix}wpsmtp_logs LIMIT 1")
+				"SELECT mail_id FROM {$wpdb->prefix}wpsmtp_logs LIMIT 1"
 			);
 		}
 		if ( ! empty( $wpSmtpSettings ) ) {
@@ -841,7 +924,7 @@ class Utils {
 		$postSmtpExist    = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'post_smtp_logs"');
 		if( !empty($postSmtpExist) ) {
 			$postSmtpSettings = $wpdb->get_var(
-				$wpdb->prepare("SELECT id FROM {$wpdb->prefix}post_smtp_logs LIMIT 1")
+				"SELECT id FROM {$wpdb->prefix}post_smtp_logs LIMIT 1"
 			);
 		}
 		if ( ! empty( $postSmtpSettings ) ) {
@@ -858,7 +941,7 @@ class Utils {
 		$mailBankExist    = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'mail_bank_logs"');
 		if( !empty($mailBankExist) ) {
 			$mailBankSettings = $wpdb->get_var(
-				$wpdb->prepare("SELECT id FROM {$wpdb->prefix}mail_bank_logs LIMIT 1")
+				"SELECT id FROM {$wpdb->prefix}mail_bank_logs LIMIT 1"
 			);
 		}
 		if ( ! empty( $mailBankSettings ) ) {
@@ -875,7 +958,7 @@ class Utils {
 		$easyWpSmtpExist    = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'easywpsmtp_emails_log"');
 		if( !empty($easyWpSmtpExist) ) {
 			$easyWpSmtpSettings = $wpdb->get_var(
-				$wpdb->prepare("SELECT id FROM {$wpdb->prefix}easywpsmtp_emails_log LIMIT 1")
+				"SELECT id FROM {$wpdb->prefix}easywpsmtp_emails_log LIMIT 1"
 			);
 		}
 		if ( ! empty( $easyWpSmtpSettings ) ) {
@@ -1049,6 +1132,75 @@ class Utils {
 		return $mailReportGroupByDataLimitData;
 	}
 
+	public static function getReportsGroupByDataForDashboard( $groupBy = 'subject', $start = '', $end = '' ) {
+		global $wpdb;
+
+		$startDate = $start;
+		$endDate   = $end;
+		if ( ! $startDate ) {
+			$startDate = gmdate( 'Y-m-d', strtotime( gmdate( 'Ym', current_time( 'timestamp' ) ) . '01' ) );
+		}
+		if ( ! $endDate ) {
+			$endDate = gmdate( 'Y-m-d', current_time( 'timestamp' ) );
+		}
+
+		// Get all grouped items with tracking totals for each subject.
+		$mailReportGroupByDataQuery = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT
+				el . subject,
+				el . status,
+				COUNT( el . id ) as total_emails,
+				SUM( COALESCE( eo.total_opened, 0 ) ) as email_opened,
+				SUM( COALESCE( cl.total_clicked, 0 ) ) as email_clicked_links
+				FROM {$wpdb->prefix}yaysmtp_email_logs el
+				LEFT JOIN (
+					SELECT log_id, SUM( count ) as total_opened
+					FROM {$wpdb->prefix}yaysmtp_event_email_opened
+					GROUP BY log_id
+				) eo ON el.id = eo.log_id
+				LEFT JOIN (
+					SELECT log_id, SUM( count ) as total_clicked
+					FROM {$wpdb->prefix}yaysmtp_event_email_clicked_link
+					GROUP BY log_id
+				) cl ON el.id = cl.log_id
+				WHERE DATE( el . date_time ) >= %s and DATE( el . date_time ) <= %s
+				GROUP BY el.subject, el.status
+				ORDER BY total_emails DESC",
+				$startDate,
+				$endDate
+			)
+		);
+
+		$mailReportGroupByData = array();
+		if ( ! empty( $mailReportGroupByDataQuery ) ) {
+			foreach ( $mailReportGroupByDataQuery as $el ) {
+				$title  = trim( $el->subject );
+				$status = (int) $el->status;
+
+				if ( empty( $mailReportGroupByData[ $title ] ) ) {
+					$mailReportGroupByData[ $title ] = array(
+						'total_sent'          => 0,
+						'total_failed'        => 0,
+						'email_opened'        => 0,
+						'email_clicked_links' => 0,
+					);
+				}
+
+				if ( 1 == $status ) {
+					$mailReportGroupByData[ $title ]['total_sent'] = (int) $el->total_emails;
+				} elseif ( 0 == $status ) {
+					$mailReportGroupByData[ $title ]['total_failed'] = (int) $el->total_emails;
+				}
+
+				$mailReportGroupByData[ $title ]['email_opened']        += (int) $el->email_opened;
+				$mailReportGroupByData[ $title ]['email_clicked_links'] += (int) $el->email_clicked_links;
+			}
+		}
+
+		return $mailReportGroupByData;
+	}
+
 	public static function conditionUseFallbackSmtp( $force = false ) {
 		if ( $force ) {
 			return true;
@@ -1197,9 +1349,9 @@ class Utils {
 
 	public static function deleteAllEmailLogs() {
 		global $wpdb;
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_email_logs' ) );
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_event_email_clicked_link' ) );
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_event_email_opened' ) );
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_email_logs' );
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_event_email_clicked_link' );
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_event_email_opened' );
 	}
 	
 	public static function deleteAllEmailLogsWithCondition( $days_setting = null, $days_param = null ) {

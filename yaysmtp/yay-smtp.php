@@ -3,7 +3,7 @@
  * Plugin Name: YaySMTP
  * Plugin URI: https://yaycommerce.com/yaysmtp
  * Description: This plugin helps you send emails from your WordPress website via your preferred SMTP server.
- * Version: 2.7.4
+ * Version: 2.7.5
  * Author: YayCommerce
  * Author URI: https://yaycommerce.com
  * Text Domain: yaysmtp
@@ -26,7 +26,7 @@ if ( ! defined( 'YAY_SMTP_PREFIX' ) ) {
 	define( 'YAY_SMTP_PREFIX', 'yay-smtp' );
 }
 if ( ! defined( 'YAY_SMTP_VERSION' ) ) {
-	define( 'YAY_SMTP_VERSION', '2.7.4' );
+	define( 'YAY_SMTP_VERSION', '2.7.5' );
 }
 
 if ( ! defined( 'YAY_SMTP_DOMAIN' ) ) {
@@ -78,9 +78,19 @@ spl_autoload_register(
 );
 
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/YaysmtpPluginAdapter.php';  // unique per plugin
+
+add_action( 'plugins_loaded', function() {
+    \YaySMTPScoped\YayCommerce\AdminShell\AdminShell::boot();
+    \YaySMTPScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
+        new \YaysmtpPluginAdapter()
+    );
+}, 5 );
+
+require_once __DIR__ . '/vendor_google_microsoft/autoload.php';
 require_once __DIR__ . '/vendor_amazon/autoload.php';
 
-$base_dir_vendor_league = __DIR__ . '/vendor/league/src/';
+$base_dir_vendor_league = __DIR__ . '/vendor_google_microsoft/league/src/';
 require_once $base_dir_vendor_league . 'Tool/RequiredParameterTrait.php';
 require_once $base_dir_vendor_league . 'Tool/QueryBuilderTrait.php';
 require_once $base_dir_vendor_league . 'Tool/ArrayAccessorTrait.php';
@@ -126,7 +136,6 @@ if ( version_compare( get_bloginfo( 'version' ), '5.5-alpha', '<' ) ) {
 
 if ( ! function_exists( 'YaySMTP\\init' ) ) {
 	function init() {
-		\YaySMTP\YayCommerceMenu\RegisterMenu::get_instance();
 		Dashboard::getInstance();
 		Schedule::getInstance();
 		Plugin::getInstance();

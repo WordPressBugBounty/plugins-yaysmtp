@@ -263,7 +263,7 @@ class ImportSettingsOtherPlugins {
 			$where_clause = implode(' AND ', $where_clause);
 			$sql_repare = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE $where_clause", $query_params );
 		} else {
-			$sql_repare = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs" );
+			$sql_repare = "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs";
 		}
 		
 		return $wpdb->get_results( $sql_repare ); // phpcs:ignore
@@ -971,7 +971,7 @@ class ImportSettingsOtherPlugins {
 		$tableLogExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'wpmailsmtp_emails_log"');
 		if( ! empty( $tableLogExist ) ) {
 			$mailerList  = Utils::getAllMailer();
-			$sqlRepare   = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wpmailsmtp_emails_log" );
+			$sqlRepare   = "SELECT * FROM {$wpdb->prefix}wpmailsmtp_emails_log";
 			$resultQuery = $wpdb->get_results( $sqlRepare );
 
 			if( !empty($resultQuery) ) {
@@ -1061,7 +1061,7 @@ class ImportSettingsOtherPlugins {
 		$tableLogExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'wpsmtp_logs"');
 		if( ! empty( $tableLogExist ) ) {
 			$mailerList = Utils::getAllMailer();
-			$sqlRepare   = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wpsmtp_logs" );
+			$sqlRepare   = "SELECT * FROM {$wpdb->prefix}wpsmtp_logs";
 			$resultQuery = $wpdb->get_results( $sqlRepare );
 
 			if( !empty($resultQuery) ) {
@@ -1095,7 +1095,7 @@ class ImportSettingsOtherPlugins {
 		$tableLogExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'post_smtp_logs"');
 		if( ! empty( $tableLogExist ) ) {
 			$mailerList = Utils::getAllMailer();
-			$sqlRepare   = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}post_smtp_logs" );
+			$sqlRepare   = "SELECT * FROM {$wpdb->prefix}post_smtp_logs";
 			$resultQuery = $wpdb->get_results( $sqlRepare );
 
 			if( !empty($resultQuery) ) {
@@ -1135,7 +1135,7 @@ class ImportSettingsOtherPlugins {
 		$tableLogExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'mail_bank_logs"');
 		if( ! empty( $tableLogExist ) ) {
 			$mailerList = Utils::getAllMailer();
-			$sqlRepare   = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}mail_bank_logs" );
+			$sqlRepare   = "SELECT * FROM {$wpdb->prefix}mail_bank_logs";
 			$resultQuery = $wpdb->get_results( $sqlRepare );
 
 			if( !empty($resultQuery) ) {
@@ -1171,7 +1171,7 @@ class ImportSettingsOtherPlugins {
 		$tableLogExist = $wpdb->query('SHOW TABLES LIKE "' . $wpdb->prefix . 'easywpsmtp_emails_log"');
 		if( ! empty( $tableLogExist ) ) {
 			$mailerList  = Utils::getAllMailer();
-			$sqlRepare   = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}easywpsmtp_emails_log" );
+			$sqlRepare   = "SELECT * FROM {$wpdb->prefix}easywpsmtp_emails_log";
 			$resultQuery = $wpdb->get_results( $sqlRepare );
 
 			if( !empty($resultQuery) ) {

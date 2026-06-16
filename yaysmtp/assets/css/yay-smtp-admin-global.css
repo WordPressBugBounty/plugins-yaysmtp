@@ -1,4 +1,3 @@
-
 /* Hide other notice in YaySMTP page */
 .yaycommerce_page_yaysmtp .yaysmtp-import-settings-notice {
   display: none;
@@ -21,8 +20,25 @@
 }
 .yaysmtp-report-performed-cl,
 .yaysmtp-group-content-wrap,
-.yaysmtp-group-content-item
-{
+.yaysmtp-group-content-item {
   display: inline-flex !important;
 }
 
+/** -------------------- It will be removed when the yay admin shell fix is released - start -------------------- */
+/* Network Admin: hide YayCommerce submenus except allowed items */
+.network-admin .toplevel_page_yaycommerce .wp-submenu li {
+  display: none;
+}
+
+.network-admin
+  .toplevel_page_yaycommerce
+  .wp-submenu
+  li:has(
+    a[href*="yaysmtp"],
+    a[href*="yaycommerce-help"],
+    a[href*="yaycommerce-licenses"],
+    a[href*="yaycommerce-other-plugins"]
+  ) {
+  display: block;
+}
+/** -------------------- It will be removed when the yay admin shell fix is released - end -------------------- */

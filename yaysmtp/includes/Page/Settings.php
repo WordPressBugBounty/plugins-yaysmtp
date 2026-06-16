@@ -10,7 +10,11 @@ defined( 'ABSPATH' ) || exit;
 
 class Settings {
 	protected static $instance = null;
-	private $hook_suffix;
+
+	private const PARENT              = 'yaycommerce';
+	private const POSITION_KEY        = 'yaycommerce_admin_shell_submenu_positions';
+	private const EMAIL_LOGS_SLUG     = 'yaysmtp#/email-logs';
+	private const EMAIL_LOGS_POSITION   = 181;
 
 	public static function getInstance() {
 		if ( null == self::$instance ) {
@@ -23,12 +27,9 @@ class Settings {
 
 
 	private function doHooks() {
-		$this->hook_suffix = array( 'yay_smtp_main_page' );
-		add_action( 'admin_menu', array( $this, 'settingsMenu' ), YAYSMTP_MENU_PRIORITY );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
-		add_action( 'network_admin_menu', array( $this, 'settingsNetWorkMenu' ), YAYSMTP_MENU_PRIORITY );
-		add_filter( 'plugin_action_links_' . YAY_SMTP_PLUGIN_BASENAME, array( $this, 'pluginActionLinks' ) );
-
+		add_action( 'network_admin_menu', array( $this, 'settingsNetWorkMenu' ), 180 );
+		add_action( 'admin_menu', array( $this, 'addYaysmtpLogEmailMenu' ), 181 );
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueueSmtpSettingsScripts' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminDashboardScripts' ) );
@@ -38,35 +39,44 @@ class Settings {
 
 	private function __construct() {}
 
-	public function settingsMenu() {
-		$this->hook_suffix['yay_smtp_main_page'] = add_submenu_page(
-			'yaycommerce',
-			__( 'YaySMTP Manager', 'yay-smtp' ),
-			__( 'YaySMTP', 'yay-smtp' ),
-			'manage_options',
-			'yaysmtp',
-			array( $this, 'settingsPage' ),
-			0
-		);
+	/**
+	 * Place Email Logs directly after YaySMTP (180) in the shared admin-shell sort.
+	 */
+	private function registerEmailLogsSubmenuPosition(): void {
+		if ( ! isset( $GLOBALS[ self::POSITION_KEY ] ) ) {
+			$GLOBALS[ self::POSITION_KEY ] = [];
+		}
+		$GLOBALS[ self::POSITION_KEY ][ self::EMAIL_LOGS_SLUG ] = self::EMAIL_LOGS_POSITION;
 	}
 
 	public function settingsNetWorkMenu() {
-		$this->hook_suffix['yay_smtp_main_page'] = add_submenu_page(
-			'yaycommerce',
-			__( 'YaySMTP Manager', 'yay-smtp' ),
-			__( 'YaySMTP', 'yay-smtp' ),
-			'manage_options',
-			'yaysmtp',
-			array( $this, 'settingsPage' ),
-			0
-		);
+		if ( $this->check_allow_smtp_settings_for_multisite() ) {
+			$this->registerEmailLogsSubmenuPosition();
+			add_submenu_page(
+				self::PARENT,
+				__( 'Email Logs', 'yay-smtp' ),
+				__( '↳ Email Logs', 'yay-smtp' ),
+				'manage_options',
+				self::EMAIL_LOGS_SLUG,
+				[ $this, 'emailLogsPage' ]
+			);
+		}
+
+		remove_submenu_page( self::PARENT, self::PARENT );
 	}
 
-	public function pluginActionLinks( $links ) {
-		$action_links = array(
-			'settings' => '<a href="' . admin_url( 'admin.php?page=yaysmtp' ) . '" aria-label="' . esc_attr__( 'YaySMTP', 'yay-smtp' ) . '">' . esc_html__( 'Settings', 'yay-smtp' ) . '</a>',
-		);
-		return array_merge( $action_links, $links );
+public function addYaysmtpLogEmailMenu() {
+		if ( ! (is_multisite() && ! is_network_admin()  && 'yes' === Utils::getMainSiteMultisiteSetting() ) ) {
+			$this->registerEmailLogsSubmenuPosition();
+			add_submenu_page(
+				self::PARENT,
+				__( 'Email Logs', 'yay-smtp' ),
+				__( '↳ Email Logs', 'yay-smtp' ),
+				'manage_options',
+				self::EMAIL_LOGS_SLUG,
+				[ $this, 'emailLogsPage' ]
+			);
+		}
 	}
 
 	public function settingsPage() {
@@ -76,6 +86,17 @@ class Settings {
 		if ( ! empty( $settings['smtp'] ) && ! empty( $settings['smtp']['pass'] ) ) {
 			echo '<input type="hidden" value="' . esc_attr( Utils::decrypt( $settings['smtp']['pass'], 'smtppass' ) ) . '">';
 		}
+	}
+
+	public function emailLogsPage() {
+		echo '<script>
+			(function () {
+				const target = "#/email-logs";
+				if (window.location.hash !== target) {
+					window.location.replace(window.location.pathname + window.location.search + target);
+				}
+			})();
+		</script>';
 	}
 
 	public function enqueueAdminDashboardScripts( $screenId ) {
@@ -187,5 +208,22 @@ class Settings {
 			$classes .= ' yay-ui';
 		}
 		return $classes;
+	}
+
+	private function isYaysmtpAdminScreen( $screen_id ) {
+		if ( is_string( $screen_id ) && false !== strpos( $screen_id, 'yaycommerce_page_yaysmtp' ) ) {
+			return true;
+		}
+
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+		return self::EMAIL_LOGS_SLUG === $page || 'yaysmtp' === $page;
+	}
+
+	private function check_allow_smtp_settings_for_multisite() {
+		if ( is_multisite() && is_network_admin()  && 'yes' === Utils::getMainSiteMultisiteSetting() ) {
+			return true;
+		}
+
+		return false;
 	}
 }

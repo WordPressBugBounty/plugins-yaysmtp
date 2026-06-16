@@ -1,59 +1,59 @@
-=== YaySMTP and Email Logs: Amazon SES, SendGrid, Outlook, Mailgun, Brevo, Google and Any SMTP Service ===
+=== YaySMTP - WP Mail SMTP with Email Logs, Tracking & Reports ===
 Contributors: YayCommerce
 Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
-Tested up to: 6.9
-Stable tag: 2.7.4
+Tested up to: 7.0
+Stable tag: 2.7.5
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
-Send WordPress emails successfully with WP Mail SMTP via your favorite mailer
+Free WordPress SMTP plugin with email logs, open & click tracking, reports & charts, CSV export, and WooCommerce email preview.
 
 == Description ==
 
-Easily send emails from your WordPress site using your preferred SMTP server. With YaySMTP, enjoy **unlimited email logging**, effortless migration from your previous SMTP plugin, and **tracking opened and clicked emails**. 
+YaySMTP fixes your WordPress email deliverability and gives you something most free SMTP plugins make you pay for: full email tracking, reporting, and log management, 100% free. 💎
 
-[Documentation](https://docs.yaycommerce.com/yaysmtp/email-log) | [**Get YaySMTP Pro**](https://yaycommerce.com/yaysmtp-wordpress-mail-smtp/) 🏆
+**Connect your favorite mailer in 3 steps**, then actually see what happens to every email: who opened it, who clicked, how your sending trends over time, and what failed. 
 
-###⚡️ FEATURES
+Every feature below is free. YaySMTP Pro adds only priority support and feature-request access, never a feature paywall.
 
-YaySMTP has powerful options to connect via API of popular sending services, including Gmail SMTP, Sendinblue SMTP, Zoho SMTP, SendGrid SMTP, and so on.
+== Why YaySMTP over other free SMTP plugins? ==
 
-3 steps to set up YaySMTP that lets you start sending emails in minutes:
+Other free SMTP plugins get your mail delivered. YaySMTP gets it delivered **and shows you what happened & what's next**:
 
-- Fill in the sender 'From' name and email address
-- Choose an email SMTP service provider as your mailer
-- Config settings with built-in fields
+📊 **Email open & click tracking** 
+Know which transactional and marketing emails actually get read.
 
-Whether you're selling via your WooCommerce website or not, you should ensure your email notifications make it to your audience inboxes. Communication should not end up in spam folders or get lost on the way. 
+📈 **Email Reports with charts & statistics**
+Visualize your sending over time: delivery volume, opens, and clicks in clear charts, so you can spot trends and catch problems early. No paid analytics add-on required.
 
-Setting up your WordPress site to use a WP SMTP mailer helps you send through without paying for regular technical maintenance. 🙌
+📁 **Export email logs to CSV**
+Keep auditable backups of everything you've sent. Filter, search, show/hide columns.
 
-[youtube https://youtu.be/J6crljFKwVA]
+♻️ **Import email logs from your old plugin**
+Switching from [WP Mail SMTP](https://wordpress.org/plugins/wp-mail-smtp/), Easy WP SMTP, and others brings your **email history** with you, not just your settings.
 
-###🚀 MORE BENEFITS
+🛒 **WooCommerce email preview & test**
+Preview and send real WooCommerce order emails before customers see them.
 
-- **Seamless connection**: YaySMTP works with your hosting's email server and dedicated SMTP service providers.
-- **Send test email**: Quickly send a test email in a single click. Or you can send test and [preview WooCommerce order emails](https://yaycommerce.com/how-to-preview-and-test-your-woocommerce-emails/) as well.
-- **Full email log**: Keep all email logs with email content and metadata in basic or full information. You can filter, show/hide columns, and search by email subject, user email, etc.
-- **Automatically delete email logs**: You can keep logging emails forever or have your email log retained within the latest 7 - 365 days.
-- **Export/Import email log**: Easily save a backup of your sent-out emails as CSV in case you need to refer to it later.
-- **One click to migrate**: Import your server's API key and settings from other WP SMTP plugins, including Easy WP SMTP, WP Mail SMTP Pro, SMTP Mailer, WP SMTP, Mail Bank, and more [upon request](https://yaycommerce.com/support/).
-- **Import email logs**: Migrate email logs from other WP SMTP plugins to ensure a complete record on your new [email logging page](https://docs.yaycommerce.com/yaysmtp/settings-and-tools/view-email-log) of YaySMTP.
-- **Fallback mailer**: Pick an alternative email sender or relay server with full options.
-- **Disable email delivery**: In the development local mode or maintenance stage, you can record email logs as if they are sent. This is helpful for testing purposes without consuming your sending volumes.
-- **Top-notch design**: Built with quality code and clean UI/UX (your clients will love it!).
-- **Ecommerce optimized**: You can send WooCommerce transactional emails and also marketing campaigns.
+🗓️ **Configurable log retention** 
+Keep logs forever or 7 to 365 days, plus weekly/monthly summary reports, totally free.
 
+== ⚡️ Core Features ==
 
-###🎉 Supported Themes and Plugins
+- Email Reports & analytics: Track email performance over time with built-in charts and statistics, including sent volume, open rates, and click activity at a glance.
+- Full email log: Keep all email logs with content and metadata. Filter, show/hide columns, and search by subject, recipient, and more.
+- Open & click tracking: See which emails are opened and which links are clicked.
+- Export/Import email logs: Save sent emails as CSV; import logs from your previous SMTP plugin.
+Configurable log retention: Keep logs forever or auto-retain within the latest 7 to 365 days.
+- Weekly/monthly summary reports: Get email performance digests delivered to your inbox.
+- WooCommerce optimized: Send and preview real WooCommerce transactional emails; works perfectly with [YayMail](https://wordpress.org/plugins/yaymail/).
+- Fallback mailer, send test email, disable email delivery (dev mode), one-click migration, clean UI/UX.
 
-- Complete compatibility with all themes, page builders and major plugins.
-- Perfect with [WooCommerce Email Customizer](https://yaycommerce.com/yaymail-woocommerce-email-customizer/) plugin.
+== 💪 Supported Mailer ==
 
-###💪 Mailer
-YaySMTP - WP SMTP Plugin allows you to freely integrate the following email SMTP services:
+YaySMTP supports mailers many other plugins skip, including MailJet, SMTP.com, SendPulse, Mandrill (Mailchimp), Yournotify, and IONOS, alongside Amazon SES, SendGrid, Gmail, Outlook/Office 365, Mailgun, Brevo, Zoho, Postmark, and any custom SMTP.
 
 1. SendGrid 
 2. Gmail SMTP server
@@ -106,10 +106,10 @@ If you're having issues, do let us know, and we'll be [happy to help](https://ya
 Absolutely! YaySMTP doesn't collect or store any personal information. So please rest assured.
 
 = Is YaySMTP free? =
-Yes, you can use it free of charge. YayCommerce SMTP plugin comes with all the features that you can find in the description above.
+Yes. Every feature is free, including email logs, open/click tracking, Email Reports with charts, CSV export, and WooCommerce email preview. There's no feature paywall.
 
-= What will I get if I become a premium user? =
-You'll have our priority support for whatever issue you have with sending and receiving emails through WordPress. You can also ask us to develop new options or features. We might not say Yes to all requests, but your feedback definitely gets its place on our desk.
+= What does YaySMTP Pro give me? =
+Pro is about support, not features. You get priority support for any sending or configuration issue, plus the ability to request new options and features from our YayCommerce team.
 
 == Installation ==
 1. Upload the entire plugin folder to the '/wp-content/plugins/' directory.
@@ -122,6 +122,10 @@ You'll have our priority support for whatever issue you have with sending and re
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Jun 16, 2026 – Version 2.7.5 =
+- New: Email Reports
+- Added: Submenu to Email Logs page
 
 = Mar 30, 2026 – Version 2.7.4 =
 - Improved: Modify Brevo's API creation link.

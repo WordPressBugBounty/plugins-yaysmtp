@@ -81,7 +81,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tbody class="top-mail-body">
 		</tbody>
 	  </table>
-	  <p class="view-detail-link"><a href="<?php echo esc_attr( YAY_SMTP_SITE_URL ) . '/wp-admin/admin.php?page=yaysmtp&tab=email-log'; ?>"><?php echo esc_html__( 'View details', 'yay-smtp' ); ?></a></p>
+	  <p class="view-detail-link"><a href="<?php echo esc_attr( YAY_SMTP_SITE_URL ) . '/wp-admin/admin.php?page=yaysmtp#/email-reports'; ?>"><?php echo esc_html__( 'View details', 'yay-smtp' ); ?></a></p>
 	</div>
 	<div class="top-mail-table-empty">
 	  <p>No data</p>

@@ -4,157 +4,87 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit98b9274f9324667442cb913c7ff7920e
+class ComposerStaticInit05cede00d5daf25f3102a72da292a5d9
 {
-    public static $files = array (
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
-        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
-        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
-        'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-        'a8d3953fd9959404dd22d3dfcd0a79f0' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        'p' => 
+        'Y' => 
         array (
-            'phpseclib\\' => 10,
-        ),
-        'S' => 
-        array (
-            'Symfony\\Polyfill\\Php72\\' => 23,
-            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
-            'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
-        ),
-        'P' => 
-        array (
-            'Psr\\Log\\' => 8,
-            'Psr\\Http\\Message\\' => 17,
-            'Psr\\Cache\\' => 10,
-        ),
-        'M' => 
-        array (
-            'Monolog\\' => 8,
-        ),
-        'G' => 
-        array (
-            'GuzzleHttp\\Psr7\\' => 16,
-            'GuzzleHttp\\Promise\\' => 19,
-            'GuzzleHttp\\' => 11,
-            'Google\\Auth\\' => 12,
-            'Google\\' => 7,
-        ),
-        'F' => 
-        array (
-            'Firebase\\JWT\\' => 13,
+            'YayCommerce\\AdminShell\\' => 23,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'phpseclib\\' => 
+        'YayCommerce\\AdminShell\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
-        ),
-        'Symfony\\Polyfill\\Php72\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
-        ),
-        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
-        ),
-        'Symfony\\Polyfill\\Intl\\Idn\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
-        ),
-        'Psr\\Log\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
-        ),
-        'Psr\\Http\\Message\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-        ),
-        'Psr\\Cache\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/cache/src',
-        ),
-        'Monolog\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
-        ),
-        'GuzzleHttp\\Psr7\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
-        ),
-        'GuzzleHttp\\Promise\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
-        ),
-        'GuzzleHttp\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
-        ),
-        'Google\\Auth\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/google/auth/src',
-        ),
-        'Google\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/google/apiclient/src',
-        ),
-        'Firebase\\JWT\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
-        ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'G' => 
-        array (
-            'Google_Service_' => 
-            array (
-                0 => __DIR__ . '/..' . '/google/apiclient-services/src',
-            ),
+            0 => __DIR__ . '/..' . '/yaycommerce/admin-shell/src',
         ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Google_AccessToken_Revoke' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_AccessToken_Verify' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_AuthHandler_AuthHandlerFactory' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_AuthHandler_Guzzle5AuthHandler' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_AuthHandler_Guzzle6AuthHandler' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_AuthHandler_Guzzle7AuthHandler' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Client' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Collection' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Exception' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Http_Batch' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Http_MediaFileUpload' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Http_REST' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Model' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Service' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Service_Exception' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Service_Resource' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Task_Composer' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Task_Exception' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Task_Retryable' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Task_Runner' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Google_Utils_UriTemplate' => __DIR__ . '/..' . '/google/apiclient/src/aliases.php',
-        'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
+        'YayCommerce\\AdminShell\\AdminShell' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/AdminShell.php',
+        'YayCommerce\\AdminShell\\Contracts\\AddonHostAdapter' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Contracts/AddonHostAdapter.php',
+        'YayCommerce\\AdminShell\\Contracts\\PluginMenuAdapter' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Contracts/PluginMenuAdapter.php',
+        'YayCommerce\\AdminShell\\License\\Contracts\\LicenseConfigAdapter' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/Contracts/LicenseConfigAdapter.php',
+        'YayCommerce\\AdminShell\\License\\EDD_SL_Plugin_Updater' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/EDD_SL_Plugin_Updater.php',
+        'YayCommerce\\AdminShell\\License\\License' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/License.php',
+        'YayCommerce\\AdminShell\\License\\LicenseAPI' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/LicenseAPI.php',
+        'YayCommerce\\AdminShell\\License\\LicenseHandler' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/LicenseHandler.php',
+        'YayCommerce\\AdminShell\\License\\PluginInfoFactory' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/PluginInfoFactory.php',
+        'YayCommerce\\AdminShell\\License\\RestAPI' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/License/RestAPI.php',
+        'YayCommerce\\AdminShell\\Menu\\ExternalPluginMenuAdapter' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Menu/ExternalPluginMenuAdapter.php',
+        'YayCommerce\\AdminShell\\Menu\\MenuSuppressor' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Menu/MenuSuppressor.php',
+        'YayCommerce\\AdminShell\\Menu\\PagesRouter' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Menu/PagesRouter.php',
+        'YayCommerce\\AdminShell\\Menu\\PluginSubmenu' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Menu/PluginSubmenu.php',
+        'YayCommerce\\AdminShell\\Menu\\SubmenuPositioner' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Menu/SubmenuPositioner.php',
+        'YayCommerce\\AdminShell\\Menu\\TopLevelMenu' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Menu/TopLevelMenu.php',
+        'YayCommerce\\AdminShell\\Pages\\HelpPage' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Pages/HelpPage.php',
+        'YayCommerce\\AdminShell\\Pages\\LicensesPage' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Pages/LicensesPage.php',
+        'YayCommerce\\AdminShell\\Pages\\RecommendedPluginsPage' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Pages/RecommendedPluginsPage.php',
+        'YayCommerce\\AdminShell\\Registry\\AddonBridge' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Registry/AddonBridge.php',
+        'YayCommerce\\AdminShell\\Registry\\AddonLicenseAdapter' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Registry/AddonLicenseAdapter.php',
+        'YayCommerce\\AdminShell\\Registry\\LegacyBridge' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Registry/LegacyBridge.php',
+        'YayCommerce\\AdminShell\\Registry\\LicenseRegistry' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Registry/LicenseRegistry.php',
+        'YayCommerce\\AdminShell\\Registry\\PluginLicenseInfo' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Registry/PluginLicenseInfo.php',
+        'YayCommerce\\AdminShell\\Support\\AdminContext' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Support/AdminContext.php',
+        'YayCommerce\\AdminShell\\Support\\Slug' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/Support/Slug.php',
+        'YayCommerce\\AdminShell\\VersionedLoader' => __DIR__ . '/..' . '/yaycommerce/admin-shell/src/VersionedLoader.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\AdminShell' => __DIR__ . '/../..' . '/vendor-prefixed/src/AdminShell.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Contracts\\AddonHostAdapter' => __DIR__ . '/../..' . '/vendor-prefixed/src/Contracts/AddonHostAdapter.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Contracts\\PluginMenuAdapter' => __DIR__ . '/../..' . '/vendor-prefixed/src/Contracts/PluginMenuAdapter.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\Contracts\\LicenseConfigAdapter' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/Contracts/LicenseConfigAdapter.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\EDD_SL_Plugin_Updater' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/EDD_SL_Plugin_Updater.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\License' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/License.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\LicenseAPI' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/LicenseAPI.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\LicenseHandler' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/LicenseHandler.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\PluginInfoFactory' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/PluginInfoFactory.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\License\\RestAPI' => __DIR__ . '/../..' . '/vendor-prefixed/src/License/RestAPI.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Menu\\ExternalPluginMenuAdapter' => __DIR__ . '/../..' . '/vendor-prefixed/src/Menu/ExternalPluginMenuAdapter.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Menu\\MenuSuppressor' => __DIR__ . '/../..' . '/vendor-prefixed/src/Menu/MenuSuppressor.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Menu\\PagesRouter' => __DIR__ . '/../..' . '/vendor-prefixed/src/Menu/PagesRouter.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Menu\\PluginSubmenu' => __DIR__ . '/../..' . '/vendor-prefixed/src/Menu/PluginSubmenu.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Menu\\SubmenuPositioner' => __DIR__ . '/../..' . '/vendor-prefixed/src/Menu/SubmenuPositioner.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Menu\\TopLevelMenu' => __DIR__ . '/../..' . '/vendor-prefixed/src/Menu/TopLevelMenu.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Pages\\HelpPage' => __DIR__ . '/../..' . '/vendor-prefixed/src/Pages/HelpPage.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Pages\\LicensesPage' => __DIR__ . '/../..' . '/vendor-prefixed/src/Pages/LicensesPage.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Pages\\RecommendedPluginsPage' => __DIR__ . '/../..' . '/vendor-prefixed/src/Pages/RecommendedPluginsPage.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Registry\\AddonBridge' => __DIR__ . '/../..' . '/vendor-prefixed/src/Registry/AddonBridge.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Registry\\AddonLicenseAdapter' => __DIR__ . '/../..' . '/vendor-prefixed/src/Registry/AddonLicenseAdapter.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Registry\\LegacyBridge' => __DIR__ . '/../..' . '/vendor-prefixed/src/Registry/LegacyBridge.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Registry\\LicenseRegistry' => __DIR__ . '/../..' . '/vendor-prefixed/src/Registry/LicenseRegistry.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Registry\\PluginLicenseInfo' => __DIR__ . '/../..' . '/vendor-prefixed/src/Registry/PluginLicenseInfo.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Support\\AdminContext' => __DIR__ . '/../..' . '/vendor-prefixed/src/Support/AdminContext.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\Support\\Slug' => __DIR__ . '/../..' . '/vendor-prefixed/src/Support/Slug.php',
+        'YaySMTPScoped\\YayCommerce\\AdminShell\\VersionedLoader' => __DIR__ . '/../..' . '/vendor-prefixed/src/VersionedLoader.php',
+        'YaysmtpPluginAdapter' => __DIR__ . '/../..' . '/YaysmtpPluginAdapter.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit98b9274f9324667442cb913c7ff7920e::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit98b9274f9324667442cb913c7ff7920e::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit98b9274f9324667442cb913c7ff7920e::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit98b9274f9324667442cb913c7ff7920e::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit05cede00d5daf25f3102a72da292a5d9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit05cede00d5daf25f3102a72da292a5d9::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit05cede00d5daf25f3102a72da292a5d9::$classMap;
 
         }, null, ClassLoader::class);
     }

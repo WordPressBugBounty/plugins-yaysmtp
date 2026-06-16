@@ -39,7 +39,7 @@ class Functions {
 		add_action( 'wp_ajax_yaysmtp_detail_email_logs', array( $this, 'getEmailLog' ) );
 		add_action( 'wp_ajax_yaysmtp_overview_chart', array( $this, 'getEmailChart' ) );
 		add_action( 'wp_ajax_yaysmtp_mark_reviewed', array( $this, 'markReviewed' ) );
-		// Utils::checkExistPhpMailerDefault();
+		add_action( 'wp_ajax_yaysmtp_reports', array( $this, 'getReports' ) );
 	}
 
 	private function __construct() {}
@@ -920,6 +920,164 @@ class Functions {
 				),
 				'successTotal' => $successTotal,
 				'failTotal'    => $failTotal,
+				'topMailList'  => $topMailListOutput,
+			);
+
+			wp_send_json_success(
+				array(
+					'mess' => __( 'Successful.', 'yay-smtp' ),
+					'data' => $response,
+				)
+			);
+		} catch ( \Exception $ex ) {
+			LogErrors::getMessageException( $ex, true );
+		} catch ( \Error $ex ) {
+			LogErrors::getMessageException( $ex, true );
+		}
+	}
+
+	public function getReports() {
+		try {
+			Utils::checkNonce();
+
+			$reqs = Utils::saniValArray( $_POST['params'] ); //phpcs:ignore
+			$from = isset( $reqs['from'] ) ? $reqs['from'] : 'first day of this month';
+			$to   = isset( $reqs['to'] ) ? $reqs['to'] : '';
+
+			$startDateOrg = new \DateTime( $from );
+			$endDateOrg   = new \DateTime( $to );
+
+			$startDate = new \DateTime( $from );
+			// $startDate = new \DateTime('15 days ago');
+			$endDate = new \DateTime( $to );
+
+			$dateModifier = $startDate->diff( $endDate )->m >= 11 ? '+1 month' : '+1 day';
+			$groupBy      = ( '+1 month' === $dateModifier ) ? 'month' : 'day';
+
+			$subject = isset( $reqs['subject'] ) ? $reqs['subject'] : '';
+			$data    = Utils::getReportsData( $groupBy, '', $startDate->format( 'Y-m-d' ), $endDate->format( 'Y-m-d' ), $subject );
+
+			$labels       = array();
+			$successData  = array();
+			$failData     = array();
+			$openedData   = array();
+			$clickedData  = array();
+			$successTotal = 0;
+			$failTotal    = 0;
+			$openedTotal  = 0;
+			$clickedTotal = 0;
+
+			// initialize data
+			for ( $i = $startDate; $i <= $endDate; $i->modify( $dateModifier ) ) {
+				$date                 = $i->format( 'Y-m-d' );
+				$labels[ $date ]      = $date;
+				$successData[ $date ] = 0;
+				$failData[ $date ]    = 0;
+				$openedData[ $date ]  = 0;
+				$clickedData[ $date ] = 0;
+			}
+
+			// fillup real data
+			if ( ! empty( $data['successData'] ) ) {
+				foreach ( $data['successData'] as $row ) {
+					if ( 'month' == $groupBy ) {
+						$date = new \DateTime( $row->date_time );
+						$date->modify( 'first day of this month' );
+						$date = $date->format( 'Y-m-d' );
+					} else {
+						$date = gmdate( 'Y-m-d', strtotime( $row->date_time ) );
+					}
+
+					$successData[ $date ] = (int) $row->total_emails;
+					$successTotal        += (int) $row->total_emails;
+				}
+			}
+
+			if ( ! empty( $data['failData'] ) ) {
+				foreach ( $data['failData'] as $row ) {
+					if ( 'month' == $groupBy ) {
+						$date = new \DateTime( $row->date_time );
+						$date->modify( 'first day of this month' );
+						$date = $date->format( 'Y-m-d' );
+					} else {
+						$date = gmdate( 'Y-m-d', strtotime( $row->date_time ) );
+					}
+
+					$failData[ $date ] = (int) $row->total_emails;
+					$failTotal        += (int) $row->total_emails;
+				}
+			}
+
+			if ( ! empty( $data['openedClickedData'] ) ) {
+				foreach ( $data['openedClickedData'] as $row ) {
+					if ( 'month' == $groupBy ) {
+						$date = new \DateTime( $row->date_time );
+						$date->modify( 'first day of this month' );
+						$date = $date->format( 'Y-m-d' );
+					} else {
+						$date = gmdate( 'Y-m-d', strtotime( $row->date_time ) );
+					}
+
+					$openedData[ $date ]  = (int) $row->total_opened;
+					$clickedData[ $date ] = (int) $row->total_clicked;
+					$openedTotal         += (int) $row->total_opened;
+					$clickedTotal        += (int) $row->total_clicked;
+				}
+			}
+
+			$topMailList       = Utils::getReportsGroupByDataForDashboard( 'subject', $startDateOrg->format( 'Y-m-d' ), $endDateOrg->format( 'Y-m-d' ) );
+			$topMailListOutput = array();
+			if ( ! empty( $topMailList ) ) {
+				foreach ( $topMailList as $title => $mail ) {
+					$el = array(
+						'title'  => $title,
+						'sent'   => ! empty( $mail['total_sent'] ) ? $mail['total_sent'] : 0,
+						'failed' => ! empty( $mail['total_failed'] ) ? $mail['total_failed'] : 0,
+						'email_opened' => ! empty( $mail['email_opened'] ) ? $mail['email_opened'] : 0,
+						'email_clicked_links' => ! empty( $mail['email_clicked_links'] ) ? $mail['email_clicked_links'] : 0,
+					);
+					array_push( $topMailListOutput, $el );
+				}
+			}
+
+			// Total Sales
+			$response = array(
+				'labels'       => array_values( $labels ),
+				'datasets'     => array(
+					array(
+						'label'           => __( 'Email Sent', 'yay-smtp' ),
+						'borderColor'     => '#2A8CE7',
+						'backgroundColor' => '#2A8CE7',
+						'order'           => 1,
+						'data'            => array_values( $successData ),
+					),
+					array(
+						'label'           => __( 'Email Fail', 'yay-smtp' ),
+						'borderColor'     => '#d94f4f',
+						'backgroundColor' => '#d94f4f',
+						'order'           => 0,
+						// 'type' => 'line',
+						'data'            => array_values( $failData ),
+					),
+					array(
+						'label'           => __( 'Email Opened', 'yay-smtp' ),
+						'borderColor'     => '#27AE60',
+						'backgroundColor' => '#27AE60',
+						'order'           => 2,
+						'data'            => array_values( $openedData ),
+					),
+					array(
+						'label'           => __( 'Email Clicked', 'yay-smtp' ),
+						'borderColor'     => '#F2994A',
+						'backgroundColor' => '#F2994A',
+						'order'           => 3,
+						'data'            => array_values( $clickedData ),
+					),
+				),
+				'successTotal' => $successTotal,
+				'failTotal'    => $failTotal,
+				'openedTotal'  => $openedTotal,
+				'clickedTotal' => $clickedTotal,
 				'topMailList'  => $topMailListOutput,
 			);
 
