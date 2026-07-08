@@ -14,7 +14,7 @@ class Settings {
 	private const PARENT              = 'yaycommerce';
 	private const POSITION_KEY        = 'yaycommerce_admin_shell_submenu_positions';
 	private const EMAIL_LOGS_SLUG     = 'yaysmtp#/email-logs';
-	private const EMAIL_LOGS_POSITION   = 181;
+	private const EMAIL_LOGS_POSITION   = PHP_INT_MAX;
 
 	public static function getInstance() {
 		if ( null == self::$instance ) {
@@ -28,8 +28,8 @@ class Settings {
 
 	private function doHooks() {
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
-		add_action( 'network_admin_menu', array( $this, 'settingsNetWorkMenu' ), 180 );
-		add_action( 'admin_menu', array( $this, 'addYaysmtpLogEmailMenu' ), 181 );
+		add_action( 'network_admin_menu', array( $this, 'settingsNetWorkMenu' ), self::EMAIL_LOGS_POSITION );
+		add_action( 'admin_menu', array( $this, 'addYaysmtpLogEmailMenu' ), self::EMAIL_LOGS_POSITION );
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueueSmtpSettingsScripts' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminDashboardScripts' ) );
@@ -60,6 +60,8 @@ class Settings {
 				self::EMAIL_LOGS_SLUG,
 				[ $this, 'emailLogsPage' ]
 			);
+
+			self::re_order_menu_items();
 		}
 
 		remove_submenu_page( self::PARENT, self::PARENT );
@@ -76,6 +78,8 @@ public function addYaysmtpLogEmailMenu() {
 				self::EMAIL_LOGS_SLUG,
 				[ $this, 'emailLogsPage' ]
 			);
+
+			self::re_order_menu_items();
 		}
 	}
 
@@ -225,5 +229,55 @@ public function addYaysmtpLogEmailMenu() {
 		}
 
 		return false;
+	}
+
+	private static function re_order_menu_items() {
+
+		global $submenu;
+
+		if ( ! isset( $submenu['yaycommerce'] ) || ! is_array( $submenu['yaycommerce'] ) ) {
+			return;
+		}
+
+		$items = $submenu['yaycommerce'];
+		$slugs = array_column( $items, 2 );
+
+		$a = array_search( 'yaysmtp', $slugs, true );
+		$b = array_search( 'yaycommerce-help', $slugs, true );
+		$c = array_search( self::EMAIL_LOGS_SLUG, $slugs, true );
+
+		if ( false === $a || false === $b || false === $c ) {
+			return;
+		}
+
+		$item_a = $items[ $a ];
+		$item_c = $items[ $c ];
+
+		// Remove only yaysmtp and email logs. Keep help in the list.
+		$items = array_values(
+			array_filter(
+				$items,
+				static function ( $item ) {
+					return ! isset( $item[2] ) || ! in_array(
+						$item[2],
+						[ 'yaysmtp', self::EMAIL_LOGS_SLUG ],
+						true
+					);
+				}
+			)
+		);
+
+		// Find help again after removing the other two items.
+		$slugs = array_column( $items, 2 );
+		$b = array_search( 'yaycommerce-help', $slugs, true );
+
+		if ( false === $b ) {
+			return;
+		}
+
+		// Insert yaysmtp and email logs immediately before help.
+		array_splice( $items, $b, 0, [ $item_a, $item_c ] );
+
+		$submenu['yaycommerce'] = $items;
 	}
 }

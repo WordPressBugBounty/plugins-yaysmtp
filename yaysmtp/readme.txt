@@ -4,7 +4,7 @@ Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
 Tested up to: 7.0
-Stable tag: 2.7.5
+Stable tag: 2.7.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -122,6 +122,10 @@ Pro is about support, not features. You get priority support for any sending or 
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Jul 8, 2026 – Version 2.7.6 =
+- New: Summary metrics for Total Emails, Sent, and Failed
+- Fixed: Hide the log description if "Keep logs forever" is selected
 
 = Jun 16, 2026 – Version 2.7.5 =
 - New: Email Reports

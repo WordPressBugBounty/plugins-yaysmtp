@@ -3,7 +3,7 @@
 namespace YaySMTPScoped\YayCommerce\AdminShell\License;
 
 use YaySMTPScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter;
-defined('ABSPATH') || exit;
+\defined('ABSPATH') || exit;
 /**
  * License state model.
  *
@@ -23,39 +23,39 @@ class License
         $this->license_key = $this->get_license_key();
         $this->license_info = $this->get_license_info();
     }
-    public function update_license_info(array $license_info): void
+    public function update_license_info(array $license_info) : void
     {
         unset($license_info['success']);
-        update_option($this->adapter->get_plugin_slug() . '_license_info', $license_info, \false);
+        \update_option($this->adapter->get_plugin_slug() . '_license_info', $license_info, \false);
         $this->license_info = $license_info;
     }
-    public function update_license_key(string $license_key): void
+    public function update_license_key(string $license_key) : void
     {
-        update_option($this->adapter->get_plugin_slug() . '_license_key', $license_key);
+        \update_option($this->adapter->get_plugin_slug() . '_license_key', $license_key);
         $this->license_key = $license_key;
     }
     public function get_license_key()
     {
-        return get_option($this->adapter->get_plugin_slug() . '_license_key');
+        return \get_option($this->adapter->get_plugin_slug() . '_license_key');
     }
-    public function get_license_info(): array
+    public function get_license_info() : array
     {
         $default = ['expires' => 'Not updated'];
-        $info = get_option($this->adapter->get_plugin_slug() . '_license_info');
-        $info = is_string($info) ? json_decode($info, \true) : $info;
+        $info = \get_option($this->adapter->get_plugin_slug() . '_license_info');
+        $info = \is_string($info) ? \json_decode($info, \true) : $info;
         return $info ?: $default;
     }
-    public function remove_license_key(): void
+    public function remove_license_key() : void
     {
-        delete_option($this->adapter->get_plugin_slug() . '_license_key');
+        \delete_option($this->adapter->get_plugin_slug() . '_license_key');
         $this->license_key = null;
     }
-    public function remove_license_info(): void
+    public function remove_license_info() : void
     {
-        delete_option($this->adapter->get_plugin_slug() . '_license_info');
+        \delete_option($this->adapter->get_plugin_slug() . '_license_info');
         $this->license_info = ['expires' => 'Not updated'];
     }
-    public function activate(string $license_key): array
+    public function activate(string $license_key) : array
     {
         $activate_response = LicenseAPI::activate_license($this->adapter->get_store_url(), $this->adapter->get_item_id(), $license_key);
         if ($activate_response['success']) {
@@ -65,7 +65,7 @@ class License
         LicenseHandler::remove_site_plugin_check($this->adapter);
         return $activate_response;
     }
-    public function update(): array
+    public function update() : array
     {
         $license_key = $this->get_license_key();
         $response = LicenseAPI::check_license($this->adapter->get_store_url(), $this->adapter->get_item_id(), $license_key);
@@ -77,7 +77,7 @@ class License
         LicenseHandler::remove_site_plugin_check($this->adapter);
         return $response;
     }
-    public function remove(): void
+    public function remove() : void
     {
         // Deactivate on EDD side to free the activation slot
         $license_key = $this->get_license_key();
@@ -88,25 +88,25 @@ class License
         $this->remove_license_key();
         $this->remove_license_info();
     }
-    public function is_active(): bool
+    public function is_active() : bool
     {
         return (bool) $this->license_key;
     }
-    public function is_expired(): bool
+    public function is_expired() : bool
     {
         if ($this->is_active()) {
             $license_info = $this->get_license_info();
             $expires = $license_info['expires'] ?? null;
             if ($expires && 'lifetime' !== $expires && 'Not updated' !== $expires) {
-                return strtotime($expires) < time();
+                return \strtotime($expires) < \time();
             }
         }
         return \false;
     }
-    public function format_license_key(int $group = 8, string $separator = '-', int $hidden = 20): string
+    public function format_license_key(int $group = 8, string $separator = '-', int $hidden = 20) : string
     {
         $key = (string) $this->license_key;
-        $len = strlen($key);
+        $len = \strlen($key);
         if ($len <= $hidden) {
             return $key;
         }
@@ -122,11 +122,11 @@ class License
         }
         return $formatted;
     }
-    public function get_renewal_url(): string
+    public function get_renewal_url() : string
     {
         return $this->adapter->get_store_url() . 'checkout/?edd_license_key=' . $this->license_key . '&download_id=' . $this->adapter->get_item_id();
     }
-    public function get_upgrade_url(): string
+    public function get_upgrade_url() : string
     {
         $payment_id = $this->license_info['payment_id'] ?? '';
         return $this->adapter->get_store_url() . 'checkout/purchase-history/?view=upgrades&action=manage_licenses&payment_id=' . $payment_id;

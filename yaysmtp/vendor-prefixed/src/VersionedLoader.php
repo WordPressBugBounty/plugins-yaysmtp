@@ -33,7 +33,7 @@ class VersionedLoader
      * @param string   $version  Semver string, e.g. '1.2.0'
      * @param callable $callback Boot callback — called only if this version wins.
      */
-    public static function register(string $version, callable $callback): void
+    public static function register(string $version, callable $callback) : void
     {
         // First-wins: do not overwrite an already-registered version.
         if (isset(self::$candidates[$version])) {
@@ -43,22 +43,22 @@ class VersionedLoader
         // Schedule election to run after all plugins_loaded callbacks.
         // We use priority 999 so all candidates at default priority register first.
         if (!self::$elected) {
-            add_action('plugins_loaded', [self::class, 'elect'], 999);
+            \add_action('plugins_loaded', [self::class, 'elect'], 999);
         }
     }
     /**
      * Run after all plugins_loaded hooks. Pick highest version and invoke its callback.
      * Idempotent — second call is a no-op.
      */
-    public static function elect(): void
+    public static function elect() : void
     {
         if (self::$elected || empty(self::$candidates)) {
             return;
         }
         self::$elected = \true;
         $winner = null;
-        foreach (array_keys(self::$candidates) as $version) {
-            if ($winner === null || version_compare($version, $winner, '>')) {
+        foreach (\array_keys(self::$candidates) as $version) {
+            if ($winner === null || \version_compare($version, $winner, '>')) {
                 $winner = $version;
             }
         }
@@ -69,14 +69,14 @@ class VersionedLoader
     /**
      * Return the winning version string, or null if election hasn't run.
      */
-    public static function get_elected_version(): ?string
+    public static function get_elected_version() : ?string
     {
         if (!self::$elected || empty(self::$candidates)) {
             return null;
         }
         $winner = null;
-        foreach (array_keys(self::$candidates) as $version) {
-            if ($winner === null || version_compare($version, $winner, '>')) {
+        foreach (\array_keys(self::$candidates) as $version) {
+            if ($winner === null || \version_compare($version, $winner, '>')) {
                 $winner = $version;
             }
         }
@@ -85,7 +85,7 @@ class VersionedLoader
     /**
      * Reset state — only for unit tests.
      */
-    public static function reset(): void
+    public static function reset() : void
     {
         self::$candidates = [];
         self::$elected = \false;

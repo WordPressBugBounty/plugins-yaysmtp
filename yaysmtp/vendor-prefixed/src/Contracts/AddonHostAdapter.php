@@ -24,5 +24,5 @@ interface AddonHostAdapter
      *
      * Same format as yaycommerce_licensing_plugins.
      */
-    public function get_addon_licensing_filter(): string;
+    public function get_addon_licensing_filter() : string;
 }

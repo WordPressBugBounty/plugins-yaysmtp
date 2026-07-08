@@ -3,7 +3,7 @@
 namespace YaySMTPScoped\YayCommerce\AdminShell\Support;
 
 use YaySMTPScoped\YayCommerce\AdminShell\Contracts\PluginMenuAdapter;
-defined('ABSPATH') || exit;
+\defined('ABSPATH') || exit;
 /**
  * Resolves the current admin context (site dashboard vs Multisite Network Admin)
  * and the per-plugin opt-in for each context.
@@ -36,10 +36,10 @@ class AdminContext
      *
      * @param callable $callback
      */
-    public static function bind_menu($callback, int $priority): void
+    public static function bind_menu($callback, int $priority) : void
     {
         foreach (self::MENU_HOOKS as $hook) {
-            add_action($hook, $callback, $priority);
+            \add_action($hook, $callback, $priority);
         }
     }
     /**
@@ -48,14 +48,14 @@ class AdminContext
      * Guarded with function_exists() so the class is usable in non-WP unit
      * context, where the function is absent and site context is assumed.
      */
-    public static function is_network(): bool
+    public static function is_network() : bool
     {
-        return \function_exists('YaySMTPScoped\is_network_admin') && \YaySMTPScoped\is_network_admin();
+        return \function_exists('is_network_admin') && \is_network_admin();
     }
     /**
      * The admin_menu hook that fires for the current context.
      */
-    public static function hook(): string
+    public static function hook() : string
     {
         return self::is_network() ? 'network_admin_menu' : 'admin_menu';
     }
@@ -63,7 +63,7 @@ class AdminContext
      * Capability required for menus/pages in the current context.
      * Network Admin requires `manage_network`; site dashboard keeps $default.
      */
-    public static function capability(string $default): string
+    public static function capability(string $default) : string
     {
         return self::is_network() ? self::NETWORK_CAPABILITY : $default;
     }
@@ -71,7 +71,7 @@ class AdminContext
      * Whether the plugin wants its submenu on the per-site dashboard.
      * Optional method — absent ⇒ true (legacy adapters stay site-visible).
      */
-    public static function wants_site(PluginMenuAdapter $adapter): bool
+    public static function wants_site(PluginMenuAdapter $adapter) : bool
     {
         if (!\method_exists($adapter, 'wants_site_menu')) {
             return \true;
@@ -82,7 +82,7 @@ class AdminContext
      * Whether the plugin wants its submenu in Network Admin.
      * Optional method — absent ⇒ false (legacy adapters never go to network).
      */
-    public static function wants_network(PluginMenuAdapter $adapter): bool
+    public static function wants_network(PluginMenuAdapter $adapter) : bool
     {
         if (!\method_exists($adapter, 'wants_network_menu')) {
             return \false;

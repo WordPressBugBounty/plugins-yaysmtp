@@ -1,10 +1,11 @@
 <?php
 namespace YaySMTP\Controller;
 
+use GuzzleHttp\Exception\GuzzleException;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
 use League\OAuth2\Client\Token\AccessToken;
 use YaySMTP\Helper\Utils;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,6 +59,8 @@ class OutlookMsServicesController {
 			$this->saveAccessTokenExpire( $this->client );
 			return $this->client;
 		} catch ( IdentityProviderException $e ) {
+			return false;
+		} catch ( GuzzleException $e ) {
 			return false;
 		}
 	}

@@ -13,7 +13,7 @@ class YaysmtpPluginAdapter implements \YaySMTPScoped\YayCommerce\AdminShell\Cont
     public function get_settings_page_callback(): ?callable {
         return array( \YaySMTP\Page\Settings::getInstance(), 'settingsPage' );
     }
-    public function get_settings_page_position(): ?int { return 180; }
+    public function get_settings_page_position(): ?int { return null; }
     public function get_capability(): string         { return 'manage_options'; }
     public function get_plugin_basename(): string    { return YAY_SMTP_PLUGIN_BASENAME; }
     public function get_settings_label(): string     { return 'Settings'; }

@@ -27,71 +27,71 @@ class AddonLicenseAdapter implements LicenseConfigAdapter
         $this->item_id = (int) ($plugin_data['item_id'] ?? 0);
         $this->store_url = 'https://yaycommerce.com/';
     }
-    public function get_plugin_slug(): string
+    public function get_plugin_slug() : string
     {
         return $this->slug;
     }
-    public function get_plugin_name(): string
+    public function get_plugin_name() : string
     {
         return $this->name;
     }
-    public function get_plugin_version(): string
+    public function get_plugin_version() : string
     {
         return '';
     }
-    public function get_plugin_file(): string
+    public function get_plugin_file() : string
     {
         return $this->file;
     }
-    public function get_item_id(): int
+    public function get_item_id() : int
     {
         return $this->item_id;
     }
-    public function get_store_url(): string
+    public function get_store_url() : string
     {
         return $this->store_url;
     }
-    public function get_store_link(): string
+    public function get_store_link() : string
     {
         return $this->url;
     }
-    public function get_menu_title(): string
+    public function get_menu_title() : string
     {
         return $this->name;
     }
-    public function get_page_title(): string
+    public function get_page_title() : string
     {
         return $this->name;
     }
-    public function get_menu_slug(): string
+    public function get_menu_slug() : string
     {
         return '';
     }
-    public function get_settings_page_callback(): ?callable
+    public function get_settings_page_callback() : ?callable
     {
         return null;
     }
-    public function get_settings_page_position(): ?int
+    public function get_settings_page_position() : ?int
     {
         return null;
     }
-    public function get_capability(): string
+    public function get_capability() : string
     {
         return 'manage_options';
     }
-    public function get_plugin_basename(): string
+    public function get_plugin_basename() : string
     {
         return $this->basename;
     }
-    public function get_settings_label(): string
+    public function get_settings_label() : string
     {
         return '';
     }
-    public function get_docs_url(): string
+    public function get_docs_url() : string
     {
         return '';
     }
-    public function get_pro_url(): string
+    public function get_pro_url() : string
     {
         return '';
     }

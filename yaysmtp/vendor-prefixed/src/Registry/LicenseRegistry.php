@@ -15,10 +15,10 @@ class LicenseRegistry
     /**
      * Register a plugin's license info. Applies the decoration filter before storing.
      */
-    public function register($info): void
+    public function register($info) : void
     {
         /** @var PluginLicenseInfo $info */
-        $info = apply_filters('yaycommerce_admin_shell_plugin_info', $info, $info->slug);
+        $info = \apply_filters('yaycommerce_admin_shell_plugin_info', $info, $info->slug);
         $this->plugins[$info->slug] = $info;
     }
     /**
@@ -26,32 +26,32 @@ class LicenseRegistry
      *
      * @return PluginLicenseInfo[]
      */
-    public function all(): array
+    public function all() : array
     {
         // Refactor old licensing plugin integration
         $old_plugins = [];
-        $handlers = ['YaySMTPScoped\YAYDP\License\License_Handler', 'YaySMTPScoped\YayMail\License\LicenseHandler', 'YaySMTPScoped\Yay_Currency\License\LicenseHandler', 'YaySMTPScoped\Yay_Swatches\License\LicenseHandler', 'YaySMTPScoped\YayExtra\License\LicenseHandler', 'YaySMTPScoped\YayRev\License\LicenseHandler', 'YaySMTPScoped\YayWholesaleB2B\License\LicenseHandler', 'YaySMTPScoped\YaySMTP\License\LicenseHandler'];
+        $handlers = ['YaySMTPScoped\\YAYDP\\License\\License_Handler', 'YaySMTPScoped\\YayMail\\License\\LicenseHandler', 'YaySMTPScoped\\Yay_Currency\\License\\LicenseHandler', 'YaySMTPScoped\\Yay_Swatches\\License\\LicenseHandler', 'YaySMTPScoped\\YayExtra\\License\\LicenseHandler', 'YaySMTPScoped\\YayRev\\License\\LicenseHandler', 'YaySMTPScoped\\YayWholesaleB2B\\License\\LicenseHandler', 'YaySMTPScoped\\YaySMTP\\License\\LicenseHandler'];
         foreach ($handlers as $handler) {
-            if (class_exists($handler) && method_exists($handler, 'get_licensing_plugins')) {
+            if (\class_exists($handler) && \method_exists($handler, 'get_licensing_plugins')) {
                 $plugins = $handler::get_licensing_plugins();
-                if (is_array($plugins)) {
-                    $old_plugins = array_merge($old_plugins, $plugins);
+                if (\is_array($plugins)) {
+                    $old_plugins = \array_merge($old_plugins, $plugins);
                 }
             }
         }
-        return array_merge($this->plugins, $old_plugins);
+        return \array_merge($this->plugins, $old_plugins);
     }
     /**
      * Return a single PluginLicenseInfo by slug, or null if not registered.
      */
-    public function get(string $slug): ?PluginLicenseInfo
+    public function get(string $slug) : ?PluginLicenseInfo
     {
         return $this->plugins[$slug] ?? null;
     }
     /**
      * Check if a slug is registered.
      */
-    public function has(string $slug): bool
+    public function has(string $slug) : bool
     {
         return isset($this->plugins[$slug]);
     }

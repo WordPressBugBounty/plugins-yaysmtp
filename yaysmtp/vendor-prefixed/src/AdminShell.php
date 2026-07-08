@@ -19,7 +19,7 @@ use YaySMTPScoped\YayCommerce\AdminShell\Registry\LegacyBridge;
 use YaySMTPScoped\YayCommerce\AdminShell\Registry\LicenseRegistry;
 use YaySMTPScoped\YayCommerce\AdminShell\Support\AdminContext;
 use YaySMTPScoped\YayCommerce\AdminShell\Support\Constants;
-defined('ABSPATH') || exit;
+\defined('ABSPATH') || exit;
 /**
  * Public facade — entry point for consuming plugins.
  *
@@ -48,7 +48,7 @@ class AdminShell
      * global. Actual menu/page registration is deferred to admin_menu where
      * only the highest version runs.
      */
-    public static function boot(): void
+    public static function boot() : void
     {
         if (self::$booted) {
             return;
@@ -59,8 +59,8 @@ class AdminShell
         // Derive our scoped prefix from the namespace (e.g. "YayMailScoped\YayCommerce\AdminShell" → "YayMailScoped")
         $ns = __NAMESPACE__;
         // YayCommerce\AdminShell or ScopedPrefix\YayCommerce\AdminShell
-        $parts = explode('\\', $ns);
-        self::$prefix = count($parts) > 2 ? $parts[0] : 'default';
+        $parts = \explode('\\', $ns);
+        self::$prefix = \count($parts) > 2 ? $parts[0] : 'default';
         // Register this version in the shared global for cross-scope election
         if (!isset($GLOBALS['yaycommerce_admin_shell_versions'])) {
             $GLOBALS['yaycommerce_admin_shell_versions'] = [];
@@ -69,7 +69,7 @@ class AdminShell
         // Register the version election — only once (first copy to call boot sets it up).
         // Bound to both admin_menu and network_admin_menu so election runs in the
         // Multisite Network Admin too; only the firing hook's election actually runs.
-        if (1 === count($GLOBALS['yaycommerce_admin_shell_versions'])) {
+        if (1 === \count($GLOBALS['yaycommerce_admin_shell_versions'])) {
             AdminContext::bind_menu([static::class, 'elect_version'], 8);
             // bind_menu() already wired BOTH hooks here, so mark the network election
             // as done. This is load-bearing: it stops the safety net below from adding
@@ -88,7 +88,7 @@ class AdminShell
         // plugin is active. elect_version still elects the highest version as the winner.
         if (empty($GLOBALS['yaycommerce_network_election_wired'])) {
             $GLOBALS['yaycommerce_network_election_wired'] = \true;
-            add_action('network_admin_menu', [static::class, 'elect_version'], 8);
+            \add_action('network_admin_menu', [static::class, 'elect_version'], 8);
         }
         // Legacy bridge — reads yaycommerce_licensing_plugins filter.
         // Runs for ALL versions (uses global WP hooks, contributes to any winning registry).
@@ -104,13 +104,13 @@ class AdminShell
                 RecommendedPluginsPage::get_instance();
             }
         }
-        do_action('yaycommerce_admin_shell_booted', $instance);
+        \do_action('yaycommerce_admin_shell_booted', $instance);
     }
     /**
      * Version election — picks the highest version and runs its shell registration.
      * Called once at admin_menu priority 8 (before TopLevelMenu at 9).
      */
-    public static function elect_version(): void
+    public static function elect_version() : void
     {
         $versions = $GLOBALS['yaycommerce_admin_shell_versions'] ?? [];
         if (empty($versions)) {
@@ -120,21 +120,21 @@ class AdminShell
         $winner_prefix = '';
         $winner_ver = '0.0.0';
         foreach ($versions as $prefix => $data) {
-            if (version_compare($data['version'], $winner_ver, '>')) {
+            if (\version_compare($data['version'], $winner_ver, '>')) {
                 $winner_ver = $data['version'];
                 $winner_prefix = $prefix;
             }
         }
         // Call the winner's registration — may be a different scoped class
         $winner = $versions[$winner_prefix];
-        if (isset($winner['boot_cb']) && is_callable($winner['boot_cb'])) {
-            call_user_func($winner['boot_cb']);
+        if (isset($winner['boot_cb']) && \is_callable($winner['boot_cb'])) {
+            \call_user_func($winner['boot_cb']);
         }
     }
     /**
      * Register menus/pages — only called by the winning version.
      */
-    public static function do_shell_registration(): void
+    public static function do_shell_registration() : void
     {
         $instance = self::get_instance();
         // Merge all registries into the winner's registry
@@ -164,7 +164,7 @@ class AdminShell
      * Auto-detects pro vs lite via instanceof.
      * Runs for ALL versions (not version-gated).
      */
-    public static function register_plugin(PluginMenuAdapter $adapter): void
+    public static function register_plugin(PluginMenuAdapter $adapter) : void
     {
         self::validate_adapter($adapter);
         // Publish this plugin's intended submenu position into a shared,
@@ -183,7 +183,7 @@ class AdminShell
         $submenu = new PluginSubmenu($adapter);
         $submenu->init();
         // Action links + row meta — per-plugin, all versions
-        if (is_admin()) {
+        if (\is_admin()) {
             self::register_plugin_links($adapter);
         }
         // License subsystem — per-plugin, all versions
@@ -206,7 +206,7 @@ class AdminShell
      *
      * @param array{parent_menu: string, menu_title: string, menu_capability: string, menu_slug: string} $config
      */
-    public static function register_external_plugin_menu(array $config): void
+    public static function register_external_plugin_menu(array $config) : void
     {
         $adapter = new ExternalPluginMenuAdapter($config);
         $adapter->init();
@@ -214,36 +214,36 @@ class AdminShell
     /**
      * Validate adapter values upfront.
      */
-    private static function validate_adapter(PluginMenuAdapter $adapter): void
+    private static function validate_adapter(PluginMenuAdapter $adapter) : void
     {
         $menu_title = $adapter->get_menu_title();
         if (empty($menu_title)) {
-            trigger_error('[YayCommerce AdminShell] get_menu_title() must return a non-empty string.', \E_USER_WARNING);
+            \trigger_error('[YayCommerce AdminShell] get_menu_title() must return a non-empty string.', \E_USER_WARNING);
         }
         $basename = $adapter->get_plugin_basename();
         if (empty($basename)) {
-            trigger_error('[YayCommerce AdminShell] get_plugin_basename() must return a non-empty string.', \E_USER_WARNING);
+            \trigger_error('[YayCommerce AdminShell] get_plugin_basename() must return a non-empty string.', \E_USER_WARNING);
         }
         $callback = $adapter->get_settings_page_callback();
-        if (null !== $callback && !is_callable($callback)) {
-            trigger_error('[YayCommerce AdminShell] get_settings_page_callback() returned a non-callable value.', \E_USER_WARNING);
+        if (null !== $callback && !\is_callable($callback)) {
+            \trigger_error('[YayCommerce AdminShell] get_settings_page_callback() returned a non-callable value.', \E_USER_WARNING);
         }
         if ($adapter instanceof LicenseConfigAdapter) {
             $slug = $adapter->get_plugin_slug();
             if (empty($slug)) {
-                trigger_error('[YayCommerce AdminShell] get_plugin_slug() must return a non-empty string.', \E_USER_WARNING);
+                \trigger_error('[YayCommerce AdminShell] get_plugin_slug() must return a non-empty string.', \E_USER_WARNING);
             }
             $item_id = $adapter->get_item_id();
             if ($item_id <= 0) {
-                trigger_error('[YayCommerce AdminShell] get_item_id() must return a positive integer.', \E_USER_WARNING);
+                \trigger_error('[YayCommerce AdminShell] get_item_id() must return a positive integer.', \E_USER_WARNING);
             }
             $store_url = $adapter->get_store_url();
             if (empty($store_url)) {
-                trigger_error('[YayCommerce AdminShell] get_store_url() must return a non-empty URL.', \E_USER_WARNING);
+                \trigger_error('[YayCommerce AdminShell] get_store_url() must return a non-empty URL.', \E_USER_WARNING);
             }
             $plugin_file = $adapter->get_plugin_file();
             if (empty($plugin_file)) {
-                trigger_error('[YayCommerce AdminShell] get_plugin_file() must return a non-empty path.', \E_USER_WARNING);
+                \trigger_error('[YayCommerce AdminShell] get_plugin_file() must return a non-empty path.', \E_USER_WARNING);
             }
         }
     }
@@ -251,7 +251,7 @@ class AdminShell
      * Enable the license subsystem for a plugin.
      * Runs for ALL versions (not version-gated).
      */
-    public static function enable_license(LicenseConfigAdapter $adapter): void
+    public static function enable_license(LicenseConfigAdapter $adapter) : void
     {
         $slug = $adapter->get_plugin_slug();
         if (isset(self::$enabled_slugs[$slug])) {
@@ -262,47 +262,47 @@ class AdminShell
         new LicenseHandler($adapter);
         $info = PluginInfoFactory::from_adapter($adapter);
         $instance->registry->register($info);
-        do_action('yaycommerce_admin_shell_license_enabled', $adapter);
+        \do_action('yaycommerce_admin_shell_license_enabled', $adapter);
     }
     /**
      * Register plugin action links + row meta.
      */
-    private static function register_plugin_links(PluginMenuAdapter $adapter): void
+    private static function register_plugin_links(PluginMenuAdapter $adapter) : void
     {
         $basename = $adapter->get_plugin_basename();
-        add_filter('plugin_action_links_' . $basename, function (array $links) use ($adapter) {
+        \add_filter('plugin_action_links_' . $basename, function (array $links) use($adapter) {
             $new = [];
             $menu_slug = $adapter->get_menu_slug();
             if (!empty($menu_slug)) {
-                $url = admin_url('admin.php?page=' . $menu_slug);
-                $new['settings'] = '<a href="' . esc_url($url) . '">' . esc_html($adapter->get_settings_label()) . '</a>';
+                $url = \admin_url('admin.php?page=' . $menu_slug);
+                $new['settings'] = '<a href="' . \esc_url($url) . '">' . \esc_html($adapter->get_settings_label()) . '</a>';
             }
             $pro_url = $adapter->get_pro_url();
             if (!empty($pro_url)) {
-                $new['go-pro'] = '<a href="' . esc_url($pro_url) . '" target="_blank" style="color:#00a32a;font-weight:700;">' . esc_html__('Go Pro', 'yaycommerce') . '</a>';
+                $new['go-pro'] = '<a href="' . \esc_url($pro_url) . '" target="_blank" style="color:#00a32a;font-weight:700;">' . \esc_html__('Go Pro', 'yaycommerce') . '</a>';
             }
-            return array_merge($new, $links);
+            return \array_merge($new, $links);
         });
-        add_filter('plugin_row_meta', function (array $meta, string $file) use ($adapter, $basename) {
+        \add_filter('plugin_row_meta', function (array $meta, string $file) use($adapter, $basename) {
             if ($file !== $basename) {
                 return $meta;
             }
             $docs_url = $adapter->get_docs_url();
             if (!empty($docs_url)) {
-                $meta[] = '<a href="' . esc_url($docs_url) . '" target="_blank">' . esc_html__('Docs', 'yaycommerce') . '</a>';
+                $meta[] = '<a href="' . \esc_url($docs_url) . '" target="_blank">' . \esc_html__('Docs', 'yaycommerce') . '</a>';
             }
-            $meta[] = '<a href="https://yaycommerce.com/support" target="_blank">' . esc_html__('Support', 'yaycommerce') . '</a>';
+            $meta[] = '<a href="https://yaycommerce.com/support" target="_blank">' . \esc_html__('Support', 'yaycommerce') . '</a>';
             return $meta;
         }, 10, 2);
     }
     /**
      * Return the shared registry.
      */
-    public static function registry(): LicenseRegistry
+    public static function registry() : LicenseRegistry
     {
         return self::get_instance()->registry;
     }
-    private static function get_instance(): self
+    private static function get_instance() : self
     {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -312,7 +312,7 @@ class AdminShell
     /**
      * Reset state — for unit tests only.
      */
-    public static function reset(): void
+    public static function reset() : void
     {
         self::$instance = null;
         self::$booted = \false;

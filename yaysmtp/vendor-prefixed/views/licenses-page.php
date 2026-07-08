@@ -28,8 +28,8 @@ $licensing_plugins = \apply_filters('yaycommerce_licensing_plugins', []);
 $has_inactive_license = \false;
 foreach ($licensing_plugins as $plugin) {
     $slug = $plugin['slug'] ?? '';
-    $key = get_option($slug . '_license_key', '');
-    $info = get_option($slug . '_license_info', []);
+    $key = \get_option($slug . '_license_key', '');
+    $info = \get_option($slug . '_license_info', []);
     if (empty($key) || empty($info) || 'expired' === ($info['license'] ?? '')) {
         $has_inactive_license = \true;
         break;
@@ -114,7 +114,7 @@ if (!empty($is_network)) {
                             <div class="yaycommerce-license-card-body">
                                 <?php 
 // translators: %s: YayCommerce plugins URL
-\printf(wp_kses(\__('Welcome to YayCommerce! Please visit our website to get more <a href="%s" target="_blank">WooCommerce plugins</a>.', 'yaycommerce'), ['a' => ['href' => [], 'target' => []]]), 'https://yaycommerce.com/');
+\printf(\wp_kses(\__('Welcome to YayCommerce! Please visit our website to get more <a href="%s" target="_blank">WooCommerce plugins</a>.', 'yaycommerce'), ['a' => ['href' => [], 'target' => []]]), 'https://yaycommerce.com/');
 ?>
                             </div>
                         </div>

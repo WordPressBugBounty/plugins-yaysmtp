@@ -28,9 +28,9 @@ class LegacyBridge
      *
      * INVARIANT: if VersionedLoader priority changes, update this priority too.
      */
-    public function init(): void
+    public function init() : void
     {
-        add_action('plugins_loaded', [$this, 'load_legacy_plugins'], 9999);
+        \add_action('plugins_loaded', [$this, 'load_legacy_plugins'], 9999);
     }
     /**
      * Read legacy filter and convert entries to PluginLicenseInfo stubs.
@@ -38,9 +38,9 @@ class LegacyBridge
      * Legacy format (each entry):
      *   [ 'slug', 'basename', 'file', 'url', 'item_id', 'dir_path', 'name' ]
      */
-    public function load_legacy_plugins(): void
+    public function load_legacy_plugins() : void
     {
-        $legacy_plugins = apply_filters('yaycommerce_licensing_plugins', []);
+        $legacy_plugins = \apply_filters('yaycommerce_licensing_plugins', []);
         foreach ($legacy_plugins as $plugin) {
             $slug = $plugin['slug'] ?? '';
             if (empty($slug)) {
@@ -58,14 +58,14 @@ class LegacyBridge
      * Build a PluginLicenseInfo from a legacy filter entry.
      * Reads {slug}_license_info from wp_options to get current status.
      */
-    private function build_legacy_info(array $plugin): PluginLicenseInfo
+    private function build_legacy_info(array $plugin) : PluginLicenseInfo
     {
         $slug = $plugin['slug'] ?? '';
-        $raw_info = get_option($slug . '_license_info', []);
-        if (is_string($raw_info)) {
-            $raw_info = json_decode($raw_info, \true) ?: [];
+        $raw_info = \get_option($slug . '_license_info', []);
+        if (\is_string($raw_info)) {
+            $raw_info = \json_decode($raw_info, \true) ?: [];
         }
-        $license_key = (string) get_option($slug . '_license_key', '');
+        $license_key = (string) \get_option($slug . '_license_key', '');
         $expires_raw = $raw_info['expires'] ?? null;
         $status = $this->derive_status($license_key, $raw_info);
         $info = new PluginLicenseInfo();
@@ -88,14 +88,14 @@ class LegacyBridge
     /**
      * Derive a normalized status string from legacy option data.
      */
-    private function derive_status(string $license_key, array $raw_info): string
+    private function derive_status(string $license_key, array $raw_info) : string
     {
         if (empty($license_key)) {
             return 'inactive';
         }
         $expires = $raw_info['expires'] ?? null;
         if ($expires && 'lifetime' !== $expires && 'Not updated' !== $expires) {
-            if (strtotime($expires) < time()) {
+            if (\strtotime($expires) < \time()) {
                 return 'expired';
             }
         }

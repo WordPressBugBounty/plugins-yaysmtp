@@ -33,12 +33,12 @@ class AddonBridge
      * Hook into plugins_loaded at priority 9999 (same as LegacyBridge)
      * and yaycommerce_licenses_page at priority 100 for card rendering.
      */
-    public function init(): void
+    public function init() : void
     {
-        add_action('plugins_loaded', [$this, 'load_addon_plugins'], 9999);
-        if (is_admin()) {
-            add_action('yaycommerce_licenses_page', [$this, 'render_addon_cards'], 100);
-            add_action('admin_enqueue_scripts', [$this, 'enqueue_addon_scripts']);
+        \add_action('plugins_loaded', [$this, 'load_addon_plugins'], 9999);
+        if (\is_admin()) {
+            \add_action('yaycommerce_licenses_page', [$this, 'render_addon_cards'], 100);
+            \add_action('admin_enqueue_scripts', [$this, 'enqueue_addon_scripts']);
         }
     }
     /**
@@ -46,9 +46,9 @@ class AddonBridge
      * Addon format matches yaycommerce_licensing_plugins:
      *   [ 'slug', 'name', 'basename', 'file', 'url', 'item_id' ]
      */
-    public function load_addon_plugins(): void
+    public function load_addon_plugins() : void
     {
-        $addons = apply_filters($this->filter_name, []);
+        $addons = \apply_filters($this->filter_name, []);
         foreach ($addons as $plugin) {
             $slug = $plugin['slug'] ?? '';
             if (empty($slug) || $this->registry->has($slug)) {
@@ -67,14 +67,14 @@ class AddonBridge
      * Reads {slug}_license_info from wp_options for current status.
      * Pattern mirrors LegacyBridge::build_legacy_info().
      */
-    private function build_addon_info(array $plugin): PluginLicenseInfo
+    private function build_addon_info(array $plugin) : PluginLicenseInfo
     {
         $slug = $plugin['slug'] ?? '';
-        $raw_info = get_option($slug . '_license_info', []);
-        if (is_string($raw_info)) {
-            $raw_info = json_decode($raw_info, \true) ?: [];
+        $raw_info = \get_option($slug . '_license_info', []);
+        if (\is_string($raw_info)) {
+            $raw_info = \json_decode($raw_info, \true) ?: [];
         }
-        $license_key = (string) get_option($slug . '_license_key', '');
+        $license_key = (string) \get_option($slug . '_license_key', '');
         $expires_raw = $raw_info['expires'] ?? null;
         $status = $this->derive_status($license_key, $raw_info);
         $info = new PluginLicenseInfo();
@@ -97,14 +97,14 @@ class AddonBridge
      * Derive normalized status from wp_options data.
      * Mirrors LegacyBridge::derive_status().
      */
-    private function derive_status(string $license_key, array $raw_info): string
+    private function derive_status(string $license_key, array $raw_info) : string
     {
         if (empty($license_key)) {
             return 'inactive';
         }
         $expires = $raw_info['expires'] ?? null;
         if ($expires && 'lifetime' !== $expires && 'Not updated' !== $expires) {
-            if (strtotime($expires) < time()) {
+            if (\strtotime($expires) < \time()) {
                 return 'expired';
             }
         }
@@ -115,7 +115,7 @@ class AddonBridge
      * Builds a minimal LicenseConfigAdapter per addon so the License
      * class and card templates work without modification.
      */
-    public function render_addon_cards(): void
+    public function render_addon_cards() : void
     {
         foreach ($this->addon_slugs as $slug) {
             $plugin_data = $this->addon_data[$slug] ?? [];
@@ -139,7 +139,7 @@ class AddonBridge
      * NOTE: Addon must register REST routes at {slug}/v1/license/*
      * for the activate/update/deactivate buttons to work.
      */
-    public function enqueue_addon_scripts(): void
+    public function enqueue_addon_scripts() : void
     {
         if (!isset($_GET['page']) || 'yaycommerce-licenses' !== $_GET['page']) {
             // phpcs:ignore WordPress.Security.NonceVerification
@@ -148,17 +148,17 @@ class AddonBridge
         if (empty($this->addon_slugs)) {
             return;
         }
-        $assets_url = plugin_dir_url(__FILE__) . '../../assets/';
-        wp_enqueue_script('yaycommerce-license', $assets_url . 'js/license.js', ['jquery'], '1.0', \true);
+        $assets_url = \plugin_dir_url(__FILE__) . '../../assets/';
+        \wp_enqueue_script('yaycommerce-license', $assets_url . 'js/license.js', ['jquery'], '1.0', \true);
         foreach ($this->addon_slugs as $slug) {
-            wp_localize_script('yaycommerce-license', Slug::to_var_name($slug) . 'LicenseData', ['slug' => $slug, 'apiSettings' => ['restNonce' => wp_create_nonce('wp_rest'), 'restUrl' => esc_url_raw(rest_url(Slug::to_var_name($slug) . '/v1')), 'adminUrl' => admin_url()]]);
+            \wp_localize_script('yaycommerce-license', Slug::to_var_name($slug) . 'LicenseData', ['slug' => $slug, 'apiSettings' => ['restNonce' => \wp_create_nonce('wp_rest'), 'restUrl' => \esc_url_raw(\rest_url(Slug::to_var_name($slug) . '/v1')), 'adminUrl' => \admin_url()]]);
         }
     }
     /**
      * Build a minimal LicenseConfigAdapter from addon filter data.
      * Used by License constructor + card templates.
      */
-    private function build_addon_adapter(array $plugin_data): AddonLicenseAdapter
+    private function build_addon_adapter(array $plugin_data) : AddonLicenseAdapter
     {
         return new AddonLicenseAdapter($plugin_data);
     }

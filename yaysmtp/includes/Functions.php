@@ -891,6 +891,7 @@ class Functions {
 				foreach ( $topMailList as $title => $mail ) {
 					$el = array(
 						'title'  => $title,
+						'total'  => ( ! empty( $mail['total_sent'] ) ? $mail['total_sent'] : 0 ) + ( ! empty( $mail['total_failed'] ) ? $mail['total_failed'] : 0 ),
 						'sent'   => ! empty( $mail['total_sent'] ) ? $mail['total_sent'] : 0,
 						'failed' => ! empty( $mail['total_failed'] ) ? $mail['total_failed'] : 0,
 					);
@@ -1031,6 +1032,7 @@ class Functions {
 				foreach ( $topMailList as $title => $mail ) {
 					$el = array(
 						'title'  => $title,
+						'total'  => ( ! empty( $mail['total_sent'] ) ? $mail['total_sent'] : 0 ) + ( ! empty( $mail['total_failed'] ) ? $mail['total_failed'] : 0 ),
 						'sent'   => ! empty( $mail['total_sent'] ) ? $mail['total_sent'] : 0,
 						'failed' => ! empty( $mail['total_failed'] ) ? $mail['total_failed'] : 0,
 						'email_opened' => ! empty( $mail['email_opened'] ) ? $mail['email_opened'] : 0,
@@ -1045,14 +1047,14 @@ class Functions {
 				'labels'       => array_values( $labels ),
 				'datasets'     => array(
 					array(
-						'label'           => __( 'Email Sent', 'yay-smtp' ),
+						'label'           => __( 'Sent', 'yay-smtp' ),
 						'borderColor'     => '#2A8CE7',
 						'backgroundColor' => '#2A8CE7',
 						'order'           => 1,
 						'data'            => array_values( $successData ),
 					),
 					array(
-						'label'           => __( 'Email Fail', 'yay-smtp' ),
+						'label'           => __( 'Fail', 'yay-smtp' ),
 						'borderColor'     => '#d94f4f',
 						'backgroundColor' => '#d94f4f',
 						'order'           => 0,
@@ -1060,14 +1062,14 @@ class Functions {
 						'data'            => array_values( $failData ),
 					),
 					array(
-						'label'           => __( 'Email Opened', 'yay-smtp' ),
+						'label'           => __( 'Opened', 'yay-smtp' ),
 						'borderColor'     => '#27AE60',
 						'backgroundColor' => '#27AE60',
 						'order'           => 2,
 						'data'            => array_values( $openedData ),
 					),
 					array(
-						'label'           => __( 'Email Clicked', 'yay-smtp' ),
+						'label'           => __( 'Clicked', 'yay-smtp' ),
 						'borderColor'     => '#F2994A',
 						'backgroundColor' => '#F2994A',
 						'order'           => 3,

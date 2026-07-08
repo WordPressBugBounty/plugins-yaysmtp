@@ -9,7 +9,7 @@ use YaySMTPScoped\YayCommerce\AdminShell\Registry\PluginLicenseInfo;
  */
 class PluginInfoFactory
 {
-    public static function from_adapter(LicenseConfigAdapter $adapter): PluginLicenseInfo
+    public static function from_adapter(LicenseConfigAdapter $adapter) : PluginLicenseInfo
     {
         $license = new License($adapter);
         $raw_info = $license->get_license_info();
