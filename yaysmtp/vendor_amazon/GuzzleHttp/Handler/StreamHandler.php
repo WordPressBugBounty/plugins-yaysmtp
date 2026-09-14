@@ -55,7 +55,7 @@ class StreamHandler
             return \YaySMTP\Aws3\GuzzleHttp\Promise\rejection_for($e);
         }
     }
-    private function invokeStats(array $options, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, $startTime, \YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, $error = null)
+    private function invokeStats(array $options, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, $startTime, ?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, $error = null)
     {
         if (isset($options['on_stats'])) {
             $stats = new \YaySMTP\Aws3\GuzzleHttp\TransferStats($request, $response, microtime(true) - $startTime, $error, []);

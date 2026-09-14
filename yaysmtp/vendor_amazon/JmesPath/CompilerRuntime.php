@@ -23,7 +23,7 @@ class CompilerRuntime
      * @param Parser $parser JMESPath parser to utilize
      * @throws \RuntimeException if the cache directory cannot be created
      */
-    public function __construct($dir = null, \YaySMTP\Aws3\JmesPath\Parser $parser = null)
+    public function __construct($dir = null, ?\YaySMTP\Aws3\JmesPath\Parser $parser = null)
     {
         $this->parser = $parser ?: new \YaySMTP\Aws3\JmesPath\Parser();
         $this->compiler = new \YaySMTP\Aws3\JmesPath\TreeCompiler();

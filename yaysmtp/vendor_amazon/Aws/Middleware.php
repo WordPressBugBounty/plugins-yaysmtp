@@ -25,7 +25,7 @@ final class Middleware
     public static function sourceFile(\YaySMTP\Aws3\Aws\Api\Service $api, $bodyParameter = 'Body', $sourceParameter = 'SourceFile')
     {
         return function (callable $handler) use($api, $bodyParameter, $sourceParameter) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $api, $bodyParameter, $sourceParameter) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $api, $bodyParameter, $sourceParameter) {
                 $operation = $api->getOperation($command->getName());
                 $source = $command[$sourceParameter];
                 if ($source !== null && $operation->getInput()->hasMember($bodyParameter)) {
@@ -43,11 +43,11 @@ final class Middleware
      *
      * @return callable
      */
-    public static function validation(\YaySMTP\Aws3\Aws\Api\Service $api, \YaySMTP\Aws3\Aws\Api\Validator $validator = null)
+    public static function validation(\YaySMTP\Aws3\Aws\Api\Service $api, ?\YaySMTP\Aws3\Aws\Api\Validator $validator = null)
     {
         $validator = $validator ?: new \YaySMTP\Aws3\Aws\Api\Validator();
         return function (callable $handler) use($api, $validator) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($api, $validator, $handler) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($api, $validator, $handler) {
                 $operation = $api->getOperation($command->getName());
                 $validator->validate($command->getName(), $operation->getInput(), $command->toArray());
                 return $handler($command, $request);
@@ -107,7 +107,7 @@ final class Middleware
     public static function tap(callable $fn)
     {
         return function (callable $handler) use($fn) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $fn) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $fn) {
                 $fn($command, $request);
                 return $handler($command, $request);
             };
@@ -130,7 +130,7 @@ final class Middleware
      *
      * @return callable
      */
-    public static function retry(callable $decider = null, callable $delay = null, $stats = false)
+    public static function retry(?callable $decider = null, ?callable $delay = null, $stats = false)
     {
         $decider = $decider ?: \YaySMTP\Aws3\Aws\RetryMiddleware::createDefaultDecider();
         $delay = $delay ?: [\YaySMTP\Aws3\Aws\RetryMiddleware::class, 'exponentialDelay'];
@@ -168,7 +168,7 @@ final class Middleware
     public static function contentType(array $operations)
     {
         return function (callable $handler) use($operations) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $operations) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $operations) {
                 if (!$request->hasHeader('Content-Type') && in_array($command->getName(), $operations, true) && ($uri = $request->getBody()->getMetadata('uri'))) {
                     $request = $request->withHeader('Content-Type', \YaySMTP\Aws3\GuzzleHttp\Psr7\mimetype_from_filename($uri) ?: 'application/octet-stream');
                 }
@@ -188,7 +188,7 @@ final class Middleware
     public static function history(\YaySMTP\Aws3\Aws\History $history)
     {
         return function (callable $handler) use($history) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $history) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $history) {
                 $ticket = $history->start($command, $request);
                 return $handler($command, $request)->then(function ($result) use($history, $ticket) {
                     $history->finish($ticket, $result);
@@ -212,7 +212,7 @@ final class Middleware
     public static function mapRequest(callable $f)
     {
         return function (callable $handler) use($f) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $f) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $f) {
                 return $handler($command, $f($request));
             };
         };
@@ -229,7 +229,7 @@ final class Middleware
     public static function mapCommand(callable $f)
     {
         return function (callable $handler) use($f) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $f) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $f) {
                 return $handler($f($command), $request);
             };
         };
@@ -245,7 +245,7 @@ final class Middleware
     public static function mapResult(callable $f)
     {
         return function (callable $handler) use($f) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $f) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, $f) {
                 return $handler($command, $request)->then($f);
             };
         };
@@ -253,7 +253,7 @@ final class Middleware
     public static function timer()
     {
         return function (callable $handler) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler) {
                 $start = microtime(true);
                 return $handler($command, $request)->then(function (\YaySMTP\Aws3\Aws\ResultInterface $res) use($start) {
                     if (!isset($res['@metadata'])) {

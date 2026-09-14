@@ -34,6 +34,7 @@ class PluginCore {
 		add_action( 'phpmailer_init', array( $this, 'doSmtperInit' ) );
 		add_filter( 'wp_mail_from', array( $this, 'getFromAddress' ), PHP_INT_MAX );
 		add_filter( 'wp_mail_from_name', array( $this, 'getFromName' ), PHP_INT_MAX );
+		add_action( 'yaysmtp_send_before', array( 'YaySMTP\Helper\Utils', 'captureEmailLogAttachments' ), 30, 2 );
 	}
 
 	public function actionForSmtpsHasAuth() {

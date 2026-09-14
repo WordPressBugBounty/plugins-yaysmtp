@@ -29,7 +29,7 @@ class MockHandler implements \Countable
      *
      * @return HandlerStack
      */
-    public static function createWithMiddleware(array $queue = null, callable $onFulfilled = null, callable $onRejected = null)
+    public static function createWithMiddleware(?array $queue = null, ?callable $onFulfilled = null, ?callable $onRejected = null)
     {
         return \YaySMTP\Aws3\GuzzleHttp\HandlerStack::create(new self($queue, $onFulfilled, $onRejected));
     }
@@ -42,7 +42,7 @@ class MockHandler implements \Countable
      * @param callable $onFulfilled Callback to invoke when the return value is fulfilled.
      * @param callable $onRejected  Callback to invoke when the return value is rejected.
      */
-    public function __construct(array $queue = null, callable $onFulfilled = null, callable $onRejected = null)
+    public function __construct(?array $queue = null, ?callable $onFulfilled = null, ?callable $onRejected = null)
     {
         $this->onFulfilled = $onFulfilled;
         $this->onRejected = $onRejected;
@@ -142,7 +142,7 @@ class MockHandler implements \Countable
     {
         return count($this->queue);
     }
-    private function invokeStats(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, array $options, \YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, $reason = null)
+    private function invokeStats(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, array $options, ?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, $reason = null)
     {
         if (isset($options['on_stats'])) {
             $stats = new \YaySMTP\Aws3\GuzzleHttp\TransferStats($request, $response, 0, $reason);

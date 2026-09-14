@@ -213,7 +213,7 @@ abstract class AbstractUploadManager implements \YaySMTP\Aws3\GuzzleHttp\Promise
     protected function getResultHandler(&$errors = [])
     {
         return function (callable $handler) use(&$errors) {
-            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, &$errors) {
+            return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use($handler, &$errors) {
                 return $handler($command, $request)->then(function (\YaySMTP\Aws3\Aws\ResultInterface $result) use($command) {
                     $this->handleResult($command, $result);
                     return $result;

@@ -64,7 +64,7 @@ final class Coroutine implements \YaySMTP\Aws3\GuzzleHttp\Promise\PromiseInterfa
         });
         $this->nextCoroutine($this->generator->current());
     }
-    public function then(callable $onFulfilled = null, callable $onRejected = null)
+    public function then(?callable $onFulfilled = null, ?callable $onRejected = null)
     {
         return $this->result->then($onFulfilled, $onRejected);
     }

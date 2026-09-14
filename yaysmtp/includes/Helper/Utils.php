@@ -6,6 +6,32 @@ use YaySMTP\Helper\LogErrors;
 defined( 'ABSPATH' ) || exit;
 
 class Utils {
+
+	/**
+	 * When set, `insertEmailLogs()` reuses this log id instead of creating a new
+	 * row - used while resending a logged email so the send attempt updates the
+	 * original log's status/error instead of writing a duplicate entry.
+	 *
+	 * @var int|null
+	 */
+	protected static $resend_log_id = null;
+
+	/**
+	 * Mark the given log id as the target of an in-progress resend.
+	 *
+	 * @param int $log_id Email log id.
+	 */
+	public static function setResendContext( $log_id ) {
+		self::$resend_log_id = absint( $log_id );
+	}
+
+	/**
+	 * Clear the resend context set by `setResendContext()`.
+	 */
+	public static function clearResendContext() {
+		self::$resend_log_id = null;
+	}
+
 	//getTemplatePart('temp-small/forder',array('groupedMetaKimonoPlans' => $groupedMetaPlans[MasterValues::MV_GROUP_KIMONO], 'sexAgeType' => $SEX_AGE_TYPE, 'planShopList' => $planShopList, 'planTypeKimonoMap' => $planTypeKimonoMap));
 	public static function getTemplatePart( $templateFolder, $slug = null, array $params = array() ) {
 		global $wp_query;
@@ -221,14 +247,178 @@ class Utils {
 		};
 
 		return array(
-			'subject'      => $phpmailer->Subject,
-			'email_from'   => $phpmailer->From,
-			'email_to'     => $emailTo, // require is array
-			'date_time'    => current_time( 'mysql', true ),
-			'status'       => 0, // 0: false, 1: true, 2: waiting
-			'content_type' => $phpmailer->ContentType,
-			'body_content' => $phpmailer->Body,
+			'subject'         => $phpmailer->Subject,
+			'email_from'      => $phpmailer->From,
+			'email_from_name' => isset( $phpmailer->FromName ) ? $phpmailer->FromName : '',
+			'email_to'        => $emailTo, // require is array
+			'email_cc'        => self::extractMailAddresses( $phpmailer->getCcAddresses() ),
+			'email_bcc'       => self::extractMailAddresses( $phpmailer->getBccAddresses() ),
+			'email_reply_to'  => self::extractMailAddresses( $phpmailer->getReplyToAddresses() ),
+			'date_time'       => current_time( 'mysql', true ),
+			'status'          => 0, // 0: false, 1: true, 2: waiting
+			'content_type'    => $phpmailer->ContentType,
+			'email_charset'   => ! empty( $phpmailer->CharSet ) ? $phpmailer->CharSet : '',
+			'email_encoding'  => ! empty( $phpmailer->Encoding ) ? $phpmailer->Encoding : '',
+			'body_content'    => $phpmailer->Body,
+			'alt_body'        => isset( $phpmailer->AltBody ) ? $phpmailer->AltBody : '',
+			'custom_headers'  => self::extractCustomHeaders( $phpmailer->getCustomHeaders() ),
 		);
+	}
+
+	/**
+	 * Normalize PHPMailer address lists to [ ['email' => '', 'name' => ''], ... ].
+	 *
+	 * @param array $addresses PHPMailer getTo/Cc/Bcc/ReplyTo result.
+	 * @return array<int,array{email:string,name:string}>
+	 */
+	public static function extractMailAddresses( $addresses ) {
+		$result = array();
+		if ( empty( $addresses ) || ! is_array( $addresses ) ) {
+			return $result;
+		}
+
+		foreach ( $addresses as $item ) {
+			if ( ! is_array( $item ) ) {
+				$email = sanitize_email( (string) $item );
+				if ( is_email( $email ) ) {
+					$result[] = array(
+						'email' => $email,
+						'name'  => '',
+					);
+				}
+				continue;
+			}
+
+			$email = isset( $item[0] ) ? sanitize_email( (string) $item[0] ) : '';
+			$name  = isset( $item[1] ) ? sanitize_text_field( (string) $item[1] ) : '';
+			if ( is_email( $email ) ) {
+				$result[] = array(
+					'email' => $email,
+					'name'  => $name,
+				);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Keep custom headers that are needed for a faithful resend.
+	 *
+	 * @param array $headers PHPMailer getCustomHeaders() result.
+	 * @return array<int,array{name:string,value:string}>
+	 */
+	public static function extractCustomHeaders( $headers ) {
+		$result = array();
+		$skip   = array(
+			'from',
+			'to',
+			'cc',
+			'bcc',
+			'reply-to',
+			'content-type',
+			'mime-version',
+			'date',
+			'message-id',
+			'x-mailer',
+			'return-path',
+		);
+
+		if ( empty( $headers ) || ! is_array( $headers ) ) {
+			return $result;
+		}
+
+		foreach ( $headers as $head ) {
+			$name  = isset( $head[0] ) ? trim( (string) $head[0] ) : '';
+			$value = isset( $head[1] ) ? (string) $head[1] : '';
+			if ( '' === $name ) {
+				continue;
+			}
+			if ( in_array( strtolower( $name ), $skip, true ) ) {
+				continue;
+			}
+
+			$result[] = array(
+				'name'  => sanitize_text_field( $name ),
+				'value' => str_replace( array( "\r", "\n" ), '', $value ),
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Parse stored address data from email log columns.
+	 *
+	 * @param mixed $raw Serialized array, JSON, comma-separated emails, or list of strings.
+	 * @return array<int,array{email:string,name:string}>
+	 */
+	public static function parseStoredMailAddresses( $raw ) {
+		$addresses = maybe_unserialize( $raw );
+		if ( is_string( $addresses ) ) {
+			$decoded = json_decode( $addresses, true );
+			if ( is_array( $decoded ) ) {
+				$addresses = $decoded;
+			} else {
+				$addresses = array_filter( array_map( 'trim', explode( ',', $addresses ) ) );
+			}
+		}
+		if ( ! is_array( $addresses ) ) {
+			$addresses = ( empty( $addresses ) ) ? array() : array( $addresses );
+		}
+
+		return self::extractMailAddresses(
+			array_map(
+				function ( $item ) {
+					if ( is_array( $item ) && isset( $item['email'] ) ) {
+						return array(
+							isset( $item['email'] ) ? $item['email'] : '',
+							isset( $item['name'] ) ? $item['name'] : '',
+						);
+					}
+					return $item;
+				},
+				$addresses
+			)
+		);
+	}
+
+	/**
+	 * Format an address for a wp_mail header.
+	 *
+	 * @param string $email Email address.
+	 * @param string $name  Display name.
+	 * @return string
+	 */
+	public static function formatMailAddressHeader( $email, $name = '' ) {
+		$email = sanitize_email( (string) $email );
+		if ( ! is_email( $email ) ) {
+			return '';
+		}
+
+		$name = trim( (string) $name );
+		if ( '' !== $name ) {
+			return $name . ' <' . $email . '>';
+		}
+
+		return $email;
+	}
+
+	/**
+	 * Format stored addresses for API/UI display.
+	 *
+	 * @param mixed $raw Stored address column value.
+	 * @return string[]
+	 */
+	public static function formatMailAddressesForDisplay( $raw ) {
+		$formatted = array();
+		foreach ( self::parseStoredMailAddresses( $raw ) as $address ) {
+			$header = self::formatMailAddressHeader( $address['email'], $address['name'] );
+			if ( '' !== $header ) {
+				$formatted[] = $header;
+			}
+		}
+		return $formatted;
 	}
 
 	public static function isMailerComplete() {
@@ -494,6 +684,11 @@ class Utils {
     }
 
 	public static function insertEmailLogs( $data, $disable_email_delivery = 'no' ) {
+		if ( ! empty( self::$resend_log_id ) ) {
+			// Resending a logged email: reuse its row instead of writing a new one.
+			return self::$resend_log_id;
+		}
+
 		$emailLogSetting = self::getYaySmtpEmailLogSetting();
 		$saveSetting     = isset( $emailLogSetting ) && isset( $emailLogSetting['save_email_log'] ) ? $emailLogSetting['save_email_log'] : 'yes';
 		$infTypeSetting  = isset( $emailLogSetting ) && isset( $emailLogSetting['email_log_inf_type'] ) ? $emailLogSetting['email_log_inf_type'] : 'full_inf';
@@ -510,13 +705,58 @@ class Utils {
 				'status'     => $data['status'],
 			);
 
+			if ( ! empty( $data['email_from_name'] ) ) {
+				$content['email_from_name'] = sanitize_text_field( $data['email_from_name'] );
+			}
+
+			if ( ! empty( $data['email_cc'] ) && is_array( $data['email_cc'] ) ) {
+				$content['email_cc'] = maybe_serialize( $data['email_cc'] );
+			}
+
+			if ( ! empty( $data['email_bcc'] ) && is_array( $data['email_bcc'] ) ) {
+				$content['email_bcc'] = maybe_serialize( $data['email_bcc'] );
+			}
+
+			if ( ! empty( $data['email_reply_to'] ) && is_array( $data['email_reply_to'] ) ) {
+				$content['email_reply_to'] = maybe_serialize( $data['email_reply_to'] );
+			}
+
+			if ( ! empty( $data['email_charset'] ) ) {
+				$content['email_charset'] = sanitize_text_field( $data['email_charset'] );
+			}
+
+			if ( ! empty( $data['email_encoding'] ) ) {
+				$content['email_encoding'] = sanitize_text_field( $data['email_encoding'] );
+			}
+
+			if ( ! empty( $data['custom_headers'] ) && is_array( $data['custom_headers'] ) ) {
+				$content['custom_headers'] = maybe_serialize( $data['custom_headers'] );
+			}
+
 			if ( ! empty( $data['reason_error'] ) ) {
 				$content['reason_error'] = $data['reason_error'];
 			}
 
 			if ( 'basic_inf' !== $infTypeSetting ) {
 				$content['content_type'] = $data['content_type'];
-				$content['body_content'] = self::wpKses( maybe_serialize( $data['body_content'] ));
+
+				// Only HTML bodies need HTML tag stripping. A plain-text body
+				// (the CF7 default, for example) commonly contains literal
+				// "<" / ">" that are not markup at all - e.g. "Name <email>" -
+				// and wp_kses() has no way to tell those apart from real tags,
+				// so running it over plain text loses content. It's also
+				// unnecessary: plain text is rendered as text, never as HTML.
+				$is_html_body = in_array( $data['content_type'], self::getHtmlContentTypes(), true );
+
+				$content['body_content'] = $is_html_body
+					? self::wpKses( maybe_serialize( $data['body_content'] ) )
+					: maybe_serialize( $data['body_content'] );
+
+				if ( ! empty( $data['alt_body'] ) ) {
+					// AltBody is always the plain-text alternative of an HTML
+					// email - never markup - so it never needs HTML sanitizing.
+					$content['alt_body'] = $data['alt_body'];
+				}
 			}
 
 			// Get email source ( what plugin, theme, or wp core ? )
@@ -562,6 +802,217 @@ class Utils {
 		}
 	}
 
+	/**
+	 * Store copies of the sending email's attachments and link them to the log row.
+	 *
+	 * Hooked to `yaysmtp_send_before`, which fires from every log-creation point
+	 * (SMTP/mail via PhpMailerExtends and every API mailer controller).
+	 *
+	 * @param \PHPMailer\PHPMailer\PHPMailer|object $phpmailer PHPMailer instance.
+	 * @param int                                   $log_id    Email log ID.
+	 */
+	public static function captureEmailLogAttachments( $phpmailer, $log_id ) {
+		$log_id = absint( $log_id );
+		if ( empty( $log_id ) ) {
+			return;
+		}
+
+		$meta = EmailLogAttachments::store( $phpmailer, $log_id );
+		if ( empty( $meta ) ) {
+			return;
+		}
+
+		self::updateEmailLog(
+			array(
+				'id'          => $log_id,
+				'attachments' => maybe_serialize( $meta ),
+			)
+		);
+	}
+
+	/**
+	 * Resend a logged email through the current mailer.
+	 *
+	 * @param int $log_id Email log ID.
+	 * @return array{success:bool,mess:string}
+	 */
+	public static function resendEmailFromLog( $log_id ) {
+		global $wpdb;
+
+		$log_id = absint( $log_id );
+		if ( empty( $log_id ) ) {
+			return array(
+				'success' => false,
+				'mess'    => __( 'No email log id found.', 'yay-smtp' ),
+			);
+		}
+
+		$log = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}yaysmtp_email_logs WHERE id = %d", $log_id ) );
+		if ( empty( $log ) ) {
+			return array(
+				'success' => false,
+				'mess'    => __( 'No email log found.', 'yay-smtp' ),
+			);
+		}
+
+		$email_to = maybe_unserialize( $log->email_to );
+		if ( is_string( $email_to ) ) {
+			$decoded = json_decode( $email_to, true );
+			if ( is_array( $decoded ) ) {
+				$email_to = $decoded;
+			} else {
+				$email_to = array_filter( array_map( 'trim', explode( ',', $email_to ) ) );
+			}
+		}
+		if ( ! is_array( $email_to ) ) {
+			$email_to = array( $email_to );
+		}
+
+		$recipients = array();
+		foreach ( $email_to as $address ) {
+			if ( is_array( $address ) ) {
+				$address = isset( $address['email'] ) ? $address['email'] : ( isset( $address[0] ) ? $address[0] : '' );
+			}
+			$address = sanitize_email( (string) $address );
+			if ( is_email( $address ) ) {
+				$recipients[] = $address;
+			}
+		}
+		$recipients = array_values( array_unique( $recipients ) );
+
+		if ( empty( $recipients ) ) {
+			return array(
+				'success' => false,
+				'mess'    => __( 'This email has no valid recipients.', 'yay-smtp' ),
+			);
+		}
+
+		$body = maybe_unserialize( $log->body_content ?? '' );
+		if ( ! is_string( $body ) ) {
+			$body = (string) $body;
+		}
+
+		$content_type = 'text/html';
+		if ( ! empty( $log->content_type ) ) {
+			$parsed = strtolower( trim( explode( ';', (string) $log->content_type, 2 )[0] ) );
+			if ( 'text/plain' === $parsed ) {
+				$content_type = 'text/plain';
+			}
+		}
+
+		$charset = ! empty( $log->email_charset ) ? sanitize_text_field( $log->email_charset ) : 'UTF-8';
+		$headers = array( 'Content-Type: ' . $content_type . '; charset=' . $charset );
+
+		if ( ! empty( $log->email_from ) && is_email( $log->email_from ) ) {
+			$from_name = ! empty( $log->email_from_name ) ? $log->email_from_name : '';
+			$from      = self::formatMailAddressHeader( $log->email_from, $from_name );
+			if ( '' !== $from ) {
+				$headers[] = 'From: ' . $from;
+			}
+		}
+
+		foreach ( self::parseStoredMailAddresses( $log->email_cc ?? '' ) as $cc ) {
+			$header = self::formatMailAddressHeader( $cc['email'], $cc['name'] );
+			if ( '' !== $header ) {
+				$headers[] = 'Cc: ' . $header;
+			}
+		}
+
+		foreach ( self::parseStoredMailAddresses( $log->email_bcc ?? '' ) as $bcc ) {
+			$header = self::formatMailAddressHeader( $bcc['email'], $bcc['name'] );
+			if ( '' !== $header ) {
+				$headers[] = 'Bcc: ' . $header;
+			}
+		}
+
+		foreach ( self::parseStoredMailAddresses( $log->email_reply_to ?? '' ) as $reply_to ) {
+			$header = self::formatMailAddressHeader( $reply_to['email'], $reply_to['name'] );
+			if ( '' !== $header ) {
+				$headers[] = 'Reply-To: ' . $header;
+			}
+		}
+
+		$custom_headers = maybe_unserialize( $log->custom_headers ?? '' );
+		if ( is_array( $custom_headers ) ) {
+			foreach ( $custom_headers as $custom_header ) {
+				$name  = isset( $custom_header['name'] ) ? trim( (string) $custom_header['name'] ) : '';
+				$value = isset( $custom_header['value'] ) ? (string) $custom_header['value'] : '';
+				if ( '' === $name ) {
+					continue;
+				}
+				$headers[] = $name . ': ' . str_replace( array( "\r", "\n" ), '', $value );
+			}
+		}
+
+		$alt_body    = isset( $log->alt_body ) ? (string) $log->alt_body : '';
+		$encoding    = ! empty( $log->email_encoding ) ? sanitize_text_field( $log->email_encoding ) : '';
+		$attachments = EmailLogAttachments::getForResend( $log_id, isset( $log->attachments ) ? $log->attachments : '' );
+		$restore     = function ( $phpmailer ) use ( $alt_body, $encoding, $attachments ) {
+			if ( '' !== $alt_body ) {
+				$phpmailer->AltBody = $alt_body;
+			}
+			if ( '' !== $encoding ) {
+				$phpmailer->Encoding = $encoding;
+			}
+			foreach ( $attachments as $attachment ) {
+				try {
+					if ( 'inline' === $attachment['disposition'] && '' !== $attachment['cid'] ) {
+						$phpmailer->addEmbeddedImage(
+							$attachment['path'],
+							$attachment['cid'],
+							$attachment['name'],
+							$attachment['encoding'],
+							$attachment['type']
+						);
+					} else {
+						$phpmailer->addAttachment(
+							$attachment['path'],
+							$attachment['name'],
+							$attachment['encoding'],
+							$attachment['type']
+						);
+					}
+				} catch ( \Exception $e ) {
+					continue;
+				}
+			}
+		};
+		add_action( 'phpmailer_init', $restore );
+
+		$subject = isset( $log->subject ) ? $log->subject : '';
+		$sent    = false;
+		self::setResendContext( $log_id );
+		try {
+			$sent = wp_mail( $recipients, $subject, $body, $headers );
+		} finally {
+			remove_action( 'phpmailer_init', $restore );
+			self::clearResendContext();
+		}
+
+		// "Generated by" should reflect that this delivery attempt was a
+		// manual resend, not the original auto-send - while still keeping
+		// the original source (e.g. "Contact Form 7") so that's not lost.
+		self::updateEmailLog(
+			array(
+				'id'        => $log_id,
+				'root_name' => self::markRootNameAsResent( isset( $log->root_name ) ? $log->root_name : '' ),
+			)
+		);
+
+		if ( $sent ) {
+			return array(
+				'success' => true,
+				'mess'    => __( 'Email has been resent.', 'yay-smtp' ),
+			);
+		}
+
+		$debug = array_filter( LogErrors::getErr() );
+		return array(
+			'success' => false,
+			'mess'    => ! empty( $debug ) ? implode( ' ', $debug ) : __( 'Email resent failed.', 'yay-smtp' ),
+		);
+	}
+
 	public static function getExtraInfo( $log_id = null ) {
 		$extra_info = [];
 		if ( ! empty( $log_id ) ) {
@@ -572,6 +1023,29 @@ class Utils {
 			}
 		}
 		return $extra_info;
+	}
+	
+	/**
+	 * Build the "Generated by" value for a resent email log: keep the
+	 * original source (e.g. "Contact Form 7") but mark it as resent, without
+	 * stacking the marker if the row is resent more than once.
+	 *
+	 * @param string $root_name The log's current root_name value.
+	 * @return string
+	 */
+	public static function markRootNameAsResent( $root_name ) {
+		$marker    = __( '(Resent)', 'yay-smtp' );
+		$pattern   = '/\s*' . preg_quote( $marker, '/' ) . '\s*$/';
+		$root_name = trim( (string) preg_replace( $pattern, '', (string) $root_name ) );
+
+		if ( '' === $root_name ) {
+			// Same lookup the original send-time logging uses (getRoot()) -
+			// keeps this name in sync with whatever the plugin's own header
+			// says (e.g. "YaySMTP" vs "YaySMTP Pro"), instead of hardcoding it.
+			$root_name = self::getRoot( __FILE__ );
+		}
+
+		return $root_name . ' ' . $marker;
 	}
 	
 	public static function getRoot( $file ) {
@@ -1352,24 +1826,29 @@ class Utils {
 		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_email_logs' );
 		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_event_email_clicked_link' );
 		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'yaysmtp_event_email_opened' );
+
+		EmailLogAttachments::deleteAll();
 	}
-	
+
 	public static function deleteAllEmailLogsWithCondition( $days_setting = null, $days_param = null ) {
 		global $wpdb;
 		if ( !empty( $days_setting ) && !empty( $days_param ) && ( intval($days_setting) >= intval($days_param) ) ) {
 			$period_day_not_delete = intval( $days_param );
 			$current_time_gmt      = current_time( 'mysql', true );
-			 
+
 			$datetime_obj = new \DateTime( $current_time_gmt );
 			$datetime_obj->modify( '-' . intval( $period_day_not_delete ) . ' days' );
 			$datetime_not_delete = $datetime_obj->format( 'Y-m-d H:i:s' );
 
-			$wpdb->query( $wpdb->prepare( 
+			$wpdb->query( $wpdb->prepare(
 				"DELETE logs, cl, eo FROM {$wpdb->prefix}yaysmtp_email_logs AS logs
 				LEFT JOIN {$wpdb->prefix}yaysmtp_event_email_clicked_link cl ON logs.id = cl.log_id
 				LEFT JOIN {$wpdb->prefix}yaysmtp_event_email_opened eo ON logs.id = eo.log_id
 				WHERE logs.date_time < %s", $datetime_not_delete
 			));
+
+			// Range delete: drop any attachment copy no surviving log references.
+			EmailLogAttachments::cleanupOrphans();
 		}
 	}
 
@@ -1621,22 +2100,43 @@ class Utils {
         );
     }
 
-	public static function wpKses( $html ) {
-        // First, decode HTML entities to ensure we catch encoded XSS attempts
-        $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+	// public static function wpKses_old( $html ) {
+    //     // First, decode HTML entities to ensure we catch encoded XSS attempts
+    //     $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         
-        // Remove any script tags and their content
-        $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
+    //     // Remove any script tags and their content
+    //     $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
         
-        // Remove any on* attributes that could execute JavaScript
-        $html = preg_replace('/\son\w+="[^"]*"/i', '', $html);
-        $html = preg_replace('/\son\w+=\'[^\']*\'/i', '', $html);
+    //     // Remove any on* attributes that could execute JavaScript
+    //     $html = preg_replace('/\son\w+="[^"]*"/i', '', $html);
+    //     $html = preg_replace('/\son\w+=\'[^\']*\'/i', '', $html);
         
-        $allowed_html = self::wpKsesAllowedHtml();
-        $html = wp_kses($html, $allowed_html);
+    //     $allowed_html = self::wpKsesAllowedHtml();
+    //     $html = wp_kses($html, $allowed_html);
        
-        return $html;
-    }
+    //     return $html;
+    // }
+
+	/**
+	 * Sanitize HTML for storage/display (email body_content, alt_body, ...).
+	 *
+	 * Deliberately does nothing but call `wp_kses()`. Do NOT add an
+	 * `html_entity_decode()` (or any other decode) step before it: text a
+	 * sender typed as literal, harmless entities (e.g. `&#x3c;img
+	 * onerror=...&#x3e;`, never meant as markup) must stay exactly that -
+	 * decoding before sanitizing is what turns it into a live `<img>` tag in
+	 * the first place, on the very first save. Regex-based `<script>`/`on*`
+	 * stripping is equally unsafe to rely on (it only matches quoted
+	 * attribute values - `<svg/onload=x>` slips through both), so don't
+	 * reintroduce that either; `wp_kses()` already parses attributes properly
+	 * and covers all of it.
+	 *
+	 * @param mixed $html Raw content.
+	 * @return string Sanitized HTML.
+	 */
+	public static function wpKses( $html ) {
+		return wp_kses( (string) $html, self::wpKsesAllowedHtml() );
+	}
 
 	public static function getHtmlContentTypes() {
 		return [

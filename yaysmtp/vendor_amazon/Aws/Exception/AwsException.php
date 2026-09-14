@@ -28,7 +28,7 @@ class AwsException extends \RuntimeException
      * @param array            $context Exception context
      * @param \Exception       $previous  Previous exception (if any)
      */
-    public function __construct($message, \YaySMTP\Aws3\Aws\CommandInterface $command, array $context = [], \Exception $previous = null)
+    public function __construct($message, \YaySMTP\Aws3\Aws\CommandInterface $command, array $context = [], ?\Exception $previous = null)
     {
         $this->command = $command;
         $this->response = isset($context['response']) ? $context['response'] : null;

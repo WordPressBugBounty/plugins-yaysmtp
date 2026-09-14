@@ -61,7 +61,7 @@ class TraceMiddleware {
   public function __invoke($step, $name) {
     $this->prevOutput = $this->prevInput = [];
     return function (callable $next) use ($step, $name) {
-      return function (\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use ($next, $step, $name) {
+      return function (\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) use ($next, $step, $name) {
         $this->createHttpDebug($command);
         $start = microtime(true);
         $this->stepInput(['step' => $step, 'name' => $name, 'request' => $this->requestArray($request), 'command' => $this->commandArray($command)]);
@@ -105,10 +105,10 @@ class TraceMiddleware {
   private function commandArray(\YaySMTP\Aws3\Aws\CommandInterface $cmd) {
     return ['instance' => spl_object_hash($cmd), 'name' => $cmd->getName(), 'params' => $cmd->toArray()];
   }
-  private function requestArray(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) {
+  private function requestArray(?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) {
     return !$request ? [] : array_filter(['instance' => spl_object_hash($request), 'method' => $request->getMethod(), 'headers' => $this->redactHeaders($request->getHeaders()), 'body' => $this->streamStr($request->getBody()), 'scheme' => $request->getUri()->getScheme(), 'port' => $request->getUri()->getPort(), 'path' => $request->getUri()->getPath(), 'query' => $request->getUri()->getQuery()]);
   }
-  private function responseArray(\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null) {
+  private function responseArray(?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null) {
     return !$response ? [] : ['instance' => spl_object_hash($response), 'statusCode' => $response->getStatusCode(), 'headers' => $this->redactHeaders($response->getHeaders()), 'body' => $this->streamStr($response->getBody())];
   }
   private function resultArray($value) {

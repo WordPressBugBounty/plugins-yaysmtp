@@ -26,7 +26,7 @@ class MockHandler implements \Countable
      * @param callable $onFulfilled Callback to invoke when the return value is fulfilled.
      * @param callable $onRejected  Callback to invoke when the return value is rejected.
      */
-    public function __construct(array $resultOrQueue = [], callable $onFulfilled = null, callable $onRejected = null)
+    public function __construct(array $resultOrQueue = [], ?callable $onFulfilled = null, ?callable $onRejected = null)
     {
         $this->onFulfilled = $onFulfilled;
         $this->onRejected = $onRejected;

@@ -37,7 +37,7 @@ class PresignUrlMiddleware {
       return $f;
     };
   }
-  public function __invoke(\YaySMTP\Aws3\Aws\CommandInterface $cmd, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) {
+  public function __invoke(\YaySMTP\Aws3\Aws\CommandInterface $cmd, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null) {
     if (in_array($cmd->getName(), $this->commandPool) && !isset($cmd->{'__skip' . $cmd->getName()})) {
       $cmd['DestinationRegion'] = $this->client->getRegion();
       if (!$this->requireDifferentRegion || !empty($cmd['SourceRegion']) && $cmd['SourceRegion'] !== $cmd['DestinationRegion']) {

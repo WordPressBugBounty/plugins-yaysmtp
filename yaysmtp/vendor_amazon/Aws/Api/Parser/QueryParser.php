@@ -23,7 +23,7 @@ class QueryParser extends \YaySMTP\Aws3\Aws\Api\Parser\AbstractParser
      *                                      back of result wrappers from the
      *                                      output structure.
      */
-    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, \YaySMTP\Aws3\Aws\Api\Parser\XmlParser $xmlParser = null, $honorResultWrapper = true)
+    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, ?\YaySMTP\Aws3\Aws\Api\Parser\XmlParser $xmlParser = null, $honorResultWrapper = true)
     {
         parent::__construct($api);
         $this->xmlParser = $xmlParser ?: new \YaySMTP\Aws3\Aws\Api\Parser\XmlParser();

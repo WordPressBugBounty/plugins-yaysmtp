@@ -18,7 +18,7 @@ class Validator {
    *                           "max", and "pattern". If a key is not
    *                           provided, the constraint will assume false.
    */
-  public function __construct(array $constraints = null) {
+  public function __construct(?array $constraints = null) {
     static $assumedFalseValues = ['required' => false, 'min' => false, 'max' => false, 'pattern' => false];
     $this->constraints = empty($constraints) ? self::$defaultConstraints : $constraints + $assumedFalseValues;
   }

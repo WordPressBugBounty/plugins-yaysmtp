@@ -50,12 +50,21 @@ class Installer {
       `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
       `subject` varchar(1000) DEFAULT NULL,
       `email_from` varchar(300) DEFAULT NULL,
+      `email_from_name` varchar(300) DEFAULT NULL,
       `email_to` longtext DEFAULT NULL,
+      `email_cc` longtext DEFAULT NULL,
+      `email_bcc` longtext DEFAULT NULL,
+      `email_reply_to` longtext DEFAULT NULL,
       `mailer` varchar(300) DEFAULT NULL,
       `date_time` datetime NOT NULL,
       `status` int(1) DEFAULT NULL,
       `content_type` varchar(300) DEFAULT NULL,
+      `email_charset` varchar(50) DEFAULT NULL,
+      `email_encoding` varchar(50) DEFAULT NULL,
       `body_content` longtext DEFAULT NULL,
+      `alt_body` longtext DEFAULT NULL,
+      `custom_headers` longtext DEFAULT NULL,
+      `attachments` longtext DEFAULT NULL,
       `reason_error` varchar(300) DEFAULT NULL,
       `flag_delete` int(1) DEFAULT 0,
       PRIMARY KEY (`id`)
@@ -76,16 +85,44 @@ class Installer {
 		global $wpdb;
 		$table = $wpdb->prefix . 'yaysmtp_email_logs';
 
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) == $table ) {
-			$check_col_1_exist = $wpdb->get_var( "SHOW COLUMNS FROM `{$wpdb->prefix}yaysmtp_email_logs` LIKE 'root_name';" );
-			if ( empty( $check_col_1_exist ) ) {
-				$ret = $wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN root_name varchar(1000) DEFAULT NULL" );
-			}
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) != $table ) {
+			return;
+		}
 
-			$check_col_2_exist = $wpdb->get_var( "SHOW COLUMNS FROM `{$wpdb->prefix}yaysmtp_email_logs` LIKE 'extra_info';" );
-			if ( empty( $check_col_2_exist ) ) {
-				$ret = $wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN extra_info longtext DEFAULT NULL" );
-			}
+		$existing_columns = $wpdb->get_col( "DESCRIBE {$wpdb->prefix}yaysmtp_email_logs" );
+
+		if ( ! in_array( 'root_name', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN root_name varchar(1000) DEFAULT NULL" );
+		}
+		if ( ! in_array( 'extra_info', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN extra_info longtext DEFAULT NULL" );
+		}
+		if ( ! in_array( 'email_from_name', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN email_from_name varchar(300) DEFAULT NULL" );
+		}
+		if ( ! in_array( 'email_cc', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN email_cc longtext DEFAULT NULL" );
+		}
+		if ( ! in_array( 'email_bcc', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN email_bcc longtext DEFAULT NULL" );
+		}
+		if ( ! in_array( 'email_reply_to', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN email_reply_to longtext DEFAULT NULL" );
+		}
+		if ( ! in_array( 'email_charset', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN email_charset varchar(50) DEFAULT NULL" );
+		}
+		if ( ! in_array( 'email_encoding', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN email_encoding varchar(50) DEFAULT NULL" );
+		}
+		if ( ! in_array( 'alt_body', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN alt_body longtext DEFAULT NULL" );
+		}
+		if ( ! in_array( 'custom_headers', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN custom_headers longtext DEFAULT NULL" );
+		}
+		if ( ! in_array( 'attachments', $existing_columns, true ) ) {
+			$wpdb->query( "ALTER TABLE {$wpdb->prefix}yaysmtp_email_logs ADD COLUMN attachments longtext DEFAULT NULL" );
 		}
 	}
 

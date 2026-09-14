@@ -48,7 +48,8 @@ class PhpMailerExtends extends \PHPMailer\PHPMailer\PHPMailer {
 			Utils::setFrom($this);
 			$dataLogsDB           = Utils::prepareDataLogInit( $this );
 			$dataLogsDB['mailer'] = '[' . $mailer_list[$currentMailer] . '] - Development Mode';
-			Utils::insertEmailLogs( $dataLogsDB, 'yes' );
+			$devLogId             = Utils::insertEmailLogs( $dataLogsDB, 'yes' );
+			Utils::captureEmailLogAttachments( $this, $devLogId );
 			return true;
 		}
 		// disable emails delivery - end

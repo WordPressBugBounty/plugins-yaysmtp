@@ -16,7 +16,7 @@ class RestXmlSerializer extends \YaySMTP\Aws3\Aws\Api\Serializer\RestSerializer 
    * @param string  $endpoint Endpoint to connect to
    * @param XmlBody $xmlBody  Optional XML formatter to use
    */
-  public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, $endpoint, \YaySMTP\Aws3\Aws\Api\Serializer\XmlBody $xmlBody = null) {
+  public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, $endpoint, ?\YaySMTP\Aws3\Aws\Api\Serializer\XmlBody $xmlBody = null) {
     parent::__construct($api, $endpoint);
     $this->xmlBody = $xmlBody ?: new \YaySMTP\Aws3\Aws\Api\Serializer\XmlBody($api);
   }

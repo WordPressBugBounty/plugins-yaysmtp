@@ -17,7 +17,7 @@ class RestXmlParser extends \YaySMTP\Aws3\Aws\Api\Parser\AbstractRestParser {
    * @param Service   $api    Service description
    * @param XmlParser $parser XML body parser
    */
-  public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, \YaySMTP\Aws3\Aws\Api\Parser\XmlParser $parser = null) {
+  public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, ?\YaySMTP\Aws3\Aws\Api\Parser\XmlParser $parser = null) {
     parent::__construct($api);
     $this->parser = $parser ?: new \YaySMTP\Aws3\Aws\Api\Parser\XmlParser();
   }

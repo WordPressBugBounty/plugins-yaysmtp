@@ -3,6 +3,7 @@ namespace YaySMTP;
 
 use YaySMTP\Helper\LogErrors;
 use YaySMTP\Helper\Utils;
+use YaySMTP\Helper\EmailLogAttachments;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,6 +38,7 @@ class Functions {
 		add_action( 'wp_ajax_yaysmtp_delete_email_logs', array( $this, 'deleteEmailLogs' ) );
 		add_action( 'wp_ajax_yaysmtp_delete_all_email_logs', array( $this, 'deleteAllEmailLogs' ) );
 		add_action( 'wp_ajax_yaysmtp_detail_email_logs', array( $this, 'getEmailLog' ) );
+		add_action( 'wp_ajax_yaysmtp_resend_email_logs', array( $this, 'resendEmailLogs' ) );
 		add_action( 'wp_ajax_yaysmtp_overview_chart', array( $this, 'getEmailChart' ) );
 		add_action( 'wp_ajax_yaysmtp_mark_reviewed', array( $this, 'markReviewed' ) );
 		add_action( 'wp_ajax_yaysmtp_reports', array( $this, 'getReports' ) );
@@ -696,6 +698,9 @@ class Functions {
 					wp_send_json_error( array( 'mess' => __( 'No email log id found.', 'yay-smtp' ) ) );
 				}
 
+				// Release attachment copies while the log rows still exist.
+				EmailLogAttachments::delete( $ids_array );
+
 				$deletedEmailLogs 		 = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_email_logs WHERE ID IN ( {$id_placeholders} )", $ids_array ) );
 				$deletedEmailClickedLink = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_event_email_clicked_link WHERE log_id IN ( {$id_placeholders} )", $ids_array ) );
 				$deletedEmailOpened 	 = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}yaysmtp_event_email_opened WHERE log_id IN ( {$id_placeholders} )", $ids_array ) );
@@ -775,11 +780,26 @@ class Functions {
 
 					if ( ! empty( $resultQuery->content_type ) ) {
 						$resultArr['content_type'] = $resultQuery->content_type;
-						$resultArr['body_content'] = Utils::wpKses( maybe_serialize( $resultQuery->body_content ));
+
+						// Only re-sanitize as HTML for HTML emails; a plain-text
+						// body has no markup to strip and is rendered as text.
+						$resultArr['body_content'] = in_array( $resultQuery->content_type, Utils::getHtmlContentTypes(), true )
+							? Utils::wpKses( maybe_serialize( $resultQuery->body_content ) )
+							: maybe_unserialize( $resultQuery->body_content );
+					}
+
+					if ( ! empty( $resultQuery->alt_body ) ) {
+						// AltBody is always plain text.
+						$resultArr['alt_body'] = $resultQuery->alt_body;
 					}
 
 					if ( ! empty( $resultQuery->reason_error ) ) {
 						$resultArr['reason_error'] = $resultQuery->reason_error;
+					}
+
+					$attachments = EmailLogAttachments::getForDisplay( isset( $resultQuery->attachments ) ? $resultQuery->attachments : '' );
+					if ( ! empty( $attachments ) ) {
+						$resultArr['attachments'] = $attachments;
 					}
 
 					$email_opened = Utils::getTrackingEmailOpenedByLogId( intval( $resultQuery->id ));
@@ -813,6 +833,92 @@ class Functions {
 			}
 			wp_send_json_error( array( 'mess' => __( 'No email log id found.', 'yay-smtp' ) ) );
 
+		} catch ( \Exception $ex ) {
+			LogErrors::getMessageException( $ex, true );
+		} catch ( \Error $ex ) {
+			LogErrors::getMessageException( $ex, true );
+		}
+	}
+
+	public function resendEmailLogs() {
+		try {
+			Utils::checkNonce();
+			if ( isset( $_POST['params'] ) ) {
+				$params    = Utils::saniValArray( $_POST['params'] ); // phpcs:ignore
+				$ids       = isset( $params['ids'] ) ? $params['ids'] : '';
+				$ids_array = array_values( array_unique( array_filter( array_map( 'absint', explode( ',', (string) $ids ) ) ) ) );
+
+				if ( empty( $ids_array ) ) {
+					wp_send_json_error( array( 'mess' => __( 'No email log id found.', 'yay-smtp' ) ) );
+				}
+
+				$ids_array = array_slice( $ids_array, 0, 50 );
+				$sent      = 0;
+				$failed    = 0;
+				$errors    = array();
+
+				foreach ( $ids_array as $id ) {
+					$result = Utils::resendEmailFromLog( $id );
+					if ( ! empty( $result['success'] ) ) {
+						++$sent;
+					} else {
+						++$failed;
+						$errors[] = ( 1 === count( $ids_array ) ) ? $result['mess'] : ( '#' . $id . ': ' . $result['mess'] );
+					}
+				}
+
+				if ( 1 === count( $ids_array ) ) {
+					if ( $sent ) {
+						wp_send_json_success(
+							array(
+								'mess'   => __( 'Email has been resent.', 'yay-smtp' ),
+								'sent'   => $sent,
+								'failed' => $failed,
+							)
+						);
+					}
+					wp_send_json_error(
+						array(
+							'mess'   => isset( $errors[0] ) ? $errors[0] : __( 'Email resent failed.', 'yay-smtp' ),
+							'sent'   => $sent,
+							'failed' => $failed,
+						)
+					);
+				}
+
+				if ( $sent && ! $failed ) {
+					wp_send_json_success(
+						array(
+							/* translators: %d: number of emails resent */
+							'mess'   => sprintf( _n( '%d email has been resent.', '%d emails have been resent.', $sent, 'yay-smtp' ), $sent ),
+							'sent'   => $sent,
+							'failed' => $failed,
+						)
+					);
+				}
+
+				if ( $sent && $failed ) {
+					wp_send_json_success(
+						array(
+							/* translators: 1: number resent, 2: number failed */
+							'mess'   => sprintf( __( '%1$d resent, %2$d failed.', 'yay-smtp' ), $sent, $failed ),
+							'sent'   => $sent,
+							'failed' => $failed,
+							'errors' => $errors,
+						)
+					);
+				}
+
+				wp_send_json_error(
+					array(
+						'mess'   => __( 'Failed to resend emails.', 'yay-smtp' ),
+						'sent'   => $sent,
+						'failed' => $failed,
+						'errors' => $errors,
+					)
+				);
+			}
+			wp_send_json_error( array( 'mess' => __( 'No email log id found.', 'yay-smtp' ) ) );
 		} catch ( \Exception $ex ) {
 			LogErrors::getMessageException( $ex, true );
 		} catch ( \Error $ex ) {

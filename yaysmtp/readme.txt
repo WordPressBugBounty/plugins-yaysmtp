@@ -3,8 +3,8 @@ Contributors: YayCommerce
 Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
-Tested up to: 7.0
-Stable tag: 2.7.6
+Tested up to: 7.1
+Stable tag: 2.7.7
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -122,6 +122,11 @@ Pro is about support, not features. You get priority support for any sending or 
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Sep 14, 2026 – Version 2.7.7 =
+- New: Resend email in email log
+- Improved: Email processing for Microsoft
+- Fixed: Notice display issues in log file when using Amazon Mailer with PHP 8.4+
 
 = Jul 8, 2026 – Version 2.7.6 =
 - New: Summary metrics for Total Emails, Sent, and Failed

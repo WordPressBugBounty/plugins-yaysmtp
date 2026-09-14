@@ -27,7 +27,7 @@ class RetryMiddleware
      *                              and [response] and returns the number of
      *                              milliseconds to delay.
      */
-    public function __construct(callable $decider, callable $nextHandler, callable $delay = null)
+    public function __construct(callable $decider, callable $nextHandler, ?callable $delay = null)
     {
         $this->decider = $decider;
         $this->nextHandler = $nextHandler;
@@ -76,7 +76,7 @@ class RetryMiddleware
             return $this->doRetry($req, $options);
         };
     }
-    private function doRetry(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, array $options, \YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null)
+    private function doRetry(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, array $options, ?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null)
     {
         $options['delay'] = call_user_func($this->delay, ++$options['retries'], $response);
         return $this($request, $options);

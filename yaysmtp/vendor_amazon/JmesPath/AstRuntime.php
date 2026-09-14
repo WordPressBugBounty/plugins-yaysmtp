@@ -11,7 +11,7 @@ class AstRuntime
     private $interpreter;
     private $cache = [];
     private $cachedCount = 0;
-    public function __construct(\YaySMTP\Aws3\JmesPath\Parser $parser = null, callable $fnDispatcher = null)
+    public function __construct(?\YaySMTP\Aws3\JmesPath\Parser $parser = null, ?callable $fnDispatcher = null)
     {
         $fnDispatcher = $fnDispatcher ?: \YaySMTP\Aws3\JmesPath\FnDispatcher::getInstance();
         $this->interpreter = new \YaySMTP\Aws3\JmesPath\TreeInterpreter($fnDispatcher);

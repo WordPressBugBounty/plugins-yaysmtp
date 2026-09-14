@@ -60,7 +60,7 @@ class MessageFormatter
      *
      * @return string
      */
-    public function format(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, \YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, \Exception $error = null)
+    public function format(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, ?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, ?\Exception $error = null)
     {
         $cache = [];
         return preg_replace_callback('/{\\s*([A-Za-z_\\-\\.0-9]+)\\s*}/', function (array $matches) use($request, $response, $error, &$cache) {

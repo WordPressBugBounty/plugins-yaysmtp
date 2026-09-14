@@ -19,7 +19,7 @@ class RestJsonSerializer extends \YaySMTP\Aws3\Aws\Api\Serializer\RestSerializer
      * @param string   $endpoint      Endpoint to connect to
      * @param JsonBody $jsonFormatter Optional JSON formatter to use
      */
-    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, $endpoint, \YaySMTP\Aws3\Aws\Api\Serializer\JsonBody $jsonFormatter = null)
+    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, $endpoint, ?\YaySMTP\Aws3\Aws\Api\Serializer\JsonBody $jsonFormatter = null)
     {
         parent::__construct($api, $endpoint);
         $this->contentType = \YaySMTP\Aws3\Aws\Api\Serializer\JsonBody::getContentType($api);

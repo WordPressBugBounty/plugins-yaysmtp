@@ -21,7 +21,7 @@ class Command implements \YaySMTP\Aws3\Aws\CommandInterface
      * @param array       $args           Arguments to pass to the command
      * @param HandlerList $list           Handler list
      */
-    public function __construct($name, array $args = [], \YaySMTP\Aws3\Aws\HandlerList $list = null)
+    public function __construct($name, array $args = [], ?\YaySMTP\Aws3\Aws\HandlerList $list = null)
     {
         $this->name = $name;
         $this->data = $args;

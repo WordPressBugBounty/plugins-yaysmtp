@@ -13,7 +13,7 @@ class TreeInterpreter {
    *                               a function name argument and an array of
    *                               function arguments and returns the result.
    */
-  public function __construct(callable $fnDispatcher = null) {
+  public function __construct(?callable $fnDispatcher = null) {
     $this->fnDispatcher = $fnDispatcher ?: \YaySMTP\Aws3\JmesPath\FnDispatcher::getInstance();
   }
   /**

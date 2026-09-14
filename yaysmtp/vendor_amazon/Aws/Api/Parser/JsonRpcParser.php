@@ -17,7 +17,7 @@ class JsonRpcParser extends \YaySMTP\Aws3\Aws\Api\Parser\AbstractParser
      * @param Service    $api    Service description
      * @param JsonParser $parser JSON body builder
      */
-    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, \YaySMTP\Aws3\Aws\Api\Parser\JsonParser $parser = null)
+    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, ?\YaySMTP\Aws3\Aws\Api\Parser\JsonParser $parser = null)
     {
         parent::__construct($api);
         $this->parser = $parser ?: new \YaySMTP\Aws3\Aws\Api\Parser\JsonParser();

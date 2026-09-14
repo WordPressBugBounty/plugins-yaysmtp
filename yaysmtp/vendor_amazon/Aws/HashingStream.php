@@ -20,7 +20,7 @@ class HashingStream implements \YaySMTP\Aws3\Psr\Http\Message\StreamInterface
      * @param callable        $onComplete Optional function invoked when the
      *                                    hash calculation is completed.
      */
-    public function __construct(\YaySMTP\Aws3\Psr\Http\Message\StreamInterface $stream, \YaySMTP\Aws3\Aws\HashInterface $hash, callable $onComplete = null)
+    public function __construct(\YaySMTP\Aws3\Psr\Http\Message\StreamInterface $stream, \YaySMTP\Aws3\Aws\HashInterface $hash, ?callable $onComplete = null)
     {
         $this->stream = $stream;
         $this->hash = $hash;

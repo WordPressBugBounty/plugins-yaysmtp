@@ -115,7 +115,7 @@ class ResultPaginator implements \Iterator {
     $this->nextToken = null;
     $this->result = null;
   }
-  private function createNextCommand(array $args, array $nextToken = null) {
+  private function createNextCommand(array $args, ?array $nextToken = null) {
     return $this->client->getCommand($this->operation, array_merge($args, $nextToken ?: []));
   }
   private function determineNextToken(\YaySMTP\Aws3\Aws\Result $result) {

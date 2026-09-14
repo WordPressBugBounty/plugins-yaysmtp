@@ -85,6 +85,7 @@ class Schedule {
 			$deleteDatetimeSetting = Utils::getDeleteDatetimeSetting();
 	    	Utils::deleteAllEmailLogsWithCondition($deleteDatetimeSetting, $deleteDatetimeSetting);
 		}
+		\YaySMTP\Helper\EmailLogAttachments::cleanupOrphans();
 	}
 
 	public function send_mail_report_weekly() {

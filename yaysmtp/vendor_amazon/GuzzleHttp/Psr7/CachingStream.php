@@ -20,7 +20,7 @@ class CachingStream implements \YaySMTP\Aws3\Psr\Http\Message\StreamInterface
      * @param StreamInterface $stream Stream to cache
      * @param StreamInterface $target Optionally specify where data is cached
      */
-    public function __construct(\YaySMTP\Aws3\Psr\Http\Message\StreamInterface $stream, \YaySMTP\Aws3\Psr\Http\Message\StreamInterface $target = null)
+    public function __construct(\YaySMTP\Aws3\Psr\Http\Message\StreamInterface $stream, ?\YaySMTP\Aws3\Psr\Http\Message\StreamInterface $target = null)
     {
         $this->remoteStream = $stream;
         $this->stream = $target ?: new \YaySMTP\Aws3\GuzzleHttp\Psr7\Stream(fopen('php://temp', 'r+'));

@@ -15,7 +15,7 @@ class QuerySerializer
     private $endpoint;
     private $api;
     private $paramBuilder;
-    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, $endpoint, callable $paramBuilder = null)
+    public function __construct(\YaySMTP\Aws3\Aws\Api\Service $api, $endpoint, ?callable $paramBuilder = null)
     {
         $this->api = $api;
         $this->endpoint = $endpoint;

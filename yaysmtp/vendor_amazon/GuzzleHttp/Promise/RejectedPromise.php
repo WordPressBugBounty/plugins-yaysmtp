@@ -18,7 +18,7 @@ class RejectedPromise implements \YaySMTP\Aws3\GuzzleHttp\Promise\PromiseInterfa
         }
         $this->reason = $reason;
     }
-    public function then(callable $onFulfilled = null, callable $onRejected = null)
+    public function then(?callable $onFulfilled = null, ?callable $onRejected = null)
     {
         // If there's no onRejected callback then just return self.
         if (!$onRejected) {

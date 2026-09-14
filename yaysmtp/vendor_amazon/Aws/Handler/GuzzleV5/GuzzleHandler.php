@@ -31,7 +31,7 @@ class GuzzleHandler
     /**
      * @param ClientInterface $client
      */
-    public function __construct(\YaySMTP\Aws3\GuzzleHttp\ClientInterface $client = null)
+    public function __construct(?\YaySMTP\Aws3\GuzzleHttp\ClientInterface $client = null)
     {
         $this->client = $client ?: new \YaySMTP\Aws3\GuzzleHttp\Client();
     }

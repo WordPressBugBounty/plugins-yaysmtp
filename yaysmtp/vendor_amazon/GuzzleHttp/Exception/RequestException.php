@@ -17,7 +17,7 @@ class RequestException extends \YaySMTP\Aws3\GuzzleHttp\Exception\TransferExcept
     private $response;
     /** @var array */
     private $handlerContext;
-    public function __construct($message, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, \YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, \Exception $previous = null, array $handlerContext = [])
+    public function __construct($message, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, ?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, ?\Exception $previous = null, array $handlerContext = [])
     {
         // Set the code of the exception if the response is set and not future.
         $code = $response && !$response instanceof PromiseInterface ? $response->getStatusCode() : 0;
@@ -48,7 +48,7 @@ class RequestException extends \YaySMTP\Aws3\GuzzleHttp\Exception\TransferExcept
      *
      * @return self
      */
-    public static function create(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, \YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, \Exception $previous = null, array $ctx = [])
+    public static function create(\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, ?\YaySMTP\Aws3\Psr\Http\Message\ResponseInterface $response = null, ?\Exception $previous = null, array $ctx = [])
     {
         if (!$response) {
             return new self('Error completing request', $request, null, $previous, $ctx);

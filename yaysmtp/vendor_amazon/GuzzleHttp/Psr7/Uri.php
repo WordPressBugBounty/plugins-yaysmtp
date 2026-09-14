@@ -191,7 +191,7 @@ class Uri implements \YaySMTP\Aws3\Psr\Http\Message\UriInterface
      * @return bool
      * @link https://tools.ietf.org/html/rfc3986#section-4.4
      */
-    public static function isSameDocumentReference(\YaySMTP\Aws3\Psr\Http\Message\UriInterface $uri, \YaySMTP\Aws3\Psr\Http\Message\UriInterface $base = null)
+    public static function isSameDocumentReference(\YaySMTP\Aws3\Psr\Http\Message\UriInterface $uri, ?\YaySMTP\Aws3\Psr\Http\Message\UriInterface $base = null)
     {
         if ($base !== null) {
             $uri = \YaySMTP\Aws3\GuzzleHttp\Psr7\UriResolver::resolve($base, $uri);

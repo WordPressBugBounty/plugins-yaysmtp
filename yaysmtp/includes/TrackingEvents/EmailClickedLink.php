@@ -27,15 +27,14 @@ class EmailClickedLink {
 
 	public function modify_email_content( $mail_content, $log_id ) {
 		global $wpdb;
-		$domDoc              = new \DOMDocument();
+		$domDoc              = new \DOMDocument( '1.0', 'UTF-8' );
 		$old_internal_errors = libxml_use_internal_errors( true );
-		$html_content 		 = make_clickable( $mail_content );
-
+		$html_content        = make_clickable( $mail_content );
 		if ( mb_detect_encoding($html_content, "UTF-8", true) ) {
-			$html_content = html_entity_decode($html_content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			$html_content = html_entity_decode( $html_content, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 		}
-
-		$domDoc->loadHTML( $html_content );
+		// loadHTML() defaults to ISO-8859-1; declare UTF-8 so umlauts/emoji are not double-encoded.
+		$domDoc->loadHTML( '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' . $html_content );
 		$org_hrefs = $domDoc->getElementsByTagName( 'a' );
 
 		$custom_hrefs = [];

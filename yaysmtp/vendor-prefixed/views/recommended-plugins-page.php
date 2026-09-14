@@ -18,16 +18,16 @@ if (empty($recommended_plugins)) {
 $page_instance = RecommendedPluginsPage::get_instance();
 foreach ($recommended_plugins as $key => $plugin_detail) {
     $plugin_slug = $plugin_detail['slug'];
-    $all_plugins = \get_plugins();
-    $install_status = \install_plugin_install_status((object) ['slug' => $plugin_slug, 'version' => $plugin_detail['version']]);
+    $all_plugins = get_plugins();
+    $install_status = install_plugin_install_status((object) ['slug' => $plugin_slug, 'version' => $plugin_detail['version']]);
     $status = $install_status['status'] ?? 'not_installed';
     $exist_pro_ver = $page_instance->check_pro_version_exists($plugin_detail);
     $is_installed = \in_array($status, ['latest_installed', 'newer_installed'], \true) || $exist_pro_ver;
-    $is_active = 'active' === $status || $exist_pro_ver && \is_plugin_active($exist_pro_ver) || $is_installed && \is_plugin_active($install_status['file']);
+    $is_active = 'active' === $status || $exist_pro_ver && is_plugin_active($exist_pro_ver) || $is_installed && is_plugin_active($install_status['file']);
     $is_update = 'update_available' === $status;
     // Hide CF7 add-ons when Contact Form 7 itself is not active
     $cf7_dependent_slugs = ['cf7-multi-step', 'cf7-database'];
-    if (\in_array($plugin_slug, $cf7_dependent_slugs, \true) && !\is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
+    if (\in_array($plugin_slug, $cf7_dependent_slugs, \true) && !is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
         continue;
     }
     // Hide active plugins that don't need updates
@@ -63,7 +63,7 @@ foreach ($recommended_plugins as $key => $plugin_detail) {
         <div class="plugin-card-bottom">
             <div class="column-rating">
                 <?php 
-    if ($is_active || $exist_pro_ver && \is_plugin_active($exist_pro_ver)) {
+    if ($is_active || $exist_pro_ver && is_plugin_active($exist_pro_ver)) {
         ?>
                     <?php 
         \esc_html_e('Status:', 'yaycommerce');
@@ -111,7 +111,7 @@ foreach ($recommended_plugins as $key => $plugin_detail) {
             <div class="column-updated">
                 <ul class="plugin-action-buttons">
                     <?php 
-    if ($is_active || $exist_pro_ver && \is_plugin_active($exist_pro_ver)) {
+    if ($is_active || $exist_pro_ver && is_plugin_active($exist_pro_ver)) {
         ?>
                         <li><button class="button button-disabled" disabled><?php 
         \esc_html_e('Activated', 'yaycommerce');

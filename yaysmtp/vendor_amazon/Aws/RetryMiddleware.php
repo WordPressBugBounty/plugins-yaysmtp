@@ -48,7 +48,7 @@ class RetryMiddleware
         if (extension_loaded('curl')) {
             $retryCurlErrors[CURLE_RECV_ERROR] = true;
         }
-        return function ($retries, \YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, \YaySMTP\Aws3\Aws\ResultInterface $result = null, $error = null) use($maxRetries, $retryCurlErrors) {
+        return function ($retries, \YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request, ?\YaySMTP\Aws3\Aws\ResultInterface $result = null, $error = null) use($maxRetries, $retryCurlErrors) {
             // Allow command-level options to override this value
             $maxRetries = null !== $command['@retries'] ? $command['@retries'] : $maxRetries;
             if ($retries >= $maxRetries) {
@@ -103,7 +103,7 @@ class RetryMiddleware
      *
      * @return PromiseInterface
      */
-    public function __invoke(\YaySMTP\Aws3\Aws\CommandInterface $command, \YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null)
+    public function __invoke(\YaySMTP\Aws3\Aws\CommandInterface $command, ?\YaySMTP\Aws3\Psr\Http\Message\RequestInterface $request = null)
     {
         $retries = 0;
         $requestStats = [];
