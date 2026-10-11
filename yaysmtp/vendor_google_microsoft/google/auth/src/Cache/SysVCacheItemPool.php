@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2018 Google Inc. All Rights Reserved.
  *
@@ -14,11 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Google\Auth\Cache;
+namespace YaySMTP\Google\Auth\Cache;
 
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
-
+use YaySMTP\Psr\Cache\CacheItemInterface;
+use YaySMTP\Psr\Cache\CacheItemPoolInterface;
 /**
  * SystemV shared memory based CacheItemPool implementation.
  *
@@ -29,36 +29,27 @@ use Psr\Cache\CacheItemPoolInterface;
 class SysVCacheItemPool implements CacheItemPoolInterface
 {
     const VAR_KEY = 1;
-
     const DEFAULT_PROJ = 'A';
-
     const DEFAULT_MEMSIZE = 10000;
-
     const DEFAULT_PERM = 0600;
-
     /** @var int */
     private $sysvKey;
-
     /**
      * @var CacheItemInterface[]
      */
     private $items;
-
     /**
      * @var CacheItemInterface[]
      */
     private $deferredItems;
-
     /**
      * @var array
      */
     private $options;
-
     /*
      * @var bool
      */
-    private $hasLoadedItems = false;
-
+    private $hasLoadedItems = \false;
     /**
      * Create a SystemV shared memory based CacheItemPool.
      *
@@ -74,28 +65,19 @@ class SysVCacheItemPool implements CacheItemPoolInterface
      */
     public function __construct($options = [])
     {
-        if (! extension_loaded('sysvshm')) {
-            throw new \RuntimeException(
-                'sysvshm extension is required to use this ItemPool'
-            );
+        if (!extension_loaded('sysvshm')) {
+            throw new \RuntimeException('sysvshm extension is required to use this ItemPool');
         }
-        $this->options = $options + [
-            'variableKey' => self::VAR_KEY,
-            'proj' => self::DEFAULT_PROJ,
-            'memsize' => self::DEFAULT_MEMSIZE,
-            'perm' => self::DEFAULT_PERM
-        ];
+        $this->options = $options + ['variableKey' => self::VAR_KEY, 'proj' => self::DEFAULT_PROJ, 'memsize' => self::DEFAULT_MEMSIZE, 'perm' => self::DEFAULT_PERM];
         $this->items = [];
         $this->deferredItems = [];
         $this->sysvKey = ftok(__FILE__, $this->options['proj']);
     }
-
     public function getItem($key)
     {
         $this->loadItems();
         return current($this->getItems([$key]));
     }
-
     /**
      * {@inheritdoc}
      */
@@ -104,13 +86,10 @@ class SysVCacheItemPool implements CacheItemPoolInterface
         $this->loadItems();
         $items = [];
         foreach ($keys as $key) {
-            $items[$key] = $this->hasItem($key) ?
-                clone $this->items[$key] :
-                new Item($key);
+            $items[$key] = $this->hasItem($key) ? clone $this->items[$key] : new Item($key);
         }
         return $items;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -119,7 +98,6 @@ class SysVCacheItemPool implements CacheItemPoolInterface
         $this->loadItems();
         return isset($this->items[$key]) && $this->items[$key]->isHit();
     }
-
     /**
      * {@inheritdoc}
      */
@@ -129,7 +107,6 @@ class SysVCacheItemPool implements CacheItemPoolInterface
         $this->deferredItems = [];
         return $this->saveCurrentItems();
     }
-
     /**
      * {@inheritdoc}
      */
@@ -137,7 +114,6 @@ class SysVCacheItemPool implements CacheItemPoolInterface
     {
         return $this->deleteItems([$key]);
     }
-
     /**
      * {@inheritdoc}
      */
@@ -146,13 +122,11 @@ class SysVCacheItemPool implements CacheItemPoolInterface
         if (!$this->hasLoadedItems) {
             $this->loadItems();
         }
-
         foreach ($keys as $key) {
             unset($this->items[$key]);
         }
         return $this->saveCurrentItems();
     }
-
     /**
      * {@inheritdoc}
      */
@@ -161,34 +135,30 @@ class SysVCacheItemPool implements CacheItemPoolInterface
         if (!$this->hasLoadedItems) {
             $this->loadItems();
         }
-
         $this->items[$item->getKey()] = $item;
         return $this->saveCurrentItems();
     }
-
     /**
      * {@inheritdoc}
      */
     public function saveDeferred(CacheItemInterface $item)
     {
         $this->deferredItems[$item->getKey()] = $item;
-        return true;
+        return \true;
     }
-
     /**
      * {@inheritdoc}
      */
     public function commit()
     {
         foreach ($this->deferredItems as $item) {
-            if ($this->save($item) === false) {
-                return false;
+            if ($this->save($item) === \false) {
+                return \false;
             }
         }
         $this->deferredItems = [];
-        return true;
+        return \true;
     }
-
     /**
      * Save the current items.
      *
@@ -196,23 +166,14 @@ class SysVCacheItemPool implements CacheItemPoolInterface
      */
     private function saveCurrentItems()
     {
-        $shmid = shm_attach(
-            $this->sysvKey,
-            $this->options['memsize'],
-            $this->options['perm']
-        );
-        if ($shmid !== false) {
-            $ret = shm_put_var(
-                $shmid,
-                $this->options['variableKey'],
-                $this->items
-            );
+        $shmid = shm_attach($this->sysvKey, $this->options['memsize'], $this->options['perm']);
+        if ($shmid !== \false) {
+            $ret = shm_put_var($shmid, $this->options['variableKey'], $this->items);
             shm_detach($shmid);
             return $ret;
         }
-        return false;
+        return \false;
     }
-
     /**
      * Load the items from the shared memory.
      *
@@ -220,12 +181,8 @@ class SysVCacheItemPool implements CacheItemPoolInterface
      */
     private function loadItems()
     {
-        $shmid = shm_attach(
-            $this->sysvKey,
-            $this->options['memsize'],
-            $this->options['perm']
-        );
-        if ($shmid !== false) {
+        $shmid = shm_attach($this->sysvKey, $this->options['memsize'], $this->options['perm']);
+        if ($shmid !== \false) {
             $data = @shm_get_var($shmid, $this->options['variableKey']);
             if (!empty($data)) {
                 $this->items = $data;
@@ -233,9 +190,9 @@ class SysVCacheItemPool implements CacheItemPoolInterface
                 $this->items = [];
             }
             shm_detach($shmid);
-            $this->hasLoadedItems = true;
-            return true;
+            $this->hasLoadedItems = \true;
+            return \true;
         }
-        return false;
+        return \false;
     }
 }

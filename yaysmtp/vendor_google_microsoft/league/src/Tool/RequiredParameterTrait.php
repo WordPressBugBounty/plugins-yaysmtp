@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,43 +12,40 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Tool;
+namespace YaySMTP\League\OAuth2\Client\Tool;
 
 use BadMethodCallException;
-
 /**
  * Provides functionality to check for required parameters.
  */
-trait RequiredParameterTrait {
-  /**
-   * Checks for a required parameter in a hash.
-   *
-   * @throws BadMethodCallException
-   * @param  string $name
-   * @param  array  $params
-   * @return void
-   */
-  private function checkRequiredParameter($name, array $params) {
-    if (!isset($params[$name])) {
-      throw new BadMethodCallException(sprintf(
-        'Required parameter not passed: "%s"',
-        $name
-      ));
+trait RequiredParameterTrait
+{
+    /**
+     * Checks for a required parameter in a hash.
+     *
+     * @throws BadMethodCallException
+     * @param  string $name
+     * @param  array  $params
+     * @return void
+     */
+    private function checkRequiredParameter($name, array $params)
+    {
+        if (!isset($params[$name])) {
+            throw new BadMethodCallException(sprintf('Required parameter not passed: "%s"', $name));
+        }
     }
-  }
-
-  /**
-   * Checks for multiple required parameters in a hash.
-   *
-   * @throws InvalidArgumentException
-   * @param  array $names
-   * @param  array $params
-   * @return void
-   */
-  private function checkRequiredParameters(array $names, array $params) {
-    foreach ($names as $name) {
-      $this->checkRequiredParameter($name, $params);
+    /**
+     * Checks for multiple required parameters in a hash.
+     *
+     * @throws InvalidArgumentException
+     * @param  array $names
+     * @param  array $params
+     * @return void
+     */
+    private function checkRequiredParameters(array $names, array $params)
+    {
+        foreach ($names as $name) {
+            $this->checkRequiredParameter($name, $params);
+        }
     }
-  }
 }

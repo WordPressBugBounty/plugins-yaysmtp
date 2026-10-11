@@ -29,8 +29,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
-
-namespace phpseclib\Net;
+namespace YaySMTP\phpseclib\Net;
 
 /**
  * Pure-PHP implementations of SCP.
@@ -54,12 +53,11 @@ class SCP
      */
     const SOURCE_STRING = 2;
     /**#@-*/
-
     /**#@+
      * @access private
      * @see \phpseclib\Net\SCP::_send()
      * @see \phpseclib\Net\SCP::_receive()
-    */
+     */
     /**
      * SSH1 is being used.
      */
@@ -67,9 +65,8 @@ class SCP
     /**
      * SSH2 is being used.
      */
-    const MODE_SSH2 =  2;
+    const MODE_SSH2 = 2;
     /**#@-*/
-
     /**
      * SSH Object
      *
@@ -77,7 +74,6 @@ class SCP
      * @access private
      */
     var $ssh;
-
     /**
      * Packet Size
      *
@@ -85,7 +81,6 @@ class SCP
      * @access private
      */
     var $packet_size;
-
     /**
      * Mode
      *
@@ -93,7 +88,6 @@ class SCP
      * @access private
      */
     var $mode;
-
     /**
      * Default Constructor.
      *
@@ -113,10 +107,8 @@ class SCP
         } else {
             return;
         }
-
         $this->ssh = $ssh;
     }
-
     /**
      * Uploads a file to the SCP server.
      *
@@ -141,70 +133,57 @@ class SCP
     function put($remote_file, $data, $mode = self::SOURCE_STRING, $callback = null)
     {
         if (!isset($this->ssh)) {
-            return false;
+            return \false;
         }
-
         if (empty($remote_file)) {
-            user_error('remote_file cannot be blank', E_USER_NOTICE);
-            return false;
+            user_error('remote_file cannot be blank', \E_USER_NOTICE);
+            return \false;
         }
-
-        if (!$this->ssh->exec('scp -t ' . escapeshellarg($remote_file), false)) { // -t = to
-            return false;
+        if (!$this->ssh->exec('scp -t ' . escapeshellarg($remote_file), \false)) {
+            // -t = to
+            return \false;
         }
-
         $temp = $this->_receive();
         if ($temp !== chr(0)) {
-            return false;
+            return \false;
         }
-
         if ($this->mode == self::MODE_SSH2) {
             $this->packet_size = $this->ssh->packet_size_client_to_server[SSH2::CHANNEL_EXEC] - 4;
         }
-
         $remote_file = basename($remote_file);
-
         if ($mode == self::SOURCE_STRING) {
             $size = strlen($data);
         } else {
             if (!is_file($data)) {
-                user_error("$data is not a valid file", E_USER_NOTICE);
-                return false;
+                user_error("{$data} is not a valid file", \E_USER_NOTICE);
+                return \false;
             }
-
             $fp = @fopen($data, 'rb');
             if (!$fp) {
-                return false;
+                return \false;
             }
             $size = filesize($data);
         }
-
         $this->_send('C0644 ' . $size . ' ' . $remote_file . "\n");
-
         $temp = $this->_receive();
         if ($temp !== chr(0)) {
-            return false;
+            return \false;
         }
-
         $sent = 0;
         while ($sent < $size) {
             $temp = $mode & self::SOURCE_STRING ? substr($data, $sent, $this->packet_size) : fread($fp, $this->packet_size);
             $this->_send($temp);
-            $sent+= strlen($temp);
-
+            $sent += strlen($temp);
             if (is_callable($callback)) {
                 call_user_func($callback, $sent);
             }
         }
         $this->_close();
-
         if ($mode != self::SOURCE_STRING) {
             fclose($fp);
         }
-
-        return true;
+        return \true;
     }
-
     /**
      * Downloads a file from the SCP server.
      *
@@ -217,56 +196,45 @@ class SCP
      * @return mixed
      * @access public
      */
-    function get($remote_file, $local_file = false)
+    function get($remote_file, $local_file = \false)
     {
         if (!isset($this->ssh)) {
-            return false;
+            return \false;
         }
-
-        if (!$this->ssh->exec('scp -f ' . escapeshellarg($remote_file), false)) { // -f = from
-            return false;
+        if (!$this->ssh->exec('scp -f ' . escapeshellarg($remote_file), \false)) {
+            // -f = from
+            return \false;
         }
-
-        $this->_send("\0");
-
+        $this->_send("\x00");
         if (!preg_match('#(?<perms>[^ ]+) (?<size>\d+) (?<name>.+)#', rtrim($this->_receive()), $info)) {
-            return false;
+            return \false;
         }
-
-        $this->_send("\0");
-
+        $this->_send("\x00");
         $size = 0;
-
-        if ($local_file !== false) {
+        if ($local_file !== \false) {
             $fp = @fopen($local_file, 'wb');
             if (!$fp) {
-                return false;
+                return \false;
             }
         }
-
         $content = '';
         while ($size < $info['size']) {
             $data = $this->_receive();
             // SCP usually seems to split stuff out into 16k chunks
-            $size+= strlen($data);
-
-            if ($local_file === false) {
-                $content.= $data;
+            $size += strlen($data);
+            if ($local_file === \false) {
+                $content .= $data;
             } else {
                 fputs($fp, $data);
             }
         }
-
         $this->_close();
-
-        if ($local_file !== false) {
+        if ($local_file !== \false) {
             fclose($fp);
-            return true;
+            return \true;
         }
-
         return $content;
     }
-
     /**
      * Sends a packet to an SSH server
      *
@@ -280,11 +248,10 @@ class SCP
                 $this->ssh->_send_channel_packet(SSH2::CHANNEL_EXEC, $data);
                 break;
             case self::MODE_SSH1:
-                $data = pack('CNa*', NET_SSH1_CMSG_STDIN_DATA, strlen($data), $data);
+                $data = pack('CNa*', \NET_SSH1_CMSG_STDIN_DATA, strlen($data), $data);
                 $this->ssh->_send_binary_packet($data);
         }
     }
-
     /**
      * Receives a packet from an SSH server
      *
@@ -295,35 +262,34 @@ class SCP
     {
         switch ($this->mode) {
             case self::MODE_SSH2:
-                return $this->ssh->_get_channel_packet(SSH2::CHANNEL_EXEC, true);
+                return $this->ssh->_get_channel_packet(SSH2::CHANNEL_EXEC, \true);
             case self::MODE_SSH1:
                 if (!$this->ssh->bitmap) {
-                    return false;
+                    return \false;
                 }
-                while (true) {
+                while (\true) {
                     $response = $this->ssh->_get_binary_packet();
                     switch ($response[SSH1::RESPONSE_TYPE]) {
-                        case NET_SSH1_SMSG_STDOUT_DATA:
+                        case \NET_SSH1_SMSG_STDOUT_DATA:
                             if (strlen($response[SSH1::RESPONSE_DATA]) < 4) {
-                                return false;
+                                return \false;
                             }
                             extract(unpack('Nlength', $response[SSH1::RESPONSE_DATA]));
                             return $this->ssh->_string_shift($response[SSH1::RESPONSE_DATA], $length);
-                        case NET_SSH1_SMSG_STDERR_DATA:
+                        case \NET_SSH1_SMSG_STDERR_DATA:
                             break;
-                        case NET_SSH1_SMSG_EXITSTATUS:
-                            $this->ssh->_send_binary_packet(chr(NET_SSH1_CMSG_EXIT_CONFIRMATION));
+                        case \NET_SSH1_SMSG_EXITSTATUS:
+                            $this->ssh->_send_binary_packet(chr(\NET_SSH1_CMSG_EXIT_CONFIRMATION));
                             fclose($this->ssh->fsock);
                             $this->ssh->bitmap = 0;
-                            return false;
+                            return \false;
                         default:
-                            user_error('Unknown packet received', E_USER_NOTICE);
-                            return false;
+                            user_error('Unknown packet received', \E_USER_NOTICE);
+                            return \false;
                     }
                 }
         }
     }
-
     /**
      * Closes the connection to an SSH server
      *
@@ -333,7 +299,7 @@ class SCP
     {
         switch ($this->mode) {
             case self::MODE_SSH2:
-                $this->ssh->_close_channel(SSH2::CHANNEL_EXEC, true);
+                $this->ssh->_close_channel(SSH2::CHANNEL_EXEC, \true);
                 break;
             case self::MODE_SSH1:
                 $this->ssh->disconnect();

@@ -24,6 +24,8 @@ class Plugin {
 			self::activate();
 			update_option( 'yay_smtp_version', YAY_SMTP_VERSION );
 		}
+		// Security: stored email log attachment copies must not keep an extension.
+		Helper\EmailLogAttachments::maybeMigrateLegacyFiles();
 		Page\Settings::getInstance();
 		PluginCore::getInstance();
 		Functions::getInstance();

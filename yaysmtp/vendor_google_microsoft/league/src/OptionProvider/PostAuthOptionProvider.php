@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,33 +12,27 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
+namespace YaySMTP\League\OAuth2\Client\OptionProvider;
 
-namespace League\OAuth2\Client\OptionProvider;
-
-use League\OAuth2\Client\Provider\AbstractProvider;
-use League\OAuth2\Client\Tool\QueryBuilderTrait;
-
+use YaySMTP\League\OAuth2\Client\Provider\AbstractProvider;
+use YaySMTP\League\OAuth2\Client\Tool\QueryBuilderTrait;
 /**
  * Provide options for access token
  */
 class PostAuthOptionProvider implements OptionProviderInterface
 {
     use QueryBuilderTrait;
-
     /**
      * @inheritdoc
      */
     public function getAccessTokenOptions($method, array $params)
     {
         $options = ['headers' => ['content-type' => 'application/x-www-form-urlencoded']];
-
         if ($method === AbstractProvider::METHOD_POST) {
             $options['body'] = $this->getAccessTokenBody($params);
         }
-
         return $options;
     }
-
     /**
      * Returns the request body for requesting an access token.
      *

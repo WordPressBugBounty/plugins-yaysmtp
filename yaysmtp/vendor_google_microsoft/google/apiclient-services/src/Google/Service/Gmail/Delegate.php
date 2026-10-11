@@ -1,4 +1,7 @@
 <?php
+
+namespace YaySMTP;
+
 /*
  * Copyright 2014 Google Inc.
  *
@@ -14,26 +17,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 class Google_Service_Gmail_Delegate extends Google_Model
 {
-  public $delegateEmail;
-  public $verificationStatus;
-
-  public function setDelegateEmail($delegateEmail)
-  {
-    $this->delegateEmail = $delegateEmail;
-  }
-  public function getDelegateEmail()
-  {
-    return $this->delegateEmail;
-  }
-  public function setVerificationStatus($verificationStatus)
-  {
-    $this->verificationStatus = $verificationStatus;
-  }
-  public function getVerificationStatus()
-  {
-    return $this->verificationStatus;
-  }
+    public $delegateEmail;
+    public $verificationStatus;
+    public function setDelegateEmail($delegateEmail)
+    {
+        $this->delegateEmail = $delegateEmail;
+    }
+    public function getDelegateEmail()
+    {
+        return $this->delegateEmail;
+    }
+    public function setVerificationStatus($verificationStatus)
+    {
+        $this->verificationStatus = $verificationStatus;
+    }
+    public function getVerificationStatus()
+    {
+        return $this->verificationStatus;
+    }
 }

@@ -8,15 +8,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace YaySMTP\Monolog\Handler;
 
-namespace Monolog\Handler;
-
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Handler\FingersCrossed\ActivationStrategyInterface;
-use Monolog\Logger;
-use Monolog\ResettableInterface;
-use Monolog\Formatter\FormatterInterface;
-
+use YaySMTP\Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use YaySMTP\Monolog\Handler\FingersCrossed\ActivationStrategyInterface;
+use YaySMTP\Monolog\Logger;
+use YaySMTP\Monolog\ResettableInterface;
+use YaySMTP\Monolog\Formatter\FormatterInterface;
 /**
  * Buffers all records until a certain level is reached
  *
@@ -33,12 +31,11 @@ class FingersCrossedHandler extends AbstractHandler
 {
     protected $handler;
     protected $activationStrategy;
-    protected $buffering = true;
+    protected $buffering = \true;
     protected $bufferSize;
     protected $buffer = array();
     protected $stopBuffering;
     protected $passthruLevel;
-
     /**
      * @param callable|HandlerInterface       $handler            Handler or factory callable($record|null, $fingersCrossedHandler).
      * @param int|ActivationStrategyInterface $activationStrategy Strategy which determines when this handler takes action
@@ -47,52 +44,45 @@ class FingersCrossedHandler extends AbstractHandler
      * @param bool                            $stopBuffering      Whether the handler should stop buffering after being triggered (default true)
      * @param int                             $passthruLevel      Minimum level to always flush to handler on close, even if strategy not triggered
      */
-    public function __construct($handler, $activationStrategy = null, $bufferSize = 0, $bubble = true, $stopBuffering = true, $passthruLevel = null)
+    public function __construct($handler, $activationStrategy = null, $bufferSize = 0, $bubble = \true, $stopBuffering = \true, $passthruLevel = null)
     {
         if (null === $activationStrategy) {
             $activationStrategy = new ErrorLevelActivationStrategy(Logger::WARNING);
         }
-
         // convert simple int activationStrategy to an object
         if (!$activationStrategy instanceof ActivationStrategyInterface) {
             $activationStrategy = new ErrorLevelActivationStrategy($activationStrategy);
         }
-
         $this->handler = $handler;
         $this->activationStrategy = $activationStrategy;
         $this->bufferSize = $bufferSize;
         $this->bubble = $bubble;
         $this->stopBuffering = $stopBuffering;
-
         if ($passthruLevel !== null) {
             $this->passthruLevel = Logger::toMonologLevel($passthruLevel);
         }
-
         if (!$this->handler instanceof HandlerInterface && !is_callable($this->handler)) {
-            throw new \RuntimeException("The given handler (".json_encode($this->handler).") is not a callable nor a Monolog\Handler\HandlerInterface object");
+            throw new \RuntimeException("The given handler (" . json_encode($this->handler) . ") is not a callable nor a Monolog\\Handler\\HandlerInterface object");
         }
     }
-
     /**
      * {@inheritdoc}
      */
     public function isHandling(array $record)
     {
-        return true;
+        return \true;
     }
-
     /**
      * Manually activate this logger regardless of the activation strategy
      */
     public function activate()
     {
         if ($this->stopBuffering) {
-            $this->buffering = false;
+            $this->buffering = \false;
         }
         $this->getHandler(end($this->buffer) ?: null)->handleBatch($this->buffer);
         $this->buffer = array();
     }
-
     /**
      * {@inheritdoc}
      */
@@ -103,7 +93,6 @@ class FingersCrossedHandler extends AbstractHandler
                 $record = call_user_func($processor, $record);
             }
         }
-
         if ($this->buffering) {
             $this->buffer[] = $record;
             if ($this->bufferSize > 0 && count($this->buffer) > $this->bufferSize) {
@@ -115,10 +104,8 @@ class FingersCrossedHandler extends AbstractHandler
         } else {
             $this->getHandler($record)->handle($record);
         }
-
-        return false === $this->bubble;
+        return \false === $this->bubble;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -126,18 +113,14 @@ class FingersCrossedHandler extends AbstractHandler
     {
         $this->flushBuffer();
     }
-
     public function reset()
     {
         $this->flushBuffer();
-
         parent::reset();
-
         if ($this->getHandler() instanceof ResettableInterface) {
             $this->getHandler()->reset();
         }
     }
-
     /**
      * Clears the buffer without flushing any messages down to the wrapped handler.
      *
@@ -148,7 +131,6 @@ class FingersCrossedHandler extends AbstractHandler
         $this->buffer = array();
         $this->reset();
     }
-
     /**
      * Resets the state of the handler. Stops forwarding records to the wrapped handler.
      */
@@ -163,11 +145,9 @@ class FingersCrossedHandler extends AbstractHandler
                 $this->getHandler(end($this->buffer) ?: null)->handleBatch($this->buffer);
             }
         }
-
         $this->buffer = array();
-        $this->buffering = true;
+        $this->buffering = \true;
     }
-
     /**
      * Return the nested handler
      *
@@ -183,20 +163,16 @@ class FingersCrossedHandler extends AbstractHandler
                 throw new \RuntimeException("The factory callable should return a HandlerInterface");
             }
         }
-
         return $this->handler;
     }
-
     /**
      * {@inheritdoc}
      */
     public function setFormatter(FormatterInterface $formatter)
     {
         $this->getHandler()->setFormatter($formatter);
-
         return $this;
     }
-
     /**
      * {@inheritdoc}
      */

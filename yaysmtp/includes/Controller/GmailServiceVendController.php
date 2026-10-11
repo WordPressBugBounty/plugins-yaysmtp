@@ -150,7 +150,7 @@ class GmailServiceVendController {
 	}
 
 	public function setUserInf( $clientWebService, $is_fallback_settings = false ) {
-		$ServiceGmail = new \Google_Service_Gmail( $clientWebService );
+		$ServiceGmail = new \YaySMTP\Google_Service_Gmail( $clientWebService );
 
 		try {
 			$mail = $ServiceGmail->users->getProfile( 'me' )->getEmailAddress();
@@ -212,7 +212,7 @@ class GmailServiceVendController {
 				),
 			);
 		}
-		return new \Google_Client($args);
+		return new \YaySMTP\Google\Client($args);
 	}
 
 	private function saveAccessTokenExpire( $googleClient, $is_fallback_settings ) {

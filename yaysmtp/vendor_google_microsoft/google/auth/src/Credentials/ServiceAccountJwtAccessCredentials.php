@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2015 Google Inc.
  *
@@ -14,16 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace YaySMTP\Google\Auth\Credentials;
 
-namespace Google\Auth\Credentials;
-
-use Google\Auth\CredentialsLoader;
-use Google\Auth\GetQuotaProjectInterface;
-use Google\Auth\OAuth2;
-use Google\Auth\ProjectIdProviderInterface;
-use Google\Auth\ServiceAccountSignerTrait;
-use Google\Auth\SignBlobInterface;
-
+use YaySMTP\Google\Auth\CredentialsLoader;
+use YaySMTP\Google\Auth\GetQuotaProjectInterface;
+use YaySMTP\Google\Auth\OAuth2;
+use YaySMTP\Google\Auth\ProjectIdProviderInterface;
+use YaySMTP\Google\Auth\ServiceAccountSignerTrait;
+use YaySMTP\Google\Auth\SignBlobInterface;
 /**
  * Authenticates requests using Google's Service Account credentials via
  * JWT Access.
@@ -33,25 +32,19 @@ use Google\Auth\SignBlobInterface;
  * console (via 'Generate new Json Key').  It is not part of any OAuth2
  * flow, rather it creates a JWT and sends that as a credential.
  */
-class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
-    GetQuotaProjectInterface,
-    SignBlobInterface,
-    ProjectIdProviderInterface
+class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements GetQuotaProjectInterface, SignBlobInterface, ProjectIdProviderInterface
 {
     use ServiceAccountSignerTrait;
-
     /**
      * The OAuth2 instance used to conduct authorization.
      *
      * @var OAuth2
      */
     protected $auth;
-
     /**
      * The quota project associated with the JSON credentials
      */
     protected $quotaProject;
-
     /**
      * Create a new ServiceAccountJwtAccessCredentials.
      *
@@ -65,35 +58,22 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
                 throw new \InvalidArgumentException('file does not exist');
             }
             $jsonKeyStream = file_get_contents($jsonKey);
-            if (!$jsonKey = json_decode($jsonKeyStream, true)) {
+            if (!$jsonKey = json_decode($jsonKeyStream, \true)) {
                 throw new \LogicException('invalid json for auth config');
             }
         }
         if (!array_key_exists('client_email', $jsonKey)) {
-            throw new \InvalidArgumentException(
-                'json key is missing the client_email field'
-            );
+            throw new \InvalidArgumentException('json key is missing the client_email field');
         }
         if (!array_key_exists('private_key', $jsonKey)) {
-            throw new \InvalidArgumentException(
-                'json key is missing the private_key field'
-            );
+            throw new \InvalidArgumentException('json key is missing the private_key field');
         }
         if (array_key_exists('quota_project_id', $jsonKey)) {
             $this->quotaProject = (string) $jsonKey['quota_project_id'];
         }
-        $this->auth = new OAuth2([
-            'issuer' => $jsonKey['client_email'],
-            'sub' => $jsonKey['client_email'],
-            'signingAlgorithm' => 'RS256',
-            'signingKey' => $jsonKey['private_key'],
-        ]);
-
-        $this->projectId = isset($jsonKey['project_id'])
-            ? $jsonKey['project_id']
-            : null;
+        $this->auth = new OAuth2(['issuer' => $jsonKey['client_email'], 'sub' => $jsonKey['client_email'], 'signingAlgorithm' => 'RS256', 'signingKey' => $jsonKey['private_key']]);
+        $this->projectId = isset($jsonKey['project_id']) ? $jsonKey['project_id'] : null;
     }
-
     /**
      * Updates metadata with the authorization token.
      *
@@ -102,20 +82,14 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
      * @param callable $httpHandler callback which delivers psr7 request
      * @return array updated metadata hashmap
      */
-    public function updateMetadata(
-        $metadata,
-        $authUri = null,
-        callable $httpHandler = null
-    ) {
+    public function updateMetadata($metadata, $authUri = null, callable $httpHandler = null)
+    {
         if (empty($authUri)) {
             return $metadata;
         }
-
         $this->auth->setAudience($authUri);
-
         return parent::updateMetadata($metadata, $authUri, $httpHandler);
     }
-
     /**
      * Implements FetchAuthTokenInterface#fetchAuthToken.
      *
@@ -131,15 +105,11 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
         if (empty($audience)) {
             return null;
         }
-
         $access_token = $this->auth->toJwt();
-
         // Set the self-signed access token in OAuth2 for getLastReceivedToken
         $this->auth->setAccessToken($access_token);
-
         return array('access_token' => $access_token);
     }
-
     /**
      * @return string
      */
@@ -147,7 +117,6 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
     {
         return $this->auth->getCacheKey();
     }
-
     /**
      * @return array
      */
@@ -155,7 +124,6 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
     {
         return $this->auth->getLastReceivedToken();
     }
-
     /**
      * Get the project ID from the service account keyfile.
      *
@@ -168,7 +136,6 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
     {
         return $this->projectId;
     }
-
     /**
      * Get the client name from the keyfile.
      *
@@ -181,7 +148,6 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
     {
         return $this->auth->getIssuer();
     }
-
     /**
      * Get the quota project used for this API request
      *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
@@ -14,19 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Google\Auth\HttpHandler;
+namespace YaySMTP\Google\Auth\HttpHandler;
 
-use GuzzleHttp\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-
+use YaySMTP\GuzzleHttp\ClientInterface;
+use YaySMTP\Psr\Http\Message\RequestInterface;
+use YaySMTP\Psr\Http\Message\ResponseInterface;
 class Guzzle6HttpHandler
 {
     /**
      * @var ClientInterface
      */
     private $client;
-
     /**
      * @param ClientInterface $client
      */
@@ -34,7 +33,6 @@ class Guzzle6HttpHandler
     {
         $this->client = $client;
     }
-
     /**
      * Accepts a PSR-7 request and an array of options and returns a PSR-7 response.
      *
@@ -46,7 +44,6 @@ class Guzzle6HttpHandler
     {
         return $this->client->send($request, $options);
     }
-
     /**
      * Accepts a PSR-7 request and an array of options and returns a PromiseInterface
      *

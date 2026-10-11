@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,12 +12,10 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Token;
+namespace YaySMTP\League\OAuth2\Client\Token;
 
 use InvalidArgumentException;
 use RuntimeException;
-
 /**
  * Represents an access token.
  *
@@ -28,32 +27,26 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
      * @var string
      */
     protected $accessToken;
-
     /**
      * @var int
      */
     protected $expires;
-
     /**
      * @var string
      */
     protected $refreshToken;
-
     /**
      * @var string
      */
     protected $resourceOwnerId;
-
     /**
      * @var array
      */
     protected $values = [];
-
     /**
      * @var int
      */
     private static $timeNow;
-
     /**
      * Set the time now. This should only be used for testing purposes.
      *
@@ -64,7 +57,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         self::$timeNow = $timeNow;
     }
-
     /**
      * Reset the time now if it was set for test purposes.
      *
@@ -74,7 +66,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         self::$timeNow = null;
     }
-
     /**
      * @return int
      */
@@ -82,7 +73,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return self::$timeNow ? self::$timeNow : time();
     }
-
     /**
      * Constructs an access token.
      *
@@ -95,17 +85,13 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
         if (empty($options['access_token'])) {
             throw new InvalidArgumentException('Required option not passed: "access_token"');
         }
-
         $this->accessToken = $options['access_token'];
-
         if (!empty($options['resource_owner_id'])) {
             $this->resourceOwnerId = $options['resource_owner_id'];
         }
-
         if (!empty($options['refresh_token'])) {
             $this->refreshToken = $options['refresh_token'];
         }
-
         // We need to know when the token expires. Show preference to
         // 'expires_in' since it is defined in RFC6749 Section 5.1.
         // Defer to 'expires' if it is provided instead.
@@ -113,32 +99,21 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
             if (!is_numeric($options['expires_in'])) {
                 throw new \InvalidArgumentException('expires_in value must be an integer');
             }
-
             $this->expires = $options['expires_in'] != 0 ? $this->getTimeNow() + $options['expires_in'] : 0;
         } elseif (!empty($options['expires'])) {
             // Some providers supply the seconds until expiration rather than
             // the exact timestamp. Take a best guess at which we received.
             $expires = $options['expires'];
-
             if (!$this->isExpirationTimestamp($expires)) {
                 $expires += $this->getTimeNow();
             }
-
             $this->expires = $expires;
         }
-
         // Capture any additional values that might exist in the token but are
         // not part of the standard response. Vendors will sometimes pass
         // additional user data this way.
-        $this->values = array_diff_key($options, array_flip([
-            'access_token',
-            'resource_owner_id',
-            'refresh_token',
-            'expires_in',
-            'expires',
-        ]));
+        $this->values = array_diff_key($options, array_flip(['access_token', 'resource_owner_id', 'refresh_token', 'expires_in', 'expires']));
     }
-
     /**
      * Check if a value is an expiration timestamp or second value.
      *
@@ -149,10 +124,10 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         // If the given value is larger than the original OAuth 2 draft date,
         // assume that it is meant to be a (possible expired) timestamp.
-        $oauth2InceptionDate = 1349067600; // 2012-10-01
-        return ($value > $oauth2InceptionDate);
+        $oauth2InceptionDate = 1349067600;
+        // 2012-10-01
+        return $value > $oauth2InceptionDate;
     }
-
     /**
      * @inheritdoc
      */
@@ -160,7 +135,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return $this->accessToken;
     }
-
     /**
      * @inheritdoc
      */
@@ -168,7 +142,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return $this->refreshToken;
     }
-
     /**
      * @inheritdoc
      */
@@ -176,7 +149,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return $this->expires;
     }
-
     /**
      * @inheritdoc
      */
@@ -184,21 +156,17 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return $this->resourceOwnerId;
     }
-
     /**
      * @inheritdoc
      */
     public function hasExpired()
     {
         $expires = $this->getExpires();
-
         if (empty($expires)) {
             throw new RuntimeException('"expires" is not set on the token');
         }
-
         return $expires < time();
     }
-
     /**
      * @inheritdoc
      */
@@ -206,7 +174,6 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return $this->values;
     }
-
     /**
      * @inheritdoc
      */
@@ -214,30 +181,24 @@ class AccessToken implements AccessTokenInterface, ResourceOwnerAccessTokenInter
     {
         return (string) $this->getToken();
     }
-
     /**
      * @inheritdoc
      */
     public function jsonSerialize()
     {
         $parameters = $this->values;
-
         if ($this->accessToken) {
             $parameters['access_token'] = $this->accessToken;
         }
-
         if ($this->refreshToken) {
             $parameters['refresh_token'] = $this->refreshToken;
         }
-
         if ($this->expires) {
             $parameters['expires'] = $this->expires;
         }
-
         if ($this->resourceOwnerId) {
             $parameters['resource_owner_id'] = $this->resourceOwnerId;
         }
-
         return $parameters;
     }
 }

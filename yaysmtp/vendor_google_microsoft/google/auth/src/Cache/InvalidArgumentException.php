@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2016 Google Inc.
  *
@@ -14,11 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace YaySMTP\Google\Auth\Cache;
 
-namespace Google\Auth\Cache;
-
-use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
-
+use YaySMTP\Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 class InvalidArgumentException extends \InvalidArgumentException implements PsrInvalidArgumentException
 {
 }

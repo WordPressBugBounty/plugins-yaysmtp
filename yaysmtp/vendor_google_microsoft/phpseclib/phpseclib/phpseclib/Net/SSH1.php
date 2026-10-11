@@ -45,14 +45,12 @@
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
+namespace YaySMTP\phpseclib\Net;
 
-namespace phpseclib\Net;
-
-use phpseclib\Crypt\DES;
-use phpseclib\Crypt\Random;
-use phpseclib\Crypt\TripleDES;
-use phpseclib\Math\BigInteger;
-
+use YaySMTP\phpseclib\Crypt\DES;
+use YaySMTP\phpseclib\Crypt\Random;
+use YaySMTP\phpseclib\Crypt\TripleDES;
+use YaySMTP\phpseclib\Math\BigInteger;
 /**
  * Pure-PHP implementation of SSHv1.
  *
@@ -121,13 +119,12 @@ class SSH1
      */
     const CIPHER_BLOWFISH = 6;
     /**#@-*/
-
     /**#@+
      * Authentication Methods
      *
      * @see \phpseclib\Net\SSH1::getSupportedAuthentications()
      * @access public
-    */
+     */
     /**
      * .rhosts or /etc/hosts.equiv
      */
@@ -147,16 +144,14 @@ class SSH1
      */
     const AUTH_RHOSTS_RSA = 4;
     /**#@-*/
-
     /**#@+
      * Terminal Modes
      *
      * @link http://3sp.com/content/developer/maverick-net/docs/Maverick.SSH.PseudoTerminalModesMembers.html
      * @access private
-    */
+     */
     const TTY_OP_END = 0;
     /**#@-*/
-
     /**
      * The Response Type
      *
@@ -164,7 +159,6 @@ class SSH1
      * @access private
      */
     const RESPONSE_TYPE = 1;
-
     /**
      * The Response Data
      *
@@ -172,23 +166,21 @@ class SSH1
      * @access private
      */
     const RESPONSE_DATA = 2;
-
     /**#@+
      * Execution Bitmap Masks
      *
      * @see \phpseclib\Net\SSH1::bitmap
      * @access private
-    */
-    const MASK_CONSTRUCTOR = 0x00000001;
-    const MASK_CONNECTED   = 0x00000002;
-    const MASK_LOGIN       = 0x00000004;
-    const MASK_SHELL       = 0x00000008;
+     */
+    const MASK_CONSTRUCTOR = 0x1;
+    const MASK_CONNECTED = 0x2;
+    const MASK_LOGIN = 0x4;
+    const MASK_SHELL = 0x8;
     /**#@-*/
-
     /**#@+
      * @access public
      * @see \phpseclib\Net\SSH1::getLog()
-    */
+     */
     /**
      * Returns the message numbers
      */
@@ -206,11 +198,10 @@ class SSH1
      */
     const LOG_REALTIME_FILE = 4;
     /**#@-*/
-
     /**#@+
      * @access public
      * @see \phpseclib\Net\SSH1::read()
-    */
+     */
     /**
      * Returns when a string matching $expect exactly is found
      */
@@ -220,7 +211,6 @@ class SSH1
      */
     const READ_REGEX = 2;
     /**#@-*/
-
     /**
      * The SSH identifier
      *
@@ -228,7 +218,6 @@ class SSH1
      * @access private
      */
     var $identifier = 'SSH-1.5-phpseclib';
-
     /**
      * The Socket Object
      *
@@ -236,15 +225,13 @@ class SSH1
      * @access private
      */
     var $fsock;
-
     /**
      * The cryptography object
      *
      * @var object
      * @access private
      */
-    var $crypto = false;
-
+    var $crypto = \false;
     /**
      * Execution Bitmap
      *
@@ -255,7 +242,6 @@ class SSH1
      * @access private
      */
     var $bitmap = 0;
-
     /**
      * The Server Key Public Exponent
      *
@@ -266,7 +252,6 @@ class SSH1
      * @access private
      */
     var $server_key_public_exponent;
-
     /**
      * The Server Key Public Modulus
      *
@@ -277,7 +262,6 @@ class SSH1
      * @access private
      */
     var $server_key_public_modulus;
-
     /**
      * The Host Key Public Exponent
      *
@@ -288,7 +272,6 @@ class SSH1
      * @access private
      */
     var $host_key_public_exponent;
-
     /**
      * The Host Key Public Modulus
      *
@@ -299,7 +282,6 @@ class SSH1
      * @access private
      */
     var $host_key_public_modulus;
-
     /**
      * Supported Ciphers
      *
@@ -309,16 +291,7 @@ class SSH1
      * @var array
      * @access private
      */
-    var $supported_ciphers = array(
-        self::CIPHER_NONE       => 'No encryption',
-        self::CIPHER_IDEA       => 'IDEA in CFB mode',
-        self::CIPHER_DES        => 'DES in CBC mode',
-        self::CIPHER_3DES       => 'Triple-DES in CBC mode',
-        self::CIPHER_BROKEN_TSS => 'TRI\'s Simple Stream encryption CBC',
-        self::CIPHER_RC4        => 'RC4',
-        self::CIPHER_BLOWFISH   => 'Blowfish'
-    );
-
+    var $supported_ciphers = array(self::CIPHER_NONE => 'No encryption', self::CIPHER_IDEA => 'IDEA in CFB mode', self::CIPHER_DES => 'DES in CBC mode', self::CIPHER_3DES => 'Triple-DES in CBC mode', self::CIPHER_BROKEN_TSS => 'TRI\'s Simple Stream encryption CBC', self::CIPHER_RC4 => 'RC4', self::CIPHER_BLOWFISH => 'Blowfish');
     /**
      * Supported Authentications
      *
@@ -328,13 +301,7 @@ class SSH1
      * @var array
      * @access private
      */
-    var $supported_authentications = array(
-        self::AUTH_RHOSTS     => '.rhosts or /etc/hosts.equiv',
-        self::AUTH_RSA        => 'pure RSA authentication',
-        self::AUTH_PASSWORD   => 'password authentication',
-        self::AUTH_RHOSTS_RSA => '.rhosts with RSA host authentication'
-    );
-
+    var $supported_authentications = array(self::AUTH_RHOSTS => '.rhosts or /etc/hosts.equiv', self::AUTH_RSA => 'pure RSA authentication', self::AUTH_PASSWORD => 'password authentication', self::AUTH_RHOSTS_RSA => '.rhosts with RSA host authentication');
     /**
      * Server Identification
      *
@@ -343,7 +310,6 @@ class SSH1
      * @access private
      */
     var $server_identification = '';
-
     /**
      * Protocol Flags
      *
@@ -352,7 +318,6 @@ class SSH1
      * @access private
      */
     var $protocol_flags = array();
-
     /**
      * Protocol Flag Log
      *
@@ -361,7 +326,6 @@ class SSH1
      * @access private
      */
     var $protocol_flag_log = array();
-
     /**
      * Message Log
      *
@@ -370,7 +334,6 @@ class SSH1
      * @access private
      */
     var $message_log = array();
-
     /**
      * Real-time log file pointer
      *
@@ -379,7 +342,6 @@ class SSH1
      * @access private
      */
     var $realtime_log_file;
-
     /**
      * Real-time log file size
      *
@@ -388,7 +350,6 @@ class SSH1
      * @access private
      */
     var $realtime_log_size;
-
     /**
      * Real-time log file wrap boolean
      *
@@ -397,7 +358,6 @@ class SSH1
      * @access private
      */
     var $realtime_log_wrap;
-
     /**
      * Interactive Buffer
      *
@@ -406,7 +366,6 @@ class SSH1
      * @access private
      */
     var $interactiveBuffer = '';
-
     /**
      * Timeout
      *
@@ -414,7 +373,6 @@ class SSH1
      * @access private
      */
     var $timeout;
-
     /**
      * Current Timeout
      *
@@ -422,7 +380,6 @@ class SSH1
      * @access private
      */
     var $curTimeout;
-
     /**
      * Log Boundary
      *
@@ -430,7 +387,6 @@ class SSH1
      * @access private
      */
     var $log_boundary = ':';
-
     /**
      * Log Long Width
      *
@@ -438,7 +394,6 @@ class SSH1
      * @access private
      */
     var $log_long_width = 65;
-
     /**
      * Log Short Width
      *
@@ -446,7 +401,6 @@ class SSH1
      * @access private
      */
     var $log_short_width = 16;
-
     /**
      * Hostname
      *
@@ -456,7 +410,6 @@ class SSH1
      * @access private
      */
     var $host;
-
     /**
      * Port Number
      *
@@ -466,7 +419,6 @@ class SSH1
      * @access private
      */
     var $port;
-
     /**
      * Timeout for initial connection
      *
@@ -481,7 +433,6 @@ class SSH1
      * @access private
      */
     var $connectionTimeout;
-
     /**
      * Default cipher
      *
@@ -491,7 +442,6 @@ class SSH1
      * @access private
      */
     var $cipher;
-
     /**
      * Default Constructor.
      *
@@ -506,33 +456,13 @@ class SSH1
      */
     function __construct($host, $port = 22, $timeout = 10, $cipher = self::CIPHER_3DES)
     {
-        $this->protocol_flags = array(
-            1  => 'NET_SSH1_MSG_DISCONNECT',
-            2  => 'NET_SSH1_SMSG_PUBLIC_KEY',
-            3  => 'NET_SSH1_CMSG_SESSION_KEY',
-            4  => 'NET_SSH1_CMSG_USER',
-            9  => 'NET_SSH1_CMSG_AUTH_PASSWORD',
-            10 => 'NET_SSH1_CMSG_REQUEST_PTY',
-            12 => 'NET_SSH1_CMSG_EXEC_SHELL',
-            13 => 'NET_SSH1_CMSG_EXEC_CMD',
-            14 => 'NET_SSH1_SMSG_SUCCESS',
-            15 => 'NET_SSH1_SMSG_FAILURE',
-            16 => 'NET_SSH1_CMSG_STDIN_DATA',
-            17 => 'NET_SSH1_SMSG_STDOUT_DATA',
-            18 => 'NET_SSH1_SMSG_STDERR_DATA',
-            19 => 'NET_SSH1_CMSG_EOF',
-            20 => 'NET_SSH1_SMSG_EXITSTATUS',
-            33 => 'NET_SSH1_CMSG_EXIT_CONFIRMATION'
-        );
-
+        $this->protocol_flags = array(1 => 'NET_SSH1_MSG_DISCONNECT', 2 => 'NET_SSH1_SMSG_PUBLIC_KEY', 3 => 'NET_SSH1_CMSG_SESSION_KEY', 4 => 'NET_SSH1_CMSG_USER', 9 => 'NET_SSH1_CMSG_AUTH_PASSWORD', 10 => 'NET_SSH1_CMSG_REQUEST_PTY', 12 => 'NET_SSH1_CMSG_EXEC_SHELL', 13 => 'NET_SSH1_CMSG_EXEC_CMD', 14 => 'NET_SSH1_SMSG_SUCCESS', 15 => 'NET_SSH1_SMSG_FAILURE', 16 => 'NET_SSH1_CMSG_STDIN_DATA', 17 => 'NET_SSH1_SMSG_STDOUT_DATA', 18 => 'NET_SSH1_SMSG_STDERR_DATA', 19 => 'NET_SSH1_CMSG_EOF', 20 => 'NET_SSH1_SMSG_EXITSTATUS', 33 => 'NET_SSH1_CMSG_EXIT_CONFIRMATION');
         $this->_define_array($this->protocol_flags);
-
         $this->host = $host;
         $this->port = $port;
         $this->connectionTimeout = $timeout;
         $this->cipher = $cipher;
     }
-
     /**
      * Connect to an SSHv1 server
      *
@@ -543,140 +473,92 @@ class SSH1
     {
         $this->fsock = @fsockopen($this->host, $this->port, $errno, $errstr, $this->connectionTimeout);
         if (!$this->fsock) {
-            user_error(rtrim("Cannot connect to {$this->host}:{$this->port}. Error $errno. $errstr"));
-            return false;
+            user_error(rtrim("Cannot connect to {$this->host}:{$this->port}. Error {$errno}. {$errstr}"));
+            return \false;
         }
-
         $this->server_identification = $init_line = fgets($this->fsock, 255);
-
         if (defined('NET_SSH1_LOGGING')) {
             $this->_append_log('<-', $this->server_identification);
             $this->_append_log('->', $this->identifier . "\r\n");
         }
-
         if (!preg_match('#SSH-([0-9\.]+)-(.+)#', $init_line, $parts)) {
             user_error('Can only connect to SSH servers');
-            return false;
+            return \false;
         }
         if ($parts[1][0] != 1) {
-            user_error("Cannot connect to SSH $parts[1] servers");
-            return false;
+            user_error("Cannot connect to SSH {$parts[1]} servers");
+            return \false;
         }
-
-        fputs($this->fsock, $this->identifier."\r\n");
-
+        fputs($this->fsock, $this->identifier . "\r\n");
         $response = $this->_get_binary_packet();
-        if ($response[self::RESPONSE_TYPE] != NET_SSH1_SMSG_PUBLIC_KEY) {
+        if ($response[self::RESPONSE_TYPE] != \NET_SSH1_SMSG_PUBLIC_KEY) {
             user_error('Expected SSH_SMSG_PUBLIC_KEY');
-            return false;
+            return \false;
         }
-
         $anti_spoofing_cookie = $this->_string_shift($response[self::RESPONSE_DATA], 8);
-
         $this->_string_shift($response[self::RESPONSE_DATA], 4);
-
         if (strlen($response[self::RESPONSE_DATA]) < 2) {
-            return false;
+            return \false;
         }
         $temp = unpack('nlen', $this->_string_shift($response[self::RESPONSE_DATA], 2));
         $server_key_public_exponent = new BigInteger($this->_string_shift($response[self::RESPONSE_DATA], ceil($temp['len'] / 8)), 256);
         $this->server_key_public_exponent = $server_key_public_exponent;
-
         if (strlen($response[self::RESPONSE_DATA]) < 2) {
-            return false;
+            return \false;
         }
         $temp = unpack('nlen', $this->_string_shift($response[self::RESPONSE_DATA], 2));
         $server_key_public_modulus = new BigInteger($this->_string_shift($response[self::RESPONSE_DATA], ceil($temp['len'] / 8)), 256);
-
         $this->server_key_public_modulus = $server_key_public_modulus;
-
         $this->_string_shift($response[self::RESPONSE_DATA], 4);
-
         if (strlen($response[self::RESPONSE_DATA]) < 2) {
-            return false;
+            return \false;
         }
         $temp = unpack('nlen', $this->_string_shift($response[self::RESPONSE_DATA], 2));
         $host_key_public_exponent = new BigInteger($this->_string_shift($response[self::RESPONSE_DATA], ceil($temp['len'] / 8)), 256);
         $this->host_key_public_exponent = $host_key_public_exponent;
-
         if (strlen($response[self::RESPONSE_DATA]) < 2) {
-            return false;
+            return \false;
         }
         $temp = unpack('nlen', $this->_string_shift($response[self::RESPONSE_DATA], 2));
         $host_key_public_modulus = new BigInteger($this->_string_shift($response[self::RESPONSE_DATA], ceil($temp['len'] / 8)), 256);
-
         $this->host_key_public_modulus = $host_key_public_modulus;
-
         $this->_string_shift($response[self::RESPONSE_DATA], 4);
-
         // get a list of the supported ciphers
         if (strlen($response[self::RESPONSE_DATA]) < 4) {
-            return false;
+            return \false;
         }
         extract(unpack('Nsupported_ciphers_mask', $this->_string_shift($response[self::RESPONSE_DATA], 4)));
-
         foreach ($this->supported_ciphers as $mask => $name) {
-            if (($supported_ciphers_mask & (1 << $mask)) == 0) {
+            if (($supported_ciphers_mask & 1 << $mask) == 0) {
                 unset($this->supported_ciphers[$mask]);
             }
         }
-
         // get a list of the supported authentications
         if (strlen($response[self::RESPONSE_DATA]) < 4) {
-            return false;
+            return \false;
         }
         extract(unpack('Nsupported_authentications_mask', $this->_string_shift($response[self::RESPONSE_DATA], 4)));
         foreach ($this->supported_authentications as $mask => $name) {
-            if (($supported_authentications_mask & (1 << $mask)) == 0) {
+            if (($supported_authentications_mask & 1 << $mask) == 0) {
                 unset($this->supported_authentications[$mask]);
             }
         }
-
         $session_id = pack('H*', md5($host_key_public_modulus->toBytes() . $server_key_public_modulus->toBytes() . $anti_spoofing_cookie));
-
         $session_key = Random::string(32);
         $double_encrypted_session_key = $session_key ^ str_pad($session_id, 32, chr(0));
-
         if ($server_key_public_modulus->compare($host_key_public_modulus) < 0) {
-            $double_encrypted_session_key = $this->_rsa_crypt(
-                $double_encrypted_session_key,
-                array(
-                    $server_key_public_exponent,
-                    $server_key_public_modulus
-                )
-            );
-            $double_encrypted_session_key = $this->_rsa_crypt(
-                $double_encrypted_session_key,
-                array(
-                    $host_key_public_exponent,
-                    $host_key_public_modulus
-                )
-            );
+            $double_encrypted_session_key = $this->_rsa_crypt($double_encrypted_session_key, array($server_key_public_exponent, $server_key_public_modulus));
+            $double_encrypted_session_key = $this->_rsa_crypt($double_encrypted_session_key, array($host_key_public_exponent, $host_key_public_modulus));
         } else {
-            $double_encrypted_session_key = $this->_rsa_crypt(
-                $double_encrypted_session_key,
-                array(
-                    $host_key_public_exponent,
-                    $host_key_public_modulus
-                )
-            );
-            $double_encrypted_session_key = $this->_rsa_crypt(
-                $double_encrypted_session_key,
-                array(
-                    $server_key_public_exponent,
-                    $server_key_public_modulus
-                )
-            );
+            $double_encrypted_session_key = $this->_rsa_crypt($double_encrypted_session_key, array($host_key_public_exponent, $host_key_public_modulus));
+            $double_encrypted_session_key = $this->_rsa_crypt($double_encrypted_session_key, array($server_key_public_exponent, $server_key_public_modulus));
         }
-
         $cipher = isset($this->supported_ciphers[$this->cipher]) ? $this->cipher : self::CIPHER_3DES;
-        $data = pack('C2a*na*N', NET_SSH1_CMSG_SESSION_KEY, $cipher, $anti_spoofing_cookie, 8 * strlen($double_encrypted_session_key), $double_encrypted_session_key, 0);
-
+        $data = pack('C2a*na*N', \NET_SSH1_CMSG_SESSION_KEY, $cipher, $anti_spoofing_cookie, 8 * strlen($double_encrypted_session_key), $double_encrypted_session_key, 0);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_SESSION_KEY');
-            return false;
+            return \false;
         }
-
         switch ($cipher) {
             //case self::CIPHER_NONE:
             //    $this->crypto = new \phpseclib\Crypt\Null();
@@ -685,7 +567,7 @@ class SSH1
                 $this->crypto = new DES();
                 $this->crypto->disablePadding();
                 $this->crypto->enableContinuousBuffer();
-                $this->crypto->setKey(substr($session_key, 0,  8));
+                $this->crypto->setKey(substr($session_key, 0, 8));
                 break;
             case self::CIPHER_3DES:
                 $this->crypto = new TripleDES(TripleDES::MODE_3CBC);
@@ -693,25 +575,15 @@ class SSH1
                 $this->crypto->enableContinuousBuffer();
                 $this->crypto->setKey(substr($session_key, 0, 24));
                 break;
-            //case self::CIPHER_RC4:
-            //    $this->crypto = new RC4();
-            //    $this->crypto->enableContinuousBuffer();
-            //    $this->crypto->setKey(substr($session_key, 0,  16));
-            //    break;
         }
-
         $response = $this->_get_binary_packet();
-
-        if ($response[self::RESPONSE_TYPE] != NET_SSH1_SMSG_SUCCESS) {
+        if ($response[self::RESPONSE_TYPE] != \NET_SSH1_SMSG_SUCCESS) {
             user_error('Expected SSH_SMSG_SUCCESS');
-            return false;
+            return \false;
         }
-
         $this->bitmap = self::MASK_CONNECTED;
-
-        return true;
+        return \true;
     }
-
     /**
      * Login
      *
@@ -725,63 +597,52 @@ class SSH1
         if (!($this->bitmap & self::MASK_CONSTRUCTOR)) {
             $this->bitmap |= self::MASK_CONSTRUCTOR;
             if (!$this->_connect()) {
-                return false;
+                return \false;
             }
         }
-
         if (!($this->bitmap & self::MASK_CONNECTED)) {
-            return false;
+            return \false;
         }
-
-        $data = pack('CNa*', NET_SSH1_CMSG_USER, strlen($username), $username);
-
+        $data = pack('CNa*', \NET_SSH1_CMSG_USER, strlen($username), $username);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_USER');
-            return false;
+            return \false;
         }
-
         $response = $this->_get_binary_packet();
-
-        if ($response === true) {
-            return false;
+        if ($response === \true) {
+            return \false;
         }
-        if ($response[self::RESPONSE_TYPE] == NET_SSH1_SMSG_SUCCESS) {
+        if ($response[self::RESPONSE_TYPE] == \NET_SSH1_SMSG_SUCCESS) {
             $this->bitmap |= self::MASK_LOGIN;
-            return true;
-        } elseif ($response[self::RESPONSE_TYPE] != NET_SSH1_SMSG_FAILURE) {
+            return \true;
+        } elseif ($response[self::RESPONSE_TYPE] != \NET_SSH1_SMSG_FAILURE) {
             user_error('Expected SSH_SMSG_SUCCESS or SSH_SMSG_FAILURE');
-            return false;
+            return \false;
         }
-
-        $data = pack('CNa*', NET_SSH1_CMSG_AUTH_PASSWORD, strlen($password), $password);
-
+        $data = pack('CNa*', \NET_SSH1_CMSG_AUTH_PASSWORD, strlen($password), $password);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_AUTH_PASSWORD');
-            return false;
+            return \false;
         }
-
         // remove the username and password from the last logged packet
-        if (defined('NET_SSH1_LOGGING') && NET_SSH1_LOGGING == self::LOG_COMPLEX) {
-            $data = pack('CNa*', NET_SSH1_CMSG_AUTH_PASSWORD, strlen('password'), 'password');
+        if (defined('NET_SSH1_LOGGING') && \NET_SSH1_LOGGING == self::LOG_COMPLEX) {
+            $data = pack('CNa*', \NET_SSH1_CMSG_AUTH_PASSWORD, strlen('password'), 'password');
             $this->message_log[count($this->message_log) - 1] = $data;
         }
-
         $response = $this->_get_binary_packet();
-
-        if ($response === true) {
-            return false;
+        if ($response === \true) {
+            return \false;
         }
-        if ($response[self::RESPONSE_TYPE] == NET_SSH1_SMSG_SUCCESS) {
+        if ($response[self::RESPONSE_TYPE] == \NET_SSH1_SMSG_SUCCESS) {
             $this->bitmap |= self::MASK_LOGIN;
-            return true;
-        } elseif ($response[self::RESPONSE_TYPE] == NET_SSH1_SMSG_FAILURE) {
-            return false;
+            return \true;
+        } elseif ($response[self::RESPONSE_TYPE] == \NET_SSH1_SMSG_FAILURE) {
+            return \false;
         } else {
             user_error('Expected SSH_SMSG_SUCCESS or SSH_SMSG_FAILURE');
-            return false;
+            return \false;
         }
     }
-
     /**
      * Set Timeout
      *
@@ -794,7 +655,6 @@ class SSH1
     {
         $this->timeout = $this->curTimeout = $timeout;
     }
-
     /**
      * Executes a command on a non-interactive shell, returns the output, and quits.
      *
@@ -815,47 +675,36 @@ class SSH1
      * @return mixed
      * @access public
      */
-    function exec($cmd, $block = true)
+    function exec($cmd, $block = \true)
     {
         if (!($this->bitmap & self::MASK_LOGIN)) {
             user_error('Operation disallowed prior to login()');
-            return false;
+            return \false;
         }
-
-        $data = pack('CNa*', NET_SSH1_CMSG_EXEC_CMD, strlen($cmd), $cmd);
-
+        $data = pack('CNa*', \NET_SSH1_CMSG_EXEC_CMD, strlen($cmd), $cmd);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_EXEC_CMD');
-            return false;
+            return \false;
         }
-
         if (!$block) {
-            return true;
+            return \true;
         }
-
         $output = '';
         $response = $this->_get_binary_packet();
-
-        if ($response !== false) {
+        if ($response !== \false) {
             do {
-                $output.= substr($response[self::RESPONSE_DATA], 4);
+                $output .= substr($response[self::RESPONSE_DATA], 4);
                 $response = $this->_get_binary_packet();
-            } while (is_array($response) && $response[self::RESPONSE_TYPE] != NET_SSH1_SMSG_EXITSTATUS);
+            } while (is_array($response) && $response[self::RESPONSE_TYPE] != \NET_SSH1_SMSG_EXITSTATUS);
         }
-
-        $data = pack('C', NET_SSH1_CMSG_EXIT_CONFIRMATION);
-
+        $data = pack('C', \NET_SSH1_CMSG_EXIT_CONFIRMATION);
         // i don't think it's really all that important if this packet gets sent or not.
         $this->_send_binary_packet($data);
-
         fclose($this->fsock);
-
         // reset the execution bitmap - a new \phpseclib\Net\SSH1 object needs to be created.
         $this->bitmap = 0;
-
         return $output;
     }
-
     /**
      * Creates an interactive shell
      *
@@ -869,37 +718,28 @@ class SSH1
         // connect using the sample parameters in protocol-1.5.txt.
         // according to wikipedia.org's entry on text terminals, "the fundamental type of application running on a text
         // terminal is a command line interpreter or shell".  thus, opening a terminal session to run the shell.
-        $data = pack('CNa*N4C', NET_SSH1_CMSG_REQUEST_PTY, strlen('vt100'), 'vt100', 24, 80, 0, 0, self::TTY_OP_END);
-
+        $data = pack('CNa*N4C', \NET_SSH1_CMSG_REQUEST_PTY, strlen('vt100'), 'vt100', 24, 80, 0, 0, self::TTY_OP_END);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_REQUEST_PTY');
-            return false;
+            return \false;
         }
-
         $response = $this->_get_binary_packet();
-
-        if ($response === true) {
-            return false;
+        if ($response === \true) {
+            return \false;
         }
-        if ($response[self::RESPONSE_TYPE] != NET_SSH1_SMSG_SUCCESS) {
+        if ($response[self::RESPONSE_TYPE] != \NET_SSH1_SMSG_SUCCESS) {
             user_error('Expected SSH_SMSG_SUCCESS');
-            return false;
+            return \false;
         }
-
-        $data = pack('C', NET_SSH1_CMSG_EXEC_SHELL);
-
+        $data = pack('C', \NET_SSH1_CMSG_EXEC_SHELL);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_EXEC_SHELL');
-            return false;
+            return \false;
         }
-
         $this->bitmap |= self::MASK_SHELL;
-
         //stream_set_blocking($this->fsock, 0);
-
-        return true;
+        return \true;
     }
-
     /**
      * Inputs a command into an interactive shell.
      *
@@ -912,7 +752,6 @@ class SSH1
     {
         return $this->interactiveWrite($cmd);
     }
-
     /**
      * Returns the output of an interactive shell when there's a match for $expect
      *
@@ -929,33 +768,29 @@ class SSH1
     {
         if (!($this->bitmap & self::MASK_LOGIN)) {
             user_error('Operation disallowed prior to login()');
-            return false;
+            return \false;
         }
-
         if (!($this->bitmap & self::MASK_SHELL) && !$this->_initShell()) {
             user_error('Unable to initiate an interactive shell session');
-            return false;
+            return \false;
         }
-
         $match = $expect;
-        while (true) {
+        while (\true) {
             if ($mode == self::READ_REGEX) {
                 preg_match($expect, $this->interactiveBuffer, $matches);
                 $match = isset($matches[0]) ? $matches[0] : '';
             }
-            $pos = strlen($match) ? strpos($this->interactiveBuffer, $match) : false;
-            if ($pos !== false) {
+            $pos = strlen($match) ? strpos($this->interactiveBuffer, $match) : \false;
+            if ($pos !== \false) {
                 return $this->_string_shift($this->interactiveBuffer, $pos + strlen($match));
             }
             $response = $this->_get_binary_packet();
-
-            if ($response === true) {
+            if ($response === \true) {
                 return $this->_string_shift($this->interactiveBuffer, strlen($this->interactiveBuffer));
             }
-            $this->interactiveBuffer.= substr($response[self::RESPONSE_DATA], 4);
+            $this->interactiveBuffer .= substr($response[self::RESPONSE_DATA], 4);
         }
     }
-
     /**
      * Inputs a command into an interactive shell.
      *
@@ -968,24 +803,19 @@ class SSH1
     {
         if (!($this->bitmap & self::MASK_LOGIN)) {
             user_error('Operation disallowed prior to login()');
-            return false;
+            return \false;
         }
-
         if (!($this->bitmap & self::MASK_SHELL) && !$this->_initShell()) {
             user_error('Unable to initiate an interactive shell session');
-            return false;
+            return \false;
         }
-
-        $data = pack('CNa*', NET_SSH1_CMSG_STDIN_DATA, strlen($cmd), $cmd);
-
+        $data = pack('CNa*', \NET_SSH1_CMSG_STDIN_DATA, strlen($cmd), $cmd);
         if (!$this->_send_binary_packet($data)) {
             user_error('Error sending SSH_CMSG_STDIN');
-            return false;
+            return \false;
         }
-
-        return true;
+        return \true;
     }
-
     /**
      * Returns the output of an interactive shell when no more output is available.
      *
@@ -1003,14 +833,12 @@ class SSH1
     {
         if (!($this->bitmap & self::MASK_LOGIN)) {
             user_error('Operation disallowed prior to login()');
-            return false;
+            return \false;
         }
-
         if (!($this->bitmap & self::MASK_SHELL) && !$this->_initShell()) {
             user_error('Unable to initiate an interactive shell session');
-            return false;
+            return \false;
         }
-
         $read = array($this->fsock);
         $write = $except = null;
         if (stream_select($read, $write, $except, 0)) {
@@ -1020,7 +848,6 @@ class SSH1
             return '';
         }
     }
-
     /**
      * Disconnect
      *
@@ -1030,7 +857,6 @@ class SSH1
     {
         $this->_disconnect();
     }
-
     /**
      * Destructor.
      *
@@ -1043,7 +869,6 @@ class SSH1
     {
         $this->_disconnect();
     }
-
     /**
      * Disconnect
      *
@@ -1053,7 +878,7 @@ class SSH1
     function _disconnect($msg = 'Client Quit')
     {
         if ($this->bitmap) {
-            $data = pack('C', NET_SSH1_CMSG_EOF);
+            $data = pack('C', \NET_SSH1_CMSG_EOF);
             $this->_send_binary_packet($data);
             /*
             $response = $this->_get_binary_packet();
@@ -1068,14 +893,12 @@ class SSH1
                     $data = pack('CNa*', NET_SSH1_MSG_DISCONNECT, strlen($msg), $msg);
             }
             */
-            $data = pack('CNa*', NET_SSH1_MSG_DISCONNECT, strlen($msg), $msg);
-
+            $data = pack('CNa*', \NET_SSH1_MSG_DISCONNECT, strlen($msg), $msg);
             $this->_send_binary_packet($data);
             fclose($this->fsock);
             $this->bitmap = 0;
         }
     }
-
     /**
      * Gets Binary Packets
      *
@@ -1092,79 +915,64 @@ class SSH1
     {
         if (feof($this->fsock)) {
             //user_error('connection closed prematurely');
-            return false;
+            return \false;
         }
-
         if ($this->curTimeout) {
             $read = array($this->fsock);
             $write = $except = null;
-
-            $start = strtok(microtime(), ' ') + strtok(''); // http://php.net/microtime#61838
+            $start = strtok(microtime(), ' ') + strtok('');
+            // http://php.net/microtime#61838
             $sec = floor($this->curTimeout);
             $usec = 1000000 * ($this->curTimeout - $sec);
             // on windows this returns a "Warning: Invalid CRT parameters detected" error
             if (!@stream_select($read, $write, $except, $sec, $usec) && !count($read)) {
                 //$this->_disconnect('Timeout');
-                return true;
+                return \true;
             }
             $elapsed = strtok(microtime(), ' ') + strtok('') - $start;
-            $this->curTimeout-= $elapsed;
+            $this->curTimeout -= $elapsed;
         }
-
-        $start = strtok(microtime(), ' ') + strtok(''); // http://php.net/microtime#61838
+        $start = strtok(microtime(), ' ') + strtok('');
+        // http://php.net/microtime#61838
         $data = fread($this->fsock, 4);
         if (strlen($data) < 4) {
-            return false;
+            return \false;
         }
         $temp = unpack('Nlength', $data);
-
         $padding_length = 8 - ($temp['length'] & 7);
         $length = $temp['length'] + $padding_length;
         $raw = '';
-
         while ($length > 0) {
             $temp = fread($this->fsock, $length);
             if (strlen($temp) != $length) {
-                return false;
+                return \false;
             }
-            $raw.= $temp;
-            $length-= strlen($temp);
+            $raw .= $temp;
+            $length -= strlen($temp);
         }
         $stop = strtok(microtime(), ' ') + strtok('');
-
-        if (strlen($raw) && $this->crypto !== false) {
+        if (strlen($raw) && $this->crypto !== \false) {
             $raw = $this->crypto->decrypt($raw);
         }
-
         $padding = substr($raw, 0, $padding_length);
         $type = $raw[$padding_length];
         $data = substr($raw, $padding_length + 1, -4);
-
         if (strlen($raw) < 4) {
-            return false;
+            return \false;
         }
         $temp = unpack('Ncrc', substr($raw, -4));
-
         //if ( $temp['crc'] != $this->_crc($padding . $type . $data) ) {
         //    user_error('Bad CRC in packet from server');
         //    return false;
         //}
-
         $type = ord($type);
-
         if (defined('NET_SSH1_LOGGING')) {
             $temp = isset($this->protocol_flags[$type]) ? $this->protocol_flags[$type] : 'UNKNOWN';
-            $temp = '<- ' . $temp .
-                    ' (' . round($stop - $start, 4) . 's)';
+            $temp = '<- ' . $temp . ' (' . round($stop - $start, 4) . 's)';
             $this->_append_log($temp, $data);
         }
-
-        return array(
-            self::RESPONSE_TYPE => $type,
-            self::RESPONSE_DATA => $data
-        );
+        return array(self::RESPONSE_TYPE => $type, self::RESPONSE_DATA => $data);
     }
-
     /**
      * Sends Binary Packets
      *
@@ -1179,37 +987,28 @@ class SSH1
     {
         if (feof($this->fsock)) {
             //user_error('connection closed prematurely');
-            return false;
+            return \false;
         }
-
         $length = strlen($data) + 4;
-
         $padding = Random::string(8 - ($length & 7));
-
         $orig = $data;
         $data = $padding . $data;
-        $data.= pack('N', $this->_crc($data));
-
-        if ($this->crypto !== false) {
+        $data .= pack('N', $this->_crc($data));
+        if ($this->crypto !== \false) {
             $data = $this->crypto->encrypt($data);
         }
-
         $packet = pack('Na*', $length, $data);
-
-        $start = strtok(microtime(), ' ') + strtok(''); // http://php.net/microtime#61838
+        $start = strtok(microtime(), ' ') + strtok('');
+        // http://php.net/microtime#61838
         $result = strlen($packet) == fputs($this->fsock, $packet);
         $stop = strtok(microtime(), ' ') + strtok('');
-
         if (defined('NET_SSH1_LOGGING')) {
             $temp = isset($this->protocol_flags[ord($orig[0])]) ? $this->protocol_flags[ord($orig[0])] : 'UNKNOWN';
-            $temp = '-> ' . $temp .
-                    ' (' . round($stop - $start, 4) . 's)';
+            $temp = '-> ' . $temp . ' (' . round($stop - $start, 4) . 's)';
             $this->_append_log($temp, $orig);
         }
-
         return $result;
     }
-
     /**
      * Cyclic Redundancy Check (CRC)
      *
@@ -1225,91 +1024,22 @@ class SSH1
      */
     function _crc($data)
     {
-        static $crc_lookup_table = array(
-            0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
-            0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
-            0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988,
-            0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
-            0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE,
-            0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7,
-            0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC,
-            0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5,
-            0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172,
-            0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B,
-            0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940,
-            0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59,
-            0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116,
-            0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F,
-            0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924,
-            0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D,
-            0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A,
-            0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433,
-            0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818,
-            0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01,
-            0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E,
-            0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457,
-            0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C,
-            0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65,
-            0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2,
-            0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB,
-            0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0,
-            0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9,
-            0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086,
-            0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F,
-            0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4,
-            0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD,
-            0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A,
-            0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683,
-            0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8,
-            0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1,
-            0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE,
-            0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7,
-            0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC,
-            0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5,
-            0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252,
-            0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B,
-            0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60,
-            0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79,
-            0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236,
-            0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F,
-            0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04,
-            0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D,
-            0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A,
-            0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713,
-            0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38,
-            0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21,
-            0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E,
-            0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777,
-            0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C,
-            0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45,
-            0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2,
-            0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB,
-            0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0,
-            0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9,
-            0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6,
-            0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF,
-            0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94,
-            0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
-        );
-
+        static $crc_lookup_table = array(0x0, 0x77073096, 0xee0e612c, 0x990951ba, 0x76dc419, 0x706af48f, 0xe963a535, 0x9e6495a3, 0xedb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x9b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2, 0xf3b97148, 0x84be41de, 0x1adad47d, 0x6ddde4eb, 0xf4d4b551, 0x83d385c7, 0x136c9856, 0x646ba8c0, 0xfd62f97a, 0x8a65c9ec, 0x14015c4f, 0x63066cd9, 0xfa0f3d63, 0x8d080df5, 0x3b6e20c8, 0x4c69105e, 0xd56041e4, 0xa2677172, 0x3c03e4d1, 0x4b04d447, 0xd20d85fd, 0xa50ab56b, 0x35b5a8fa, 0x42b2986c, 0xdbbbc9d6, 0xacbcf940, 0x32d86ce3, 0x45df5c75, 0xdcd60dcf, 0xabd13d59, 0x26d930ac, 0x51de003a, 0xc8d75180, 0xbfd06116, 0x21b4f4b5, 0x56b3c423, 0xcfba9599, 0xb8bda50f, 0x2802b89e, 0x5f058808, 0xc60cd9b2, 0xb10be924, 0x2f6f7c87, 0x58684c11, 0xc1611dab, 0xb6662d3d, 0x76dc4190, 0x1db7106, 0x98d220bc, 0xefd5102a, 0x71b18589, 0x6b6b51f, 0x9fbfe4a5, 0xe8b8d433, 0x7807c9a2, 0xf00f934, 0x9609a88e, 0xe10e9818, 0x7f6a0dbb, 0x86d3d2d, 0x91646c97, 0xe6635c01, 0x6b6b51f4, 0x1c6c6162, 0x856530d8, 0xf262004e, 0x6c0695ed, 0x1b01a57b, 0x8208f4c1, 0xf50fc457, 0x65b0d9c6, 0x12b7e950, 0x8bbeb8ea, 0xfcb9887c, 0x62dd1ddf, 0x15da2d49, 0x8cd37cf3, 0xfbd44c65, 0x4db26158, 0x3ab551ce, 0xa3bc0074, 0xd4bb30e2, 0x4adfa541, 0x3dd895d7, 0xa4d1c46d, 0xd3d6f4fb, 0x4369e96a, 0x346ed9fc, 0xad678846, 0xda60b8d0, 0x44042d73, 0x33031de5, 0xaa0a4c5f, 0xdd0d7cc9, 0x5005713c, 0x270241aa, 0xbe0b1010, 0xc90c2086, 0x5768b525, 0x206f85b3, 0xb966d409, 0xce61e49f, 0x5edef90e, 0x29d9c998, 0xb0d09822, 0xc7d7a8b4, 0x59b33d17, 0x2eb40d81, 0xb7bd5c3b, 0xc0ba6cad, 0xedb88320, 0x9abfb3b6, 0x3b6e20c, 0x74b1d29a, 0xead54739, 0x9dd277af, 0x4db2615, 0x73dc1683, 0xe3630b12, 0x94643b84, 0xd6d6a3e, 0x7a6a5aa8, 0xe40ecf0b, 0x9309ff9d, 0xa00ae27, 0x7d079eb1, 0xf00f9344, 0x8708a3d2, 0x1e01f268, 0x6906c2fe, 0xf762575d, 0x806567cb, 0x196c3671, 0x6e6b06e7, 0xfed41b76, 0x89d32be0, 0x10da7a5a, 0x67dd4acc, 0xf9b9df6f, 0x8ebeeff9, 0x17b7be43, 0x60b08ed5, 0xd6d6a3e8, 0xa1d1937e, 0x38d8c2c4, 0x4fdff252, 0xd1bb67f1, 0xa6bc5767, 0x3fb506dd, 0x48b2364b, 0xd80d2bda, 0xaf0a1b4c, 0x36034af6, 0x41047a60, 0xdf60efc3, 0xa867df55, 0x316e8eef, 0x4669be79, 0xcb61b38c, 0xbc66831a, 0x256fd2a0, 0x5268e236, 0xcc0c7795, 0xbb0b4703, 0x220216b9, 0x5505262f, 0xc5ba3bbe, 0xb2bd0b28, 0x2bb45a92, 0x5cb36a04, 0xc2d7ffa7, 0xb5d0cf31, 0x2cd99e8b, 0x5bdeae1d, 0x9b64c2b0, 0xec63f226, 0x756aa39c, 0x26d930a, 0x9c0906a9, 0xeb0e363f, 0x72076785, 0x5005713, 0x95bf4a82, 0xe2b87a14, 0x7bb12bae, 0xcb61b38, 0x92d28e9b, 0xe5d5be0d, 0x7cdcefb7, 0xbdbdf21, 0x86d3d2d4, 0xf1d4e242, 0x68ddb3f8, 0x1fda836e, 0x81be16cd, 0xf6b9265b, 0x6fb077e1, 0x18b74777, 0x88085ae6, 0xff0f6a70, 0x66063bca, 0x11010b5c, 0x8f659eff, 0xf862ae69, 0x616bffd3, 0x166ccf45, 0xa00ae278, 0xd70dd2ee, 0x4e048354, 0x3903b3c2, 0xa7672661, 0xd06016f7, 0x4969474d, 0x3e6e77db, 0xaed16a4a, 0xd9d65adc, 0x40df0b66, 0x37d83bf0, 0xa9bcae53, 0xdebb9ec5, 0x47b2cf7f, 0x30b5ffe9, 0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d);
         // For this function to yield the same output as PHP's crc32 function, $crc would have to be
         // set to 0xFFFFFFFF, initially - not 0x00000000 as it currently is.
-        $crc = 0x00000000;
+        $crc = 0x0;
         $length = strlen($data);
-
-        for ($i=0; $i<$length; $i++) {
+        for ($i = 0; $i < $length; $i++) {
             // We AND $crc >> 8 with 0x00FFFFFF because we want the eight newly added bits to all
             // be zero.  PHP, unfortunately, doesn't always do this.  0x80000000 >> 8, as an example,
             // yields 0xFF800000 - not 0x00800000.  The following link elaborates:
             // http://www.php.net/manual/en/language.operators.bitwise.php#57281
-            $crc = (($crc >> 8) & 0x00FFFFFF) ^ $crc_lookup_table[($crc & 0xFF) ^ ord($data[$i])];
+            $crc = $crc >> 8 & 0xffffff ^ $crc_lookup_table[$crc & 0xff ^ ord($data[$i])];
         }
-
         // In addition to having to set $crc to 0xFFFFFFFF, initially, the return value must be XOR'd with
         // 0xFFFFFFFF for this function to return the same thing that PHP's crc32 function would.
         return $crc;
     }
-
     /**
      * String Shift
      *
@@ -1326,7 +1056,6 @@ class SSH1
         $string = substr($string, $index);
         return $substr;
     }
-
     /**
      * RSA Encrypt
      *
@@ -1348,7 +1077,6 @@ class SSH1
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         return $rsa->encrypt($m);
         */
-
         // To quote from protocol-1.5.txt:
         // The most significant byte (which is only partial as the value must be
         // less than the public modulus, which is never a power of two) is zero.
@@ -1358,7 +1086,6 @@ class SSH1
         // zero random bytes to fill any unused space, a zero byte, and the data
         // to be encrypted in the least significant bytes, the last byte of the
         // data in the least significant byte.
-
         // Presumably the part of PKCS#1 they're refering to is "Section 7.2.1 Encryption Operation",
         // under "7.2 RSAES-PKCS1-v1.5" and "7 Encryption schemes" of the following URL:
         // ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
@@ -1368,16 +1095,13 @@ class SSH1
         while (strlen($random) != $length) {
             $block = Random::string($length - strlen($random));
             $block = str_replace("\x00", '', $block);
-            $random.= $block;
+            $random .= $block;
         }
         $temp = chr(0) . chr(2) . $random . chr(0) . $m;
-
         $m = new BigInteger($temp, 256);
         $m = $m->modPow($key[0], $key[1]);
-
         return $m->toBytes();
     }
-
     /**
      * Define Array
      *
@@ -1401,7 +1125,6 @@ class SSH1
             }
         }
     }
-
     /**
      * Returns a log of the packets that have been sent and received.
      *
@@ -1413,10 +1136,9 @@ class SSH1
     function getLog()
     {
         if (!defined('NET_SSH1_LOGGING')) {
-            return false;
+            return \false;
         }
-
-        switch (NET_SSH1_LOGGING) {
+        switch (\NET_SSH1_LOGGING) {
             case self::LOG_SIMPLE:
                 return $this->message_number_log;
                 break;
@@ -1424,10 +1146,9 @@ class SSH1
                 return $this->_format_log($this->message_log, $this->protocol_flags_log);
                 break;
             default:
-                return false;
+                return \false;
         }
     }
-
     /**
      * Formats a log for printing
      *
@@ -1440,12 +1161,12 @@ class SSH1
     {
         $output = '';
         for ($i = 0; $i < count($message_log); $i++) {
-            $output.= $message_number_log[$i] . "\r\n";
+            $output .= $message_number_log[$i] . "\r\n";
             $current_log = $message_log[$i];
             $j = 0;
             do {
                 if (strlen($current_log)) {
-                    $output.= str_pad(dechex($j), 7, '0', STR_PAD_LEFT) . '0  ';
+                    $output .= str_pad(dechex($j), 7, '0', \STR_PAD_LEFT) . '0  ';
                 }
                 $fragment = $this->_string_shift($current_log, $this->log_short_width);
                 $hex = substr(preg_replace_callback('#.#s', array($this, '_format_log_helper'), $fragment), strlen($this->log_boundary));
@@ -1453,15 +1174,13 @@ class SSH1
                 // http://en.wikipedia.org/wiki/ASCII#ASCII_printable_characters
                 // also replace < with a . since < messes up the output on web browsers
                 $raw = preg_replace('#[^\x20-\x7E]|<#', '.', $fragment);
-                $output.= str_pad($hex, $this->log_long_width - $this->log_short_width, ' ') . $raw . "\r\n";
+                $output .= str_pad($hex, $this->log_long_width - $this->log_short_width, ' ') . $raw . "\r\n";
                 $j++;
             } while (strlen($current_log));
-            $output.= "\r\n";
+            $output .= "\r\n";
         }
-
         return $output;
     }
-
     /**
      * Helper function for _format_log
      *
@@ -1473,9 +1192,8 @@ class SSH1
      */
     function _format_log_helper($matches)
     {
-        return $this->log_boundary . str_pad(dechex(ord($matches[0])), 2, '0', STR_PAD_LEFT);
+        return $this->log_boundary . str_pad(dechex(ord($matches[0])), 2, '0', \STR_PAD_LEFT);
     }
-
     /**
      * Return the server key public exponent
      *
@@ -1486,11 +1204,10 @@ class SSH1
      * @return string
      * @access public
      */
-    function getServerKeyPublicExponent($raw_output = false)
+    function getServerKeyPublicExponent($raw_output = \false)
     {
         return $raw_output ? $this->server_key_public_exponent->toBytes() : $this->server_key_public_exponent->toString();
     }
-
     /**
      * Return the server key public modulus
      *
@@ -1501,11 +1218,10 @@ class SSH1
      * @return string
      * @access public
      */
-    function getServerKeyPublicModulus($raw_output = false)
+    function getServerKeyPublicModulus($raw_output = \false)
     {
         return $raw_output ? $this->server_key_public_modulus->toBytes() : $this->server_key_public_modulus->toString();
     }
-
     /**
      * Return the host key public exponent
      *
@@ -1516,11 +1232,10 @@ class SSH1
      * @return string
      * @access public
      */
-    function getHostKeyPublicExponent($raw_output = false)
+    function getHostKeyPublicExponent($raw_output = \false)
     {
         return $raw_output ? $this->host_key_public_exponent->toBytes() : $this->host_key_public_exponent->toString();
     }
-
     /**
      * Return the host key public modulus
      *
@@ -1531,11 +1246,10 @@ class SSH1
      * @return string
      * @access public
      */
-    function getHostKeyPublicModulus($raw_output = false)
+    function getHostKeyPublicModulus($raw_output = \false)
     {
         return $raw_output ? $this->host_key_public_modulus->toBytes() : $this->host_key_public_modulus->toString();
     }
-
     /**
      * Return a list of ciphers supported by SSH1 server.
      *
@@ -1547,11 +1261,10 @@ class SSH1
      * @return array
      * @access public
      */
-    function getSupportedCiphers($raw_output = false)
+    function getSupportedCiphers($raw_output = \false)
     {
         return $raw_output ? array_keys($this->supported_ciphers) : array_values($this->supported_ciphers);
     }
-
     /**
      * Return a list of authentications supported by SSH1 server.
      *
@@ -1563,11 +1276,10 @@ class SSH1
      * @return array
      * @access public
      */
-    function getSupportedAuthentications($raw_output = false)
+    function getSupportedAuthentications($raw_output = \false)
     {
         return $raw_output ? array_keys($this->supported_authentications) : array_values($this->supported_authentications);
     }
-
     /**
      * Return the server identification.
      *
@@ -1578,7 +1290,6 @@ class SSH1
     {
         return rtrim($this->server_identification);
     }
-
     /**
      * Logs data packets
      *
@@ -1589,7 +1300,7 @@ class SSH1
      */
     function _append_log($protocol_flags, $message)
     {
-        switch (NET_SSH1_LOGGING) {
+        switch (\NET_SSH1_LOGGING) {
             // useful for benchmarks
             case self::LOG_SIMPLE:
                 $this->protocol_flags_log[] = $protocol_flags;
@@ -1598,10 +1309,10 @@ class SSH1
             case self::LOG_COMPLEX:
                 $this->protocol_flags_log[] = $protocol_flags;
                 $this->_string_shift($message);
-                $this->log_size+= strlen($message);
+                $this->log_size += strlen($message);
                 $this->message_log[] = $message;
                 while ($this->log_size > self::LOG_MAX_SIZE) {
-                    $this->log_size-= strlen(array_shift($this->message_log));
+                    $this->log_size -= strlen(array_shift($this->message_log));
                     array_shift($this->protocol_flags_log);
                 }
                 break;
@@ -1630,14 +1341,14 @@ class SSH1
                 $entry = $this->_format_log(array($message), array($protocol_flags));
                 if ($this->realtime_log_wrap) {
                     $temp = "<<< START >>>\r\n";
-                    $entry.= $temp;
+                    $entry .= $temp;
                     fseek($this->realtime_log_file, ftell($this->realtime_log_file) - strlen($temp));
                 }
-                $this->realtime_log_size+= strlen($entry);
+                $this->realtime_log_size += strlen($entry);
                 if ($this->realtime_log_size > self::LOG_MAX_SIZE) {
                     fseek($this->realtime_log_file, 0);
                     $this->realtime_log_size = strlen($entry);
-                    $this->realtime_log_wrap = true;
+                    $this->realtime_log_wrap = \true;
                 }
                 fputs($this->realtime_log_file, $entry);
         }

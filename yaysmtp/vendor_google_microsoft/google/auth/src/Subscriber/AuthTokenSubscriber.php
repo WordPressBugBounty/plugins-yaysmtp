@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2015 Google Inc.
  *
@@ -14,15 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace YaySMTP\Google\Auth\Subscriber;
 
-namespace Google\Auth\Subscriber;
-
-use Google\Auth\FetchAuthTokenInterface;
-use Google\Auth\GetQuotaProjectInterface;
-use GuzzleHttp\Event\BeforeEvent;
-use GuzzleHttp\Event\RequestEvents;
-use GuzzleHttp\Event\SubscriberInterface;
-
+use YaySMTP\Google\Auth\FetchAuthTokenInterface;
+use YaySMTP\Google\Auth\GetQuotaProjectInterface;
+use YaySMTP\GuzzleHttp\Event\BeforeEvent;
+use YaySMTP\GuzzleHttp\Event\RequestEvents;
+use YaySMTP\GuzzleHttp\Event\SubscriberInterface;
 /**
  * AuthTokenSubscriber is a Guzzle Subscriber that adds an Authorization header
  * provided by an object implementing FetchAuthTokenInterface.
@@ -40,17 +39,14 @@ class AuthTokenSubscriber implements SubscriberInterface
      * @var callable
      */
     private $httpHandler;
-
     /**
      * @var FetchAuthTokenInterface
      */
     private $fetcher;
-
     /**
      * @var callable
      */
     private $tokenCallback;
-
     /**
      * Creates a new AuthTokenSubscriber.
      *
@@ -58,16 +54,12 @@ class AuthTokenSubscriber implements SubscriberInterface
      * @param callable $httpHandler (optional) http client to fetch the token.
      * @param callable $tokenCallback (optional) function to be called when a new token is fetched.
      */
-    public function __construct(
-        FetchAuthTokenInterface $fetcher,
-        callable $httpHandler = null,
-        callable $tokenCallback = null
-    ) {
+    public function __construct(FetchAuthTokenInterface $fetcher, callable $httpHandler = null, callable $tokenCallback = null)
+    {
         $this->fetcher = $fetcher;
         $this->httpHandler = $httpHandler;
         $this->tokenCallback = $tokenCallback;
     }
-
     /**
      * @return array
      */
@@ -75,7 +67,6 @@ class AuthTokenSubscriber implements SubscriberInterface
     {
         return ['before' => ['onBefore', RequestEvents::SIGN_REQUEST]];
     }
-
     /**
      * Updates the request with an Authorization header when auth is 'fetched_auth_token'.
      *
@@ -107,26 +98,19 @@ class AuthTokenSubscriber implements SubscriberInterface
         if ($request->getConfig()['auth'] != 'google_auth') {
             return;
         }
-
         // Fetch the auth token.
         $auth_tokens = $this->fetcher->fetchAuthToken($this->httpHandler);
         if (array_key_exists('access_token', $auth_tokens)) {
             $request->setHeader('authorization', 'Bearer ' . $auth_tokens['access_token']);
-
             // notify the callback if applicable
             if ($this->tokenCallback) {
                 call_user_func($this->tokenCallback, $this->fetcher->getCacheKey(), $auth_tokens['access_token']);
             }
         }
-
         if ($quotaProject = $this->getQuotaProject()) {
-            $request->setHeader(
-                GetQuotaProjectInterface::X_GOOG_USER_PROJECT_HEADER,
-                $quotaProject
-            );
+            $request->setHeader(GetQuotaProjectInterface::X_GOOG_USER_PROJECT_HEADER, $quotaProject);
         }
     }
-
     private function getQuotaProject()
     {
         if ($this->fetcher instanceof GetQuotaProjectInterface) {

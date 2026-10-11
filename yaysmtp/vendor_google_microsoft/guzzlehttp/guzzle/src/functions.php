@@ -1,11 +1,11 @@
 <?php
-namespace GuzzleHttp;
 
-use GuzzleHttp\Handler\CurlHandler;
-use GuzzleHttp\Handler\CurlMultiHandler;
-use GuzzleHttp\Handler\Proxy;
-use GuzzleHttp\Handler\StreamHandler;
+namespace YaySMTP\GuzzleHttp;
 
+use YaySMTP\GuzzleHttp\Handler\CurlHandler;
+use YaySMTP\GuzzleHttp\Handler\CurlMultiHandler;
+use YaySMTP\GuzzleHttp\Handler\Proxy;
+use YaySMTP\GuzzleHttp\Handler\StreamHandler;
 /**
  * Expands a URI template
  *
@@ -18,18 +18,15 @@ function uri_template($template, array $variables)
 {
     if (extension_loaded('uri_template')) {
         // @codeCoverageIgnoreStart
-        return \uri_template($template, $variables);
+        return \YaySMTP\uri_template($template, $variables);
         // @codeCoverageIgnoreEnd
     }
-
     static $uriTemplate;
     if (!$uriTemplate) {
         $uriTemplate = new UriTemplate();
     }
-
     return $uriTemplate->expand($template, $variables);
 }
-
 /**
  * Debug function used to describe the provided value type and class.
  *
@@ -42,7 +39,6 @@ function describe_type($input)
 {
     return Utils::describeType($input);
 }
-
 /**
  * Parses an array of header lines into an associative array of headers.
  *
@@ -54,7 +50,6 @@ function headers_from_lines($lines)
 {
     return Utils::headersFromLines($lines);
 }
-
 /**
  * Returns a debug stream based on the provided variable.
  *
@@ -66,7 +61,6 @@ function debug_resource($value = null)
 {
     Utils::debugResource($value);
 }
-
 /**
  * Chooses and creates a default handler to use based on the environment.
  *
@@ -79,7 +73,6 @@ function choose_handler()
 {
     return Utils::chooseHandler();
 }
-
 /**
  * Get the default User-Agent string to use with Guzzle
  *
@@ -89,7 +82,6 @@ function default_user_agent()
 {
     return Utils::defaultUserAgent();
 }
-
 /**
  * Returns the default cacert bundle for the current system.
  *
@@ -108,7 +100,6 @@ function default_ca_bundle()
 {
     return Utils::defaultCaBundle();
 }
-
 /**
  * Creates an associative array of lowercase header names to the actual
  * header casing.
@@ -121,7 +112,6 @@ function normalize_header_keys(array $headers)
 {
     return Utils::normalizeHeaderKeys($headers);
 }
-
 /**
  * Returns true if the provided host matches any of the no proxy areas.
  *
@@ -145,7 +135,6 @@ function is_host_in_noproxy($host, array $noProxyArray)
 {
     return Utils::isHostInNoProxy($host, $noProxyArray);
 }
-
 /**
  * Wrapper for json_decode that throws when an error occurs.
  *
@@ -159,11 +148,10 @@ function is_host_in_noproxy($host, array $noProxyArray)
  * @throws Exception\InvalidArgumentException if the JSON cannot be decoded.
  * @link http://www.php.net/manual/en/function.json-decode.php
  */
-function json_decode($json, $assoc = false, $depth = 512, $options = 0)
+function json_decode($json, $assoc = \false, $depth = 512, $options = 0)
 {
     return Utils::jsonDecode($json, $assoc, $depth, $options);
 }
-
 /**
  * Wrapper for JSON encoding that throws when an error occurs.
  *

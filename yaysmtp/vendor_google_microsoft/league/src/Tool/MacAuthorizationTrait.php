@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,12 +12,10 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
+namespace YaySMTP\League\OAuth2\Client\Tool;
 
-namespace League\OAuth2\Client\Tool;
-
-use League\OAuth2\Client\Token\AccessToken;
-use League\OAuth2\Client\Token\AccessTokenInterface;
-
+use YaySMTP\League\OAuth2\Client\Token\AccessToken;
+use YaySMTP\League\OAuth2\Client\Token\AccessTokenInterface;
 /**
  * Enables `MAC` header authorization for providers.
  *
@@ -31,7 +30,6 @@ trait MacAuthorizationTrait
      * @return string
      */
     abstract protected function getTokenId(AccessToken $token);
-
     /**
      * Returns the MAC signature for the current request.
      *
@@ -41,7 +39,6 @@ trait MacAuthorizationTrait
      * @return string
      */
     abstract protected function getMacSignature($id, $ts, $nonce);
-
     /**
      * Returns a new random string to use as the state parameter in an
      * authorization flow.
@@ -50,7 +47,6 @@ trait MacAuthorizationTrait
      * @return string
      */
     abstract protected function getRandomState($length = 32);
-
     /**
      * Returns the authorization headers for the 'mac' grant.
      *
@@ -67,17 +63,14 @@ trait MacAuthorizationTrait
         if ($token === null) {
             return [];
         }
-
-        $ts    = time();
-        $id    = $this->getTokenId($token);
+        $ts = time();
+        $id = $this->getTokenId($token);
         $nonce = $this->getRandomState(16);
-        $mac   = $this->getMacSignature($id, $ts, $nonce);
-
+        $mac = $this->getMacSignature($id, $ts, $nonce);
         $parts = [];
         foreach (compact('id', 'ts', 'nonce', 'mac') as $key => $value) {
             $parts[] = sprintf('%s="%s"', $key, $value);
         }
-
         return ['Authorization' => 'MAC ' . implode(', ', $parts)];
     }
 }

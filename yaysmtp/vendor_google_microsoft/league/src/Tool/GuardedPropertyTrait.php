@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,8 +12,7 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Tool;
+namespace YaySMTP\League\OAuth2\Client\Tool;
 
 /**
  * Provides support for blacklisting explicit properties from the
@@ -26,7 +26,6 @@ trait GuardedPropertyTrait
      * @var array
      */
     protected $guarded = [];
-
     /**
      * Attempts to mass assign the given options to explicitly defined properties,
      * skipping over any properties that are defined in the guarded array.
@@ -39,14 +38,12 @@ trait GuardedPropertyTrait
         if (isset($options['guarded'])) {
             unset($options['guarded']);
         }
-
         foreach ($options as $option => $value) {
             if (property_exists($this, $option) && !$this->isGuarded($option)) {
                 $this->{$option} = $value;
             }
         }
     }
-
     /**
      * Returns current guarded properties.
      *
@@ -56,7 +53,6 @@ trait GuardedPropertyTrait
     {
         return $this->guarded;
     }
-
     /**
      * Determines if the given property is guarded.
      *

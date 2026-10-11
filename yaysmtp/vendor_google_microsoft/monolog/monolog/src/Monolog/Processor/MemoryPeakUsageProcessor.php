@@ -8,8 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-namespace Monolog\Processor;
+namespace YaySMTP\Monolog\Processor;
 
 /**
  * Injects memory_get_peak_usage in all records
@@ -27,9 +26,7 @@ class MemoryPeakUsageProcessor extends MemoryProcessor
     {
         $bytes = memory_get_peak_usage($this->realUsage);
         $formatted = $this->formatBytes($bytes);
-
         $record['extra']['memory_peak_usage'] = $formatted;
-
         return $record;
     }
 }

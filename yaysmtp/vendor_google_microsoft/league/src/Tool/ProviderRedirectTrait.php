@@ -1,13 +1,12 @@
 <?php
 
-namespace League\OAuth2\Client\Tool;
+namespace YaySMTP\League\OAuth2\Client\Tool;
 
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Psr7\Uri;
+use YaySMTP\GuzzleHttp\Exception\BadResponseException;
+use YaySMTP\GuzzleHttp\Psr7\Uri;
 use InvalidArgumentException;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-
+use YaySMTP\Psr\Http\Message\RequestInterface;
+use YaySMTP\Psr\Http\Message\ResponseInterface;
 trait ProviderRedirectTrait
 {
     /**
@@ -16,7 +15,6 @@ trait ProviderRedirectTrait
      * @var integer
      */
     protected $redirectLimit = 2;
-
     /**
      * Retrieves a response for a given request and retrieves subsequent
      * responses, with authorization headers, if a redirect is detected.
@@ -29,13 +27,9 @@ trait ProviderRedirectTrait
     {
         $response = null;
         $attempts = 0;
-
         while ($attempts < $this->redirectLimit) {
             $attempts++;
-            $response = $this->getHttpClient()->send($request, [
-                'allow_redirects' => false
-            ]);
-
+            $response = $this->getHttpClient()->send($request, ['allow_redirects' => \false]);
             if ($this->isRedirect($response)) {
                 $redirectUrl = new Uri($response->getHeader('Location')[0]);
                 $request = $request->withUri($redirectUrl);
@@ -43,17 +37,14 @@ trait ProviderRedirectTrait
                 break;
             }
         }
-
         return $response;
     }
-
     /**
      * Returns the HTTP client instance.
      *
      * @return GuzzleHttp\ClientInterface
      */
     abstract public function getHttpClient();
-
     /**
      * Retrieves current redirect limit.
      *
@@ -63,7 +54,6 @@ trait ProviderRedirectTrait
     {
         return $this->redirectLimit;
     }
-
     /**
      * Determines if a given response is a redirect.
      *
@@ -74,10 +64,8 @@ trait ProviderRedirectTrait
     protected function isRedirect(ResponseInterface $response)
     {
         $statusCode = $response->getStatusCode();
-
         return $statusCode > 300 && $statusCode < 400 && $response->hasHeader('Location');
     }
-
     /**
      * Sends a request instance and returns a response instance.
      *
@@ -94,10 +82,8 @@ trait ProviderRedirectTrait
         } catch (BadResponseException $e) {
             $response = $e->getResponse();
         }
-
         return $response;
     }
-
     /**
      * Updates the redirect limit.
      *
@@ -110,13 +96,10 @@ trait ProviderRedirectTrait
         if (!is_int($limit)) {
             throw new InvalidArgumentException('redirectLimit must be an integer.');
         }
-
         if ($limit < 1) {
             throw new InvalidArgumentException('redirectLimit must be greater than or equal to one.');
         }
-
         $this->redirectLimit = $limit;
-
         return $this;
     }
 }

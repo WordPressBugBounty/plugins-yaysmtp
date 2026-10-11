@@ -8,14 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace YaySMTP\Monolog\Handler;
 
-namespace Monolog\Handler;
-
-use Monolog\Logger;
-use Monolog\Utils;
-use Monolog\Formatter\FlowdockFormatter;
-use Monolog\Formatter\FormatterInterface;
-
+use YaySMTP\Monolog\Logger;
+use YaySMTP\Monolog\Utils;
+use YaySMTP\Monolog\Formatter\FlowdockFormatter;
+use YaySMTP\Monolog\Formatter\FormatterInterface;
 /**
  * Sends notifications through the Flowdock push API
  *
@@ -33,7 +31,6 @@ class FlowdockHandler extends SocketHandler
      * @var string
      */
     protected $apiToken;
-
     /**
      * @param string   $apiToken
      * @param bool|int $level    The minimum logging level at which this handler will be triggered
@@ -41,16 +38,14 @@ class FlowdockHandler extends SocketHandler
      *
      * @throws MissingExtensionException if OpenSSL is missing
      */
-    public function __construct($apiToken, $level = Logger::DEBUG, $bubble = true)
+    public function __construct($apiToken, $level = Logger::DEBUG, $bubble = \true)
     {
         if (!extension_loaded('openssl')) {
             throw new MissingExtensionException('The OpenSSL PHP extension is required to use the FlowdockHandler');
         }
-
         parent::__construct('ssl://api.flowdock.com:443', $level, $bubble);
         $this->apiToken = $apiToken;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -59,10 +54,8 @@ class FlowdockHandler extends SocketHandler
         if (!$formatter instanceof FlowdockFormatter) {
             throw new \InvalidArgumentException('The FlowdockHandler requires an instance of Monolog\Formatter\FlowdockFormatter to function correctly');
         }
-
         return parent::setFormatter($formatter);
     }
-
     /**
      * Gets the default formatter.
      *
@@ -72,7 +65,6 @@ class FlowdockHandler extends SocketHandler
     {
         throw new \InvalidArgumentException('The FlowdockHandler must be configured (via setFormatter) with an instance of Monolog\Formatter\FlowdockFormatter to function correctly');
     }
-
     /**
      * {@inheritdoc}
      *
@@ -81,10 +73,8 @@ class FlowdockHandler extends SocketHandler
     protected function write(array $record)
     {
         parent::write($record);
-
         $this->closeSocket();
     }
-
     /**
      * {@inheritdoc}
      *
@@ -94,10 +84,8 @@ class FlowdockHandler extends SocketHandler
     protected function generateDataStream($record)
     {
         $content = $this->buildContent($record);
-
         return $this->buildHeader($content) . $content;
     }
-
     /**
      * Builds the body of API call
      *
@@ -108,7 +96,6 @@ class FlowdockHandler extends SocketHandler
     {
         return Utils::jsonEncode($record['formatted']['flowdock']);
     }
-
     /**
      * Builds the header of the API Call
      *
@@ -122,7 +109,6 @@ class FlowdockHandler extends SocketHandler
         $header .= "Content-Type: application/json\r\n";
         $header .= "Content-Length: " . strlen($content) . "\r\n";
         $header .= "\r\n";
-
         return $header;
     }
 }

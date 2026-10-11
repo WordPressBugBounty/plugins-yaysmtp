@@ -3,7 +3,7 @@
  * Plugin Name: YaySMTP
  * Plugin URI: https://yaycommerce.com/yaysmtp
  * Description: This plugin helps you send emails from your WordPress website via your preferred SMTP server.
- * Version: 2.7.7
+ * Version: 2.7.8
  * Author: YayCommerce
  * Author URI: https://yaycommerce.com
  * Text Domain: yaysmtp
@@ -26,7 +26,7 @@ if ( ! defined( 'YAY_SMTP_PREFIX' ) ) {
 	define( 'YAY_SMTP_PREFIX', 'yay-smtp' );
 }
 if ( ! defined( 'YAY_SMTP_VERSION' ) ) {
-	define( 'YAY_SMTP_VERSION', '2.7.7' );
+	define( 'YAY_SMTP_VERSION', '2.7.8' );
 }
 
 if ( ! defined( 'YAY_SMTP_DOMAIN' ) ) {
@@ -89,34 +89,6 @@ add_action( 'plugins_loaded', function() {
 
 require_once __DIR__ . '/vendor_google_microsoft/autoload.php';
 require_once __DIR__ . '/vendor_amazon/autoload.php';
-
-$base_dir_vendor_league = __DIR__ . '/vendor_google_microsoft/league/src/';
-require_once $base_dir_vendor_league . 'Tool/RequiredParameterTrait.php';
-require_once $base_dir_vendor_league . 'Tool/QueryBuilderTrait.php';
-require_once $base_dir_vendor_league . 'Tool/ArrayAccessorTrait.php';
-require_once $base_dir_vendor_league . 'Tool/BearerAuthorizationTrait.php';
-require_once $base_dir_vendor_league . 'Tool/GuardedPropertyTrait.php';
-require_once $base_dir_vendor_league . 'Tool/MacAuthorizationTrait.php';
-require_once $base_dir_vendor_league . 'Tool/ProviderRedirectTrait.php';
-require_once $base_dir_vendor_league . 'Tool/RequestFactory.php';
-require_once $base_dir_vendor_league . 'OptionProvider/OptionProviderInterface.php';
-require_once $base_dir_vendor_league . 'Provider/ResourceOwnerInterface.php';
-require_once $base_dir_vendor_league . 'Token/AccessTokenInterface.php';
-require_once $base_dir_vendor_league . 'Token/ResourceOwnerAccessTokenInterface.php';
-require_once $base_dir_vendor_league . 'OptionProvider/PostAuthOptionProvider.php';
-require_once $base_dir_vendor_league . 'Grant/Exception/InvalidGrantException.php';
-require_once $base_dir_vendor_league . 'Grant/AbstractGrant.php';
-require_once $base_dir_vendor_league . 'Grant/AuthorizationCode.php';
-require_once $base_dir_vendor_league . 'Grant/ClientCredentials.php';
-require_once $base_dir_vendor_league . 'Grant/GrantFactory.php';
-require_once $base_dir_vendor_league . 'Grant/Password.php';
-require_once $base_dir_vendor_league . 'Grant/RefreshToken.php';
-require_once $base_dir_vendor_league . 'OptionProvider/HttpBasicAuthOptionProvider.php';
-require_once $base_dir_vendor_league . 'Provider/Exception/IdentityProviderException.php';
-require_once $base_dir_vendor_league . 'Provider/AbstractProvider.php';
-require_once $base_dir_vendor_league . 'Provider/GenericProvider.php';
-require_once $base_dir_vendor_league . 'Provider/GenericResourceOwner.php';
-require_once $base_dir_vendor_league . 'Token/AccessToken.php';
 
 if ( version_compare( get_bloginfo( 'version' ), '5.5-alpha', '<' ) ) {
 	if ( ! class_exists( '\PHPMailer', false ) ) {

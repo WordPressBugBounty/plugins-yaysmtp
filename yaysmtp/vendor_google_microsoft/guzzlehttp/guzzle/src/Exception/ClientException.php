@@ -1,5 +1,6 @@
 <?php
-namespace GuzzleHttp\Exception;
+
+namespace YaySMTP\GuzzleHttp\Exception;
 
 /**
  * Exception when a client error is encountered (4xx codes)

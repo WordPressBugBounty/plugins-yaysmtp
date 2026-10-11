@@ -1,4 +1,7 @@
 <?php
+
+namespace YaySMTP;
+
 /*
  * Copyright 2014 Google Inc.
  *
@@ -14,7 +17,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 /**
  * The "v2" collection of methods.
  * Typical usage is:

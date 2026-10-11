@@ -2151,7 +2151,7 @@ class Utils {
 		$clientWebService = $auth->getclientWebService( $is_fallback );
 
 		$urlAuth = '#';
-		if ( class_exists( '\Google_Client', false ) && $clientWebService instanceof \Google_Client && ! empty( $clientWebService ) ) {
+		if ( class_exists( '\YaySMTP\Google\Client', false ) && $clientWebService instanceof \YaySMTP\Google\Client && ! empty( $clientWebService ) ) {
 			$urlAuth = filter_var( $clientWebService->createAuthUrl(), FILTER_SANITIZE_URL );
 		}
 
@@ -2163,7 +2163,7 @@ class Utils {
 		$clientWebService = $auth->getclientWebService();
 
 		$urlAuth = '#';
-		if ( ! empty( $clientWebService ) && class_exists( '\League\OAuth2\Client\Provider\GenericProvider', false ) && $clientWebService instanceof \League\OAuth2\Client\Provider\GenericProvider ) {
+		if ( ! empty( $clientWebService ) && class_exists( '\YaySMTP\League\OAuth2\Client\Provider\GenericProvider', false ) && $clientWebService instanceof \YaySMTP\League\OAuth2\Client\Provider\GenericProvider ) {
 			$urlAuth = $clientWebService->getAuthorizationUrl(
 				[
 					'state' => wp_create_nonce( 'yaysmtp_outlookms_client_state' ),

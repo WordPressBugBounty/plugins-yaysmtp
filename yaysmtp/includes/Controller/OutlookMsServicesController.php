@@ -1,10 +1,10 @@
 <?php
 namespace YaySMTP\Controller;
 
-use GuzzleHttp\Exception\GuzzleException;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Provider\GenericProvider;
-use League\OAuth2\Client\Token\AccessToken;
+use YaySMTP\GuzzleHttp\Exception\GuzzleException;
+use YaySMTP\League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use YaySMTP\League\OAuth2\Client\Provider\GenericProvider;
+use YaySMTP\League\OAuth2\Client\Token\AccessToken;
 use YaySMTP\Helper\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -138,15 +138,20 @@ class OutlookMsServicesController {
 	private function saveAccessTokenWithCode( $msClient ) {
 		$outlookms_auth_code = $this->getSetting( 'outlookms_auth_code' );
 		if ( ! empty( $outlookms_auth_code ) && $this->tokenEmpty() ) {
-			$accessToken = $msClient->getAccessToken(
-				'authorization_code',
-				array( 'code' => $outlookms_auth_code )
-			);
+			try {
+				$accessToken = $msClient->getAccessToken(
+					'authorization_code',
+					array( 'code' => $outlookms_auth_code )
+				);
 
-			$this->saveAccessToken( $accessToken->jsonSerialize() );
-			$this->saveRefToken( $accessToken->getRefreshToken() );
-			$this->setUserInf( $msClient );
-			$this->saveAuthorizeCode( '' );
+				$this->saveAccessToken( $accessToken->jsonSerialize() );
+				$this->saveRefToken( $accessToken->getRefreshToken() );
+				$this->setUserInf( $msClient );
+				$this->saveAuthorizeCode( '' );
+			} catch ( IdentityProviderException $e ) {
+				$this->saveAuthorizeCode( '' );
+				throw $e;
+			}
 		}
 	}
 }

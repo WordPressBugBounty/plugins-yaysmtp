@@ -1,5 +1,6 @@
 <?php
-namespace GuzzleHttp\Exception;
+
+namespace YaySMTP\GuzzleHttp\Exception;
 
 class TooManyRedirectsException extends RequestException
 {

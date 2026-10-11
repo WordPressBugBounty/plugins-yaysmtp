@@ -1,11 +1,11 @@
 <?php
-namespace GuzzleHttp;
 
-use GuzzleHttp\Promise\EachPromise;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Promise\PromisorInterface;
-use Psr\Http\Message\RequestInterface;
+namespace YaySMTP\GuzzleHttp;
 
+use YaySMTP\GuzzleHttp\Promise\EachPromise;
+use YaySMTP\GuzzleHttp\Promise\PromiseInterface;
+use YaySMTP\GuzzleHttp\Promise\PromisorInterface;
+use YaySMTP\Psr\Http\Message\RequestInterface;
 /**
  * Sends an iterator of requests concurrently using a capped pool size.
  *
@@ -21,7 +21,6 @@ class Pool implements PromisorInterface
 {
     /** @var EachPromise */
     private $each;
-
     /**
      * @param ClientInterface $client   Client used to send the requests.
      * @param array|\Iterator $requests Requests or functions that return
@@ -32,26 +31,21 @@ class Pool implements PromisorInterface
      *     - fulfilled: (callable) Function to invoke when a request completes.
      *     - rejected: (callable) Function to invoke when a request is rejected.
      */
-    public function __construct(
-        ClientInterface $client,
-        $requests,
-        array $config = []
-    ) {
+    public function __construct(ClientInterface $client, $requests, array $config = [])
+    {
         // Backwards compatibility.
         if (isset($config['pool_size'])) {
             $config['concurrency'] = $config['pool_size'];
         } elseif (!isset($config['concurrency'])) {
             $config['concurrency'] = 25;
         }
-
         if (isset($config['options'])) {
             $opts = $config['options'];
             unset($config['options']);
         } else {
             $opts = [];
         }
-
-        $iterable = \GuzzleHttp\Promise\iter_for($requests);
+        $iterable = \YaySMTP\GuzzleHttp\Promise\iter_for($requests);
         $requests = function () use ($iterable, $client, $opts) {
             foreach ($iterable as $key => $rfn) {
                 if ($rfn instanceof RequestInterface) {
@@ -59,17 +53,12 @@ class Pool implements PromisorInterface
                 } elseif (is_callable($rfn)) {
                     yield $key => $rfn($opts);
                 } else {
-                    throw new \InvalidArgumentException('Each value yielded by '
-                        . 'the iterator must be a Psr7\Http\Message\RequestInterface '
-                        . 'or a callable that returns a promise that fulfills '
-                        . 'with a Psr7\Message\Http\ResponseInterface object.');
+                    throw new \InvalidArgumentException('Each value yielded by ' . 'the iterator must be a Psr7\Http\Message\RequestInterface ' . 'or a callable that returns a promise that fulfills ' . 'with a Psr7\Message\Http\ResponseInterface object.');
                 }
             }
         };
-
         $this->each = new EachPromise($requests(), $config);
     }
-
     /**
      * Get promise
      *
@@ -79,7 +68,6 @@ class Pool implements PromisorInterface
     {
         return $this->each->promise();
     }
-
     /**
      * Sends multiple requests concurrently and returns an array of responses
      * and exceptions that uses the same ordering as the provided requests.
@@ -97,21 +85,16 @@ class Pool implements PromisorInterface
      *               in the same order that the requests were sent.
      * @throws \InvalidArgumentException if the event format is incorrect.
      */
-    public static function batch(
-        ClientInterface $client,
-        $requests,
-        array $options = []
-    ) {
+    public static function batch(ClientInterface $client, $requests, array $options = [])
+    {
         $res = [];
         self::cmpCallback($options, 'fulfilled', $res);
         self::cmpCallback($options, 'rejected', $res);
         $pool = new static($client, $requests, $options);
         $pool->promise()->wait();
         ksort($res);
-
         return $res;
     }
-
     /**
      * Execute callback(s)
      *

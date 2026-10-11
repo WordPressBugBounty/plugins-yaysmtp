@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace YaySMTP\GuzzleHttp\Psr7;
 
 final class Header
 {
@@ -18,7 +18,6 @@ final class Header
     {
         static $trimmed = "\"'  \n\t\r";
         $params = $matches = [];
-
         foreach (self::normalize($header) as $val) {
             $part = [];
             foreach (preg_split('/;(?=([^"]*"[^"]*")*[^"]*$)/', $val) as $kvp) {
@@ -35,10 +34,8 @@ final class Header
                 $params[] = $part;
             }
         }
-
         return $params;
     }
-
     /**
      * Converts an array of header values that may contain comma separated
      * headers into an array of headers with no comma separated values.
@@ -52,11 +49,10 @@ final class Header
         if (!is_array($header)) {
             return array_map('trim', explode(',', $header));
         }
-
         $result = [];
         foreach ($header as $value) {
             foreach ((array) $value as $v) {
-                if (strpos($v, ',') === false) {
+                if (strpos($v, ',') === \false) {
                     $result[] = $v;
                     continue;
                 }
@@ -65,7 +61,6 @@ final class Header
                 }
             }
         }
-
         return $result;
     }
 }

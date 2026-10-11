@@ -8,11 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace YaySMTP\Monolog\Handler;
 
-namespace Monolog\Handler;
-
-use Monolog\ResettableInterface;
-
+use YaySMTP\Monolog\ResettableInterface;
 /**
  * Base Handler class providing the Handler structure
  *
@@ -29,18 +27,13 @@ abstract class AbstractProcessingHandler extends AbstractHandler
     public function handle(array $record)
     {
         if (!$this->isHandling($record)) {
-            return false;
+            return \false;
         }
-
         $record = $this->processRecord($record);
-
         $record['formatted'] = $this->getFormatter()->format($record);
-
         $this->write($record);
-
-        return false === $this->bubble;
+        return \false === $this->bubble;
     }
-
     /**
      * Writes the record down to the log of the implementing handler
      *
@@ -48,7 +41,6 @@ abstract class AbstractProcessingHandler extends AbstractHandler
      * @return void
      */
     abstract protected function write(array $record);
-
     /**
      * Processes a record.
      *
@@ -62,7 +54,6 @@ abstract class AbstractProcessingHandler extends AbstractHandler
                 $record = call_user_func($processor, $record);
             }
         }
-
         return $record;
     }
 }

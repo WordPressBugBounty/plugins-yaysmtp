@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
@@ -14,11 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Google\Auth\HttpHandler;
+namespace YaySMTP\Google\Auth\HttpHandler;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-
+use YaySMTP\GuzzleHttp\Client;
+use YaySMTP\GuzzleHttp\ClientInterface;
 class HttpHandlerFactory
 {
     /**
@@ -31,14 +31,12 @@ class HttpHandlerFactory
     public static function build(?ClientInterface $client = null)
     {
         $client = $client ?: new Client();
-
         $version = null;
-        if (defined('GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
+        if (defined('YaySMTP\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
             $version = ClientInterface::MAJOR_VERSION;
-        } elseif (defined('GuzzleHttp\ClientInterface::VERSION')) {
+        } elseif (defined('YaySMTP\GuzzleHttp\ClientInterface::VERSION')) {
             $version = (int) substr(ClientInterface::VERSION, 0, 1);
         }
-
         switch ($version) {
             case 5:
                 return new Guzzle5HttpHandler($client);

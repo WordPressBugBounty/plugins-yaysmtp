@@ -66,6 +66,8 @@ if ( current_user_can( 'manage_options' ) ) {
 				delete_option( 'yaysmtp_debug' );
 				delete_option( 'yaysmtp_debug_fallback' );
 				delete_option( 'yay_smtp_version' );
+				delete_option( 'yaysmtp_email_log_attachments_layout' );
+				delete_option( 'yaysmtp_email_log_attachments_secret' );
 
 				// Delete table
 				$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}yaysmtp_email_logs;" );
@@ -85,6 +87,8 @@ if ( current_user_can( 'manage_options' ) ) {
 			delete_option( 'yaysmtp_debug' );
 			delete_option( 'yaysmtp_debug_fallback' );
 			delete_option( 'yay_smtp_version' );
+			delete_option( 'yaysmtp_email_log_attachments_layout' );
+			delete_option( 'yaysmtp_email_log_attachments_secret' );
 
 			// Delete table
 			$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}yaysmtp_email_logs;" );

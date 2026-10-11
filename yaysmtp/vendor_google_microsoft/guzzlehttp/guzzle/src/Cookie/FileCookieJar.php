@@ -1,5 +1,6 @@
 <?php
-namespace GuzzleHttp\Cookie;
+
+namespace YaySMTP\GuzzleHttp\Cookie;
 
 /**
  * Persists non-session cookies using a JSON formatted file
@@ -8,10 +9,8 @@ class FileCookieJar extends CookieJar
 {
     /** @var string filename */
     private $filename;
-
     /** @var bool Control whether to persist session cookies or not. */
     private $storeSessionCookies;
-
     /**
      * Create a new FileCookieJar object
      *
@@ -21,17 +20,15 @@ class FileCookieJar extends CookieJar
      *
      * @throws \RuntimeException if the file cannot be found or created
      */
-    public function __construct($cookieFile, $storeSessionCookies = false)
+    public function __construct($cookieFile, $storeSessionCookies = \false)
     {
         parent::__construct();
         $this->filename = $cookieFile;
         $this->storeSessionCookies = $storeSessionCookies;
-
         if (file_exists($cookieFile)) {
             $this->load($cookieFile);
         }
     }
-
     /**
      * Saves the file when shutting down
      */
@@ -39,7 +36,6 @@ class FileCookieJar extends CookieJar
     {
         $this->save($this->filename);
     }
-
     /**
      * Saves the cookies to a file.
      *
@@ -55,13 +51,11 @@ class FileCookieJar extends CookieJar
                 $json[] = $cookie->toArray();
             }
         }
-
-        $jsonStr = \GuzzleHttp\json_encode($json);
-        if (false === file_put_contents($filename, $jsonStr, LOCK_EX)) {
+        $jsonStr = \YaySMTP\GuzzleHttp\json_encode($json);
+        if (\false === file_put_contents($filename, $jsonStr, \LOCK_EX)) {
             throw new \RuntimeException("Unable to save file {$filename}");
         }
     }
-
     /**
      * Load cookies from a JSON formatted file.
      *
@@ -73,15 +67,14 @@ class FileCookieJar extends CookieJar
     public function load($filename)
     {
         $json = file_get_contents($filename);
-        if (false === $json) {
+        if (\false === $json) {
             throw new \RuntimeException("Unable to load file {$filename}");
         } elseif ($json === '') {
             return;
         }
-
-        $data = \GuzzleHttp\json_decode($json, true);
+        $data = \YaySMTP\GuzzleHttp\json_decode($json, \true);
         if (is_array($data)) {
-            foreach (json_decode($json, true) as $cookie) {
+            foreach (json_decode($json, \true) as $cookie) {
                 $this->setCookie(new SetCookie($cookie));
             }
         } elseif (strlen($data)) {

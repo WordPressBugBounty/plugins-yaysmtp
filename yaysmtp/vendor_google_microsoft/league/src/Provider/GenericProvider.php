@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,15 +12,13 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Provider;
+namespace YaySMTP\League\OAuth2\Client\Provider;
 
 use InvalidArgumentException;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Token\AccessToken;
-use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
-use Psr\Http\Message\ResponseInterface;
-
+use YaySMTP\League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use YaySMTP\League\OAuth2\Client\Token\AccessToken;
+use YaySMTP\League\OAuth2\Client\Tool\BearerAuthorizationTrait;
+use YaySMTP\Psr\Http\Message\ResponseInterface;
 /**
  * Represents a generic service provider that may be used to interact with any
  * OAuth 2.0 service provider, using Bearer token authentication.
@@ -27,57 +26,46 @@ use Psr\Http\Message\ResponseInterface;
 class GenericProvider extends AbstractProvider
 {
     use BearerAuthorizationTrait;
-
     /**
      * @var string
      */
     private $urlAuthorize;
-
     /**
      * @var string
      */
     private $urlAccessToken;
-
     /**
      * @var string
      */
     private $urlResourceOwnerDetails;
-
     /**
      * @var string
      */
     private $accessTokenMethod;
-
     /**
      * @var string
      */
     private $accessTokenResourceOwnerId;
-
     /**
      * @var array|null
      */
     private $scopes = null;
-
     /**
      * @var string
      */
     private $scopeSeparator;
-
     /**
      * @var string
      */
     private $responseError = 'error';
-
     /**
      * @var string
      */
     private $responseCode;
-
     /**
      * @var string
      */
     private $responseResourceOwnerId = 'id';
-
     /**
      * @param array $options
      * @param array $collaborators
@@ -85,20 +73,15 @@ class GenericProvider extends AbstractProvider
     public function __construct(array $options = [], array $collaborators = [])
     {
         $this->assertRequiredOptions($options);
-
-        $possible   = $this->getConfigurableOptions();
+        $possible = $this->getConfigurableOptions();
         $configured = array_intersect_key($options, array_flip($possible));
-
         foreach ($configured as $key => $value) {
-            $this->$key = $value;
+            $this->{$key} = $value;
         }
-
         // Remove all options that are only used locally
         $options = array_diff_key($options, $configured);
-
         parent::__construct($options, $collaborators);
     }
-
     /**
      * Returns all options that can be configured.
      *
@@ -106,17 +89,8 @@ class GenericProvider extends AbstractProvider
      */
     protected function getConfigurableOptions()
     {
-        return array_merge($this->getRequiredOptions(), [
-            'accessTokenMethod',
-            'accessTokenResourceOwnerId',
-            'scopeSeparator',
-            'responseError',
-            'responseCode',
-            'responseResourceOwnerId',
-            'scopes',
-        ]);
+        return array_merge($this->getRequiredOptions(), ['accessTokenMethod', 'accessTokenResourceOwnerId', 'scopeSeparator', 'responseError', 'responseCode', 'responseResourceOwnerId', 'scopes']);
     }
-
     /**
      * Returns all options that are required.
      *
@@ -124,13 +98,8 @@ class GenericProvider extends AbstractProvider
      */
     protected function getRequiredOptions()
     {
-        return [
-            'urlAuthorize',
-            'urlAccessToken',
-            'urlResourceOwnerDetails',
-        ];
+        return ['urlAuthorize', 'urlAccessToken', 'urlResourceOwnerDetails'];
     }
-
     /**
      * Verifies that all required options have been passed.
      *
@@ -141,14 +110,10 @@ class GenericProvider extends AbstractProvider
     private function assertRequiredOptions(array $options)
     {
         $missing = array_diff_key(array_flip($this->getRequiredOptions()), $options);
-
         if (!empty($missing)) {
-            throw new InvalidArgumentException(
-                'Required options not defined: ' . implode(', ', array_keys($missing))
-            );
+            throw new InvalidArgumentException('Required options not defined: ' . implode(', ', array_keys($missing)));
         }
     }
-
     /**
      * @inheritdoc
      */
@@ -156,7 +121,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->urlAuthorize;
     }
-
     /**
      * @inheritdoc
      */
@@ -164,7 +128,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->urlAccessToken;
     }
-
     /**
      * @inheritdoc
      */
@@ -172,7 +135,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->urlResourceOwnerDetails;
     }
-
     /**
      * @inheritdoc
      */
@@ -180,7 +142,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->scopes;
     }
-
     /**
      * @inheritdoc
      */
@@ -188,7 +149,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->accessTokenMethod ?: parent::getAccessTokenMethod();
     }
-
     /**
      * @inheritdoc
      */
@@ -196,7 +156,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->accessTokenResourceOwnerId ?: parent::getAccessTokenResourceOwnerId();
     }
-
     /**
      * @inheritdoc
      */
@@ -204,7 +163,6 @@ class GenericProvider extends AbstractProvider
     {
         return $this->scopeSeparator ?: parent::getScopeSeparator();
     }
-
     /**
      * @inheritdoc
      */
@@ -213,16 +171,15 @@ class GenericProvider extends AbstractProvider
         if (!empty($data[$this->responseError])) {
             $error = $data[$this->responseError];
             if (!is_string($error)) {
-                $error = var_export($error, true);
+                $error = var_export($error, \true);
             }
-            $code  = $this->responseCode && !empty($data[$this->responseCode])? $data[$this->responseCode] : 0;
+            $code = $this->responseCode && !empty($data[$this->responseCode]) ? $data[$this->responseCode] : 0;
             if (!is_int($code)) {
                 $code = intval($code);
             }
             throw new IdentityProviderException($error, $code, $data);
         }
     }
-
     /**
      * @inheritdoc
      */

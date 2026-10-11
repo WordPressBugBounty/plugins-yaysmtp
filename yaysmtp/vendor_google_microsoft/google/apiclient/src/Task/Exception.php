@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2014 Google Inc.
  *
@@ -14,11 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace YaySMTP\Google\Task;
 
-namespace Google\Task;
-
-use Google\Exception as GoogleException;
-
+use YaySMTP\Google\Exception as GoogleException;
 class Exception extends GoogleException
 {
 }

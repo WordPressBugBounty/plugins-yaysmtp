@@ -1,6 +1,6 @@
 <?php
 
-namespace Psr\Cache;
+namespace YaySMTP\Psr\Cache;
 
 /**
  * Exception interface for invalid cache arguments.

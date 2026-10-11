@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,8 +12,7 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Provider;
+namespace YaySMTP\League\OAuth2\Client\Provider;
 
 /**
  * Represents a generic resource owner for use with the GenericProvider.
@@ -23,12 +23,10 @@ class GenericResourceOwner implements ResourceOwnerInterface
      * @var array
      */
     protected $response;
-
     /**
      * @var string
      */
     protected $resourceOwnerId;
-
     /**
      * @param array $response
      * @param string $resourceOwnerId
@@ -38,7 +36,6 @@ class GenericResourceOwner implements ResourceOwnerInterface
         $this->response = $response;
         $this->resourceOwnerId = $resourceOwnerId;
     }
-
     /**
      * Returns the identifier of the authorized resource owner.
      *
@@ -48,7 +45,6 @@ class GenericResourceOwner implements ResourceOwnerInterface
     {
         return $this->response[$this->resourceOwnerId];
     }
-
     /**
      * Returns the raw resource owner response.
      *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,8 +12,7 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Provider;
+namespace YaySMTP\League\OAuth2\Client\Provider;
 
 /**
  * Classes implementing `ResourceOwnerInterface` may be used to represent
@@ -26,7 +26,6 @@ interface ResourceOwnerInterface
      * @return mixed
      */
     public function getId();
-
     /**
      * Return all of the owner details available as an array.
      *

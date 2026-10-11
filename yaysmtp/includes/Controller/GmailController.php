@@ -18,7 +18,7 @@ class GmailController {
 	public function send() {
 		$use_fallback_smtp = Utils::conditionUseFallbackSmtp();
 		$servVend          = new GmailServiceVendController( $use_fallback_smtp );
-		$Service_Gmail     = new \Google_Service_Gmail( $servVend->getclientWebService( $use_fallback_smtp ) );
+		$Service_Gmail     = new \YaySMTP\Google_Service_Gmail( $servVend->getclientWebService( $use_fallback_smtp ) );
 
 		try {
 			$resp             = $Service_Gmail->users_settings_sendAs->listUsersSettingsSendAs( 'me' );
@@ -79,7 +79,7 @@ class GmailController {
 			// Fix Bcc
 			$this->smtpObj->Mailer = 'mail'; 
 			$this->smtpObj->preSend();
-			$Service_Gmail_Message = new \Google_Service_Gmail_Message();
+			$Service_Gmail_Message = new \YaySMTP\Google_Service_Gmail_Message();
 			$Service_Gmail_Message->setRaw( str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), base64_encode( $this->smtpObj->getSentMIMEMessage() ) ) );
 
 			$response   = $Service_Gmail->users_messages->send( 'me', $Service_Gmail_Message );

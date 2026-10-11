@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,8 +12,7 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Grant;
+namespace YaySMTP\League\OAuth2\Client\Grant;
 
 /**
  * Represents an authorization code grant.
@@ -28,14 +28,11 @@ class AuthorizationCode extends AbstractGrant
     {
         return 'authorization_code';
     }
-
     /**
      * @inheritdoc
      */
     protected function getRequiredRequestParameters()
     {
-        return [
-            'code',
-        ];
+        return ['code'];
     }
 }

@@ -8,11 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace YaySMTP\Monolog\Handler;
 
- namespace Monolog\Handler;
- 
- use Monolog\Logger;
-
+use YaySMTP\Monolog\Logger;
 /**
  * Inspired on LogEntriesHandler.
  *
@@ -25,7 +23,6 @@ class InsightOpsHandler extends SocketHandler
      * @var string
      */
     protected $logToken;
-
     /**
      * @param string $token  Log token supplied by InsightOps
      * @param string $region Region where InsightOps account is hosted. Could be 'us' or 'eu'.
@@ -35,20 +32,15 @@ class InsightOpsHandler extends SocketHandler
      *
      * @throws MissingExtensionException If SSL encryption is set to true and OpenSSL is missing
      */
-    public function __construct($token, $region = 'us', $useSSL = true, $level = Logger::DEBUG, $bubble = true)
+    public function __construct($token, $region = 'us', $useSSL = \true, $level = Logger::DEBUG, $bubble = \true)
     {
         if ($useSSL && !extension_loaded('openssl')) {
             throw new MissingExtensionException('The OpenSSL PHP plugin is required to use SSL encrypted connection for InsightOpsHandler');
         }
-
-        $endpoint = $useSSL
-            ? 'ssl://' . $region . '.data.logs.insight.rapid7.com:443'
-            : $region . '.data.logs.insight.rapid7.com:80';
-
+        $endpoint = $useSSL ? 'ssl://' . $region . '.data.logs.insight.rapid7.com:443' : $region . '.data.logs.insight.rapid7.com:80';
         parent::__construct($endpoint, $level, $bubble);
         $this->logToken = $token;
     }
-
     /**
      * {@inheritdoc}
      *

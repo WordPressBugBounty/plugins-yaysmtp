@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,8 +12,7 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\Grant;
+namespace YaySMTP\League\OAuth2\Client\Grant;
 
 /**
  * Represents a resource owner password credentials grant.
@@ -28,15 +28,11 @@ class Password extends AbstractGrant
     {
         return 'password';
     }
-
     /**
      * @inheritdoc
      */
     protected function getRequiredRequestParameters()
     {
-        return [
-            'username',
-            'password',
-        ];
+        return ['username', 'password'];
     }
 }

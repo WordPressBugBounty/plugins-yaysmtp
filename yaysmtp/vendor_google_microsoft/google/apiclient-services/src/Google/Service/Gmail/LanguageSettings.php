@@ -1,4 +1,7 @@
 <?php
+
+namespace YaySMTP;
+
 /*
  * Copyright 2014 Google Inc.
  *
@@ -14,17 +17,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 class Google_Service_Gmail_LanguageSettings extends Google_Model
 {
-  public $displayLanguage;
-
-  public function setDisplayLanguage($displayLanguage)
-  {
-    $this->displayLanguage = $displayLanguage;
-  }
-  public function getDisplayLanguage()
-  {
-    return $this->displayLanguage;
-  }
+    public $displayLanguage;
+    public function setDisplayLanguage($displayLanguage)
+    {
+        $this->displayLanguage = $displayLanguage;
+    }
+    public function getDisplayLanguage()
+    {
+        return $this->displayLanguage;
+    }
 }

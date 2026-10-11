@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,27 +12,25 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
+namespace YaySMTP\League\OAuth2\Client\Provider;
 
-namespace League\OAuth2\Client\Provider;
-
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\ClientInterface as HttpClientInterface;
-use GuzzleHttp\Exception\BadResponseException;
-use League\OAuth2\Client\Grant\AbstractGrant;
-use League\OAuth2\Client\Grant\GrantFactory;
-use League\OAuth2\Client\OptionProvider\OptionProviderInterface;
-use League\OAuth2\Client\OptionProvider\PostAuthOptionProvider;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Token\AccessToken;
-use League\OAuth2\Client\Token\AccessTokenInterface;
-use League\OAuth2\Client\Tool\ArrayAccessorTrait;
-use League\OAuth2\Client\Tool\GuardedPropertyTrait;
-use League\OAuth2\Client\Tool\QueryBuilderTrait;
-use League\OAuth2\Client\Tool\RequestFactory;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use YaySMTP\GuzzleHttp\Client as HttpClient;
+use YaySMTP\GuzzleHttp\ClientInterface as HttpClientInterface;
+use YaySMTP\GuzzleHttp\Exception\BadResponseException;
+use YaySMTP\League\OAuth2\Client\Grant\AbstractGrant;
+use YaySMTP\League\OAuth2\Client\Grant\GrantFactory;
+use YaySMTP\League\OAuth2\Client\OptionProvider\OptionProviderInterface;
+use YaySMTP\League\OAuth2\Client\OptionProvider\PostAuthOptionProvider;
+use YaySMTP\League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use YaySMTP\League\OAuth2\Client\Token\AccessToken;
+use YaySMTP\League\OAuth2\Client\Token\AccessTokenInterface;
+use YaySMTP\League\OAuth2\Client\Tool\ArrayAccessorTrait;
+use YaySMTP\League\OAuth2\Client\Tool\GuardedPropertyTrait;
+use YaySMTP\League\OAuth2\Client\Tool\QueryBuilderTrait;
+use YaySMTP\League\OAuth2\Client\Tool\RequestFactory;
+use YaySMTP\Psr\Http\Message\RequestInterface;
+use YaySMTP\Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
-
 /**
  * Represents a service provider (authorization server).
  *
@@ -42,62 +41,50 @@ abstract class AbstractProvider
     use ArrayAccessorTrait;
     use GuardedPropertyTrait;
     use QueryBuilderTrait;
-
     /**
      * @var string Key used in a token response to identify the resource owner.
      */
     const ACCESS_TOKEN_RESOURCE_OWNER_ID = null;
-
     /**
      * @var string HTTP method used to fetch access tokens.
      */
     const METHOD_GET = 'GET';
-
     /**
      * @var string HTTP method used to fetch access tokens.
      */
     const METHOD_POST = 'POST';
-
     /**
      * @var string
      */
     protected $clientId;
-
     /**
      * @var string
      */
     protected $clientSecret;
-
     /**
      * @var string
      */
     protected $redirectUri;
-
     /**
      * @var string
      */
     protected $state;
-
     /**
      * @var GrantFactory
      */
     protected $grantFactory;
-
     /**
      * @var RequestFactory
      */
     protected $requestFactory;
-
     /**
      * @var HttpClientInterface
      */
     protected $httpClient;
-
     /**
      * @var OptionProviderInterface
      */
     protected $optionProvider;
-
     /**
      * Constructs an OAuth 2.0 service provider.
      *
@@ -114,32 +101,24 @@ abstract class AbstractProvider
         // We'll let the GuardedPropertyTrait handle mass assignment of incoming
         // options, skipping any blacklisted properties defined in the provider
         $this->fillProperties($options);
-
         if (empty($collaborators['grantFactory'])) {
             $collaborators['grantFactory'] = new GrantFactory();
         }
         $this->setGrantFactory($collaborators['grantFactory']);
-
         if (empty($collaborators['requestFactory'])) {
             $collaborators['requestFactory'] = new RequestFactory();
         }
         $this->setRequestFactory($collaborators['requestFactory']);
-
         if (empty($collaborators['httpClient'])) {
             $client_options = $this->getAllowedClientOptions($options);
-
-            $collaborators['httpClient'] = new HttpClient(
-                array_intersect_key($options, array_flip($client_options))
-            );
+            $collaborators['httpClient'] = new HttpClient(array_intersect_key($options, array_flip($client_options)));
         }
         $this->setHttpClient($collaborators['httpClient']);
-
         if (empty($collaborators['optionProvider'])) {
             $collaborators['optionProvider'] = new PostAuthOptionProvider();
         }
         $this->setOptionProvider($collaborators['optionProvider']);
     }
-
     /**
      * Returns the list of options that can be passed to the HttpClient
      *
@@ -151,15 +130,12 @@ abstract class AbstractProvider
     protected function getAllowedClientOptions(array $options)
     {
         $client_options = ['timeout', 'proxy'];
-
         // Only allow turning off ssl verification if it's for a proxy
         if (!empty($options['proxy'])) {
             $client_options[] = 'verify';
         }
-
         return $client_options;
     }
-
     /**
      * Sets the grant factory instance.
      *
@@ -169,10 +145,8 @@ abstract class AbstractProvider
     public function setGrantFactory(GrantFactory $factory)
     {
         $this->grantFactory = $factory;
-
         return $this;
     }
-
     /**
      * Returns the current grant factory instance.
      *
@@ -182,7 +156,6 @@ abstract class AbstractProvider
     {
         return $this->grantFactory;
     }
-
     /**
      * Sets the request factory instance.
      *
@@ -192,10 +165,8 @@ abstract class AbstractProvider
     public function setRequestFactory(RequestFactory $factory)
     {
         $this->requestFactory = $factory;
-
         return $this;
     }
-
     /**
      * Returns the request factory instance.
      *
@@ -205,7 +176,6 @@ abstract class AbstractProvider
     {
         return $this->requestFactory;
     }
-
     /**
      * Sets the HTTP client instance.
      *
@@ -215,10 +185,8 @@ abstract class AbstractProvider
     public function setHttpClient(HttpClientInterface $client)
     {
         $this->httpClient = $client;
-
         return $this;
     }
-
     /**
      * Returns the HTTP client instance.
      *
@@ -228,7 +196,6 @@ abstract class AbstractProvider
     {
         return $this->httpClient;
     }
-
     /**
      * Sets the option provider instance.
      *
@@ -238,10 +205,8 @@ abstract class AbstractProvider
     public function setOptionProvider(OptionProviderInterface $provider)
     {
         $this->optionProvider = $provider;
-
         return $this;
     }
-
     /**
      * Returns the option provider instance.
      *
@@ -251,7 +216,6 @@ abstract class AbstractProvider
     {
         return $this->optionProvider;
     }
-
     /**
      * Returns the current value of the state parameter.
      *
@@ -263,7 +227,6 @@ abstract class AbstractProvider
     {
         return $this->state;
     }
-
     /**
      * Returns the base URL for authorizing a client.
      *
@@ -272,7 +235,6 @@ abstract class AbstractProvider
      * @return string
      */
     abstract public function getBaseAuthorizationUrl();
-
     /**
      * Returns the base URL for requesting an access token.
      *
@@ -282,7 +244,6 @@ abstract class AbstractProvider
      * @return string
      */
     abstract public function getBaseAccessTokenUrl(array $params);
-
     /**
      * Returns the URL for requesting the resource owner's details.
      *
@@ -290,7 +251,6 @@ abstract class AbstractProvider
      * @return string
      */
     abstract public function getResourceOwnerDetailsUrl(AccessToken $token);
-
     /**
      * Returns a new random string to use as the state parameter in an
      * authorization flow.
@@ -304,7 +264,6 @@ abstract class AbstractProvider
         // the amount of bytes by half to produce the correct length.
         return bin2hex(random_bytes($length / 2));
     }
-
     /**
      * Returns the default scopes used by this provider.
      *
@@ -314,7 +273,6 @@ abstract class AbstractProvider
      * @return array
      */
     abstract protected function getDefaultScopes();
-
     /**
      * Returns the string that should be used to separate scopes when building
      * the URL for requesting an access token.
@@ -325,7 +283,6 @@ abstract class AbstractProvider
     {
         return ',';
     }
-
     /**
      * Returns authorization parameters based on provided options.
      *
@@ -337,35 +294,24 @@ abstract class AbstractProvider
         if (empty($options['state'])) {
             $options['state'] = $this->getRandomState();
         }
-
         if (empty($options['scope'])) {
             $options['scope'] = $this->getDefaultScopes();
         }
-
-        $options += [
-            'response_type'   => 'code',
-            'approval_prompt' => 'auto'
-        ];
-
+        $options += ['response_type' => 'code', 'approval_prompt' => 'auto'];
         if (is_array($options['scope'])) {
             $separator = $this->getScopeSeparator();
             $options['scope'] = implode($separator, $options['scope']);
         }
-
         // Store the state as it may need to be accessed later on.
         $this->state = $options['state'];
-
         // Business code layer might set a different redirect_uri parameter
         // depending on the context, leave it as-is
         if (!isset($options['redirect_uri'])) {
             $options['redirect_uri'] = $this->redirectUri;
         }
-
         $options['client_id'] = $this->clientId;
-
         return $options;
     }
-
     /**
      * Builds the authorization URL's query string.
      *
@@ -376,7 +322,6 @@ abstract class AbstractProvider
     {
         return $this->buildQueryString($params);
     }
-
     /**
      * Builds the authorization URL.
      *
@@ -385,13 +330,11 @@ abstract class AbstractProvider
      */
     public function getAuthorizationUrl(array $options = [])
     {
-        $base   = $this->getBaseAuthorizationUrl();
+        $base = $this->getBaseAuthorizationUrl();
         $params = $this->getAuthorizationParameters($options);
-        $query  = $this->getAuthorizationQuery($params);
-
+        $query = $this->getAuthorizationQuery($params);
         return $this->appendQuery($base, $query);
     }
-
     /**
      * Redirects the client for authorization.
      *
@@ -399,21 +342,17 @@ abstract class AbstractProvider
      * @param  callable|null $redirectHandler
      * @return mixed
      */
-    public function authorize(
-        array $options = [],
-        ?callable $redirectHandler = null
-    ) {
+    public function authorize(array $options = [], ?callable $redirectHandler = null)
+    {
         $url = $this->getAuthorizationUrl($options);
         if ($redirectHandler) {
             return $redirectHandler($url, $this);
         }
-
         // @codeCoverageIgnoreStart
         header('Location: ' . $url);
         exit;
         // @codeCoverageIgnoreEnd
     }
-
     /**
      * Appends a query string to a URL.
      *
@@ -424,15 +363,12 @@ abstract class AbstractProvider
     protected function appendQuery($url, $query)
     {
         $query = trim($query, '?&');
-
         if ($query) {
-            $glue = strstr($url, '?') === false ? '?' : '&';
+            $glue = strstr($url, '?') === \false ? '?' : '&';
             return $url . $glue . $query;
         }
-
         return $url;
     }
-
     /**
      * Returns the method to use when requesting an access token.
      *
@@ -442,7 +378,6 @@ abstract class AbstractProvider
     {
         return self::METHOD_POST;
     }
-
     /**
      * Returns the key used in the access token response to identify the resource owner.
      *
@@ -452,7 +387,6 @@ abstract class AbstractProvider
     {
         return static::ACCESS_TOKEN_RESOURCE_OWNER_ID;
     }
-
     /**
      * Builds the access token URL's query string.
      *
@@ -463,7 +397,6 @@ abstract class AbstractProvider
     {
         return $this->buildQueryString($params);
     }
-
     /**
      * Checks that a provided grant is valid, or attempts to produce one if the
      * provided grant is a string.
@@ -476,11 +409,9 @@ abstract class AbstractProvider
         if (is_string($grant)) {
             return $this->grantFactory->getGrant($grant);
         }
-
         $this->grantFactory->checkGrant($grant);
         return $grant;
     }
-
     /**
      * Returns the full URL to use when requesting an access token.
      *
@@ -490,15 +421,12 @@ abstract class AbstractProvider
     protected function getAccessTokenUrl(array $params)
     {
         $url = $this->getBaseAccessTokenUrl($params);
-
         if ($this->getAccessTokenMethod() === self::METHOD_GET) {
             $query = $this->getAccessTokenQuery($params);
             return $this->appendQuery($url, $query);
         }
-
         return $url;
     }
-
     /**
      * Returns a prepared request for requesting an access token.
      *
@@ -507,13 +435,11 @@ abstract class AbstractProvider
      */
     protected function getAccessTokenRequest(array $params)
     {
-        $method  = $this->getAccessTokenMethod();
-        $url     = $this->getAccessTokenUrl($params);
+        $method = $this->getAccessTokenMethod();
+        $url = $this->getAccessTokenUrl($params);
         $options = $this->optionProvider->getAccessTokenOptions($this->getAccessTokenMethod(), $params);
-
         return $this->getRequest($method, $url, $options);
     }
-
     /**
      * Requests an access token using a specified grant and option set.
      *
@@ -525,27 +451,17 @@ abstract class AbstractProvider
     public function getAccessToken($grant, array $options = [])
     {
         $grant = $this->verifyGrant($grant);
-
-        $params = [
-            'client_id'     => $this->clientId,
-            'client_secret' => $this->clientSecret,
-            'redirect_uri'  => $this->redirectUri,
-        ];
-
-        $params   = $grant->prepareRequestParameters($params, $options);
-        $request  = $this->getAccessTokenRequest($params);
+        $params = ['client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'redirect_uri' => $this->redirectUri];
+        $params = $grant->prepareRequestParameters($params, $options);
+        $request = $this->getAccessTokenRequest($params);
         $response = $this->getParsedResponse($request);
-        if (false === is_array($response)) {
-            throw new UnexpectedValueException(
-                'Invalid response received from Authorization Server. Expected JSON.'
-            );
+        if (\false === is_array($response)) {
+            throw new UnexpectedValueException('Invalid response received from Authorization Server. Expected JSON.');
         }
         $prepared = $this->prepareAccessTokenResponse($response);
-        $token    = $this->createAccessToken($prepared, $grant);
-
+        $token = $this->createAccessToken($prepared, $grant);
         return $token;
     }
-
     /**
      * Returns a PSR-7 request instance that is not authenticated.
      *
@@ -558,7 +474,6 @@ abstract class AbstractProvider
     {
         return $this->createRequest($method, $url, null, $options);
     }
-
     /**
      * Returns an authenticated PSR-7 request instance.
      *
@@ -572,7 +487,6 @@ abstract class AbstractProvider
     {
         return $this->createRequest($method, $url, $token, $options);
     }
-
     /**
      * Creates a PSR-7 request instance.
      *
@@ -584,16 +498,11 @@ abstract class AbstractProvider
      */
     protected function createRequest($method, $url, $token, array $options)
     {
-        $defaults = [
-            'headers' => $this->getHeaders($token),
-        ];
-
+        $defaults = ['headers' => $this->getHeaders($token)];
         $options = array_merge_recursive($defaults, $options);
         $factory = $this->getRequestFactory();
-
         return $factory->getRequestWithOptions($method, $url, $options);
     }
-
     /**
      * Sends a request instance and returns a response instance.
      *
@@ -607,7 +516,6 @@ abstract class AbstractProvider
     {
         return $this->getHttpClient()->send($request);
     }
-
     /**
      * Sends a request and returns the parsed response.
      *
@@ -622,14 +530,10 @@ abstract class AbstractProvider
         } catch (BadResponseException $e) {
             $response = $e->getResponse();
         }
-
         $parsed = $this->parseResponse($response);
-
         $this->checkResponse($response, $parsed);
-
         return $parsed;
     }
-
     /**
      * Attempts to parse a JSON response.
      *
@@ -639,18 +543,12 @@ abstract class AbstractProvider
      */
     protected function parseJson($content)
     {
-        $content = json_decode($content, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new UnexpectedValueException(sprintf(
-                "Failed to parse JSON response: %s",
-                json_last_error_msg()
-            ));
+        $content = json_decode($content, \true);
+        if (json_last_error() !== \JSON_ERROR_NONE) {
+            throw new UnexpectedValueException(sprintf("Failed to parse JSON response: %s", json_last_error_msg()));
         }
-
         return $content;
     }
-
     /**
      * Returns the content type header of a response.
      *
@@ -661,7 +559,6 @@ abstract class AbstractProvider
     {
         return join(';', (array) $response->getHeader('content-type'));
     }
-
     /**
      * Parses the response according to its content-type header.
      *
@@ -673,34 +570,25 @@ abstract class AbstractProvider
     {
         $content = (string) $response->getBody();
         $type = $this->getContentType($response);
-
-        if (strpos($type, 'urlencoded') !== false) {
+        if (strpos($type, 'urlencoded') !== \false) {
             parse_str($content, $parsed);
             return $parsed;
         }
-
         // Attempt to parse the string as JSON regardless of content type,
         // since some providers use non-standard content types. Only throw an
         // exception if the JSON could not be parsed when it was expected to.
         try {
             return $this->parseJson($content);
         } catch (UnexpectedValueException $e) {
-            if (strpos($type, 'json') !== false) {
+            if (strpos($type, 'json') !== \false) {
                 throw $e;
             }
-
             if ($response->getStatusCode() == 500) {
-                throw new UnexpectedValueException(
-                    'An OAuth server error was encountered that did not contain a JSON body',
-                    0,
-                    $e
-                );
+                throw new UnexpectedValueException('An OAuth server error was encountered that did not contain a JSON body', 0, $e);
             }
-
             return $content;
         }
     }
-
     /**
      * Checks a provider response for errors.
      *
@@ -710,7 +598,6 @@ abstract class AbstractProvider
      * @return void
      */
     abstract protected function checkResponse(ResponseInterface $response, $data);
-
     /**
      * Prepares an parsed access token response for a grant.
      *
@@ -723,14 +610,10 @@ abstract class AbstractProvider
     protected function prepareAccessTokenResponse(array $result)
     {
         if ($this->getAccessTokenResourceOwnerId() !== null) {
-            $result['resource_owner_id'] = $this->getValueByKey(
-                $result,
-                $this->getAccessTokenResourceOwnerId()
-            );
+            $result['resource_owner_id'] = $this->getValueByKey($result, $this->getAccessTokenResourceOwnerId());
         }
         return $result;
     }
-
     /**
      * Creates an access token from a response.
      *
@@ -745,7 +628,6 @@ abstract class AbstractProvider
     {
         return new AccessToken($response);
     }
-
     /**
      * Generates a resource owner object from a successful resource owner
      * details request.
@@ -755,7 +637,6 @@ abstract class AbstractProvider
      * @return ResourceOwnerInterface
      */
     abstract protected function createResourceOwner(array $response, AccessToken $token);
-
     /**
      * Requests and returns the resource owner of given access token.
      *
@@ -765,10 +646,8 @@ abstract class AbstractProvider
     public function getResourceOwner(AccessToken $token)
     {
         $response = $this->fetchResourceOwnerDetails($token);
-
         return $this->createResourceOwner($response, $token);
     }
-
     /**
      * Requests resource owner details.
      *
@@ -778,20 +657,13 @@ abstract class AbstractProvider
     protected function fetchResourceOwnerDetails(AccessToken $token)
     {
         $url = $this->getResourceOwnerDetailsUrl($token);
-
         $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
-
         $response = $this->getParsedResponse($request);
-
-        if (false === is_array($response)) {
-            throw new UnexpectedValueException(
-                'Invalid response received from Authorization Server. Expected JSON.'
-            );
+        if (\false === is_array($response)) {
+            throw new UnexpectedValueException('Invalid response received from Authorization Server. Expected JSON.');
         }
-
         return $response;
     }
-
     /**
      * Returns the default headers used by this provider.
      *
@@ -803,7 +675,6 @@ abstract class AbstractProvider
     {
         return [];
     }
-
     /**
      * Returns the authorization headers used by this provider.
      *
@@ -820,7 +691,6 @@ abstract class AbstractProvider
     {
         return [];
     }
-
     /**
      * Returns all headers used by this provider for a request.
      *
@@ -832,12 +702,8 @@ abstract class AbstractProvider
     public function getHeaders($token = null)
     {
         if ($token) {
-            return array_merge(
-                $this->getDefaultHeaders(),
-                $this->getAuthorizationHeaders($token)
-            );
+            return array_merge($this->getDefaultHeaders(), $this->getAuthorizationHeaders($token));
         }
-
         return $this->getDefaultHeaders();
     }
 }

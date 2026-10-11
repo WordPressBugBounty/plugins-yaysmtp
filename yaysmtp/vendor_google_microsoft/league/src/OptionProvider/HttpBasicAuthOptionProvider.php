@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,11 +12,9 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
-
-namespace League\OAuth2\Client\OptionProvider;
+namespace YaySMTP\League\OAuth2\Client\OptionProvider;
 
 use InvalidArgumentException;
-
 /**
  * Add http basic auth into access token request options
  * @link https://tools.ietf.org/html/rfc6749#section-2.3.1
@@ -30,13 +29,10 @@ class HttpBasicAuthOptionProvider extends PostAuthOptionProvider
         if (empty($params['client_id']) || empty($params['client_secret'])) {
             throw new InvalidArgumentException('clientId and clientSecret are required for http basic auth');
         }
-
         $encodedCredentials = base64_encode(sprintf('%s:%s', $params['client_id'], $params['client_secret']));
         unset($params['client_id'], $params['client_secret']);
-
         $options = parent::getAccessTokenOptions($method, $params);
         $options['headers']['Authorization'] = 'Basic ' . $encodedCredentials;
-
         return $options;
     }
 }

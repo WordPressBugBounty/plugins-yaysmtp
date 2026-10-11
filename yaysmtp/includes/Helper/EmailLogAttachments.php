@@ -11,10 +11,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * original files, even after the source (often a temporary file) is gone.
  *
  * Storage is content addressed: every attachment is saved once as
- * `{uploads}/yaysmtp/email-log-attachments/{ab}/{sha256}.{ext}` and shared by
- * every log that carries the same bytes. The log row keeps only lightweight
- * metadata (name, hash, size, ...). A physical file is removed once no log
- * references its hash any more.
+ * `{uploads}/yaysmtp/email-log-attachments/store-{secret}/{ab}/{sha256}` and
+ * shared by every log that carries the same bytes. The log row keeps only
+ * lightweight metadata (name, hash, size, ...). A physical file is removed once
+ * no log references its hash any more.
+ *
+ * SECURITY: the attachment name and bytes come from whoever triggered the email
+ * (often a public form), and this folder is web-accessible.
+ * - The file on disk never carries an extension, so an attacker cannot drop an
+ *   executable file (.php, .phar, ...). The original name / extension live in
+ *   the log row metadata only.
+ * - `{secret}` is random per site, so the sender cannot work out the URL of the
+ *   copy from the bytes they sent.
  */
 class EmailLogAttachments {
 
@@ -33,6 +41,22 @@ class EmailLogAttachments {
 	 * Default cap for the sum of copied files of a single email.
 	 */
 	const DEFAULT_MAX_TOTAL_SIZE = 41943040; // 40 MB.
+
+	/**
+	 * Option flag: set once the files of the older layouts have been moved to
+	 * the current one.
+	 */
+	const LAYOUT_OPTION = 'yaysmtp_email_log_attachments_layout';
+
+	/**
+	 * Current on-disk layout version.
+	 */
+	const LAYOUT_VERSION = '3';
+
+	/**
+	 * Option that holds the random folder name segment of the store.
+	 */
+	const SECRET_OPTION = 'yaysmtp_email_log_attachments_secret';
 
 	/**
 	 * Whether saving attachment copies for email logs is enabled.
@@ -97,20 +121,112 @@ class EmailLogAttachments {
 	}
 
 	/**
-	 * Absolute path of the shared file for a given content hash.
+	 * Absolute path of the folder that holds the shared files:
+	 * `{root}/{secret}/`. The secret segment is random per site, so the URL of
+	 * a stored copy cannot be worked out from its content.
 	 *
-	 * @param string $hash Content hash (hex).
-	 * @param string $ext  Lower-case extension without the dot.
-	 * @return string Path, or '' when the hash is invalid or uploads unavailable.
+	 * @return string Trailing-slashed path, or '' when uploads are unavailable.
 	 */
-	public static function pathForHash( $hash, $ext = '' ) {
-		$hash = preg_replace( '/[^a-f0-9]/', '', strtolower( (string) $hash ) );
+	public static function getStoreDir() {
 		$root = self::getRootDir();
-		if ( strlen( $hash ) < 8 || '' === $root ) {
+		if ( '' === $root ) {
 			return '';
 		}
-		$ext = preg_replace( '/[^a-z0-9]/', '', strtolower( (string) $ext ) );
-		return $root . substr( $hash, 0, 2 ) . '/' . $hash . ( '' !== $ext ? '.' . $ext : '' );
+
+		$secret = (string) get_option( self::SECRET_OPTION, '' );
+		if ( ! preg_match( '/^[a-z0-9]{32}$/', $secret ) ) {
+			$new = strtolower( wp_generate_password( 32, false, false ) );
+			// add_option() loses against a concurrent request, so both end up
+			// on the same secret; only overwrite a stored value that is invalid.
+			if ( ! add_option( self::SECRET_OPTION, $new, '', false ) ) {
+				$secret = (string) get_option( self::SECRET_OPTION, '' );
+				if ( preg_match( '/^[a-z0-9]{32}$/', $secret ) ) {
+					return $root . 'store-' . $secret . '/';
+				}
+				update_option( self::SECRET_OPTION, $new, false );
+			}
+			$secret = $new;
+		}
+
+		return $root . 'store-' . $secret . '/';
+	}
+
+	/**
+	 * Absolute path of the shared file for a given content hash. The file name
+	 * is the hash alone - never append an extension (see the class docblock).
+	 *
+	 * @param string $hash Content hash (hex).
+	 * @return string Path, or '' when the hash is invalid or uploads unavailable.
+	 */
+	public static function pathForHash( $hash ) {
+		$hash  = preg_replace( '/[^a-f0-9]/', '', strtolower( (string) $hash ) );
+		$store = self::getStoreDir();
+		if ( strlen( $hash ) < 8 || '' === $store ) {
+			return '';
+		}
+		return $store . substr( $hash, 0, 2 ) . '/' . $hash;
+	}
+
+	/**
+	 * Run migrateLegacyFiles() once per site, then remember it is done.
+	 */
+	public static function maybeMigrateLegacyFiles() {
+		if ( self::LAYOUT_VERSION === get_option( self::LAYOUT_OPTION ) ) {
+			return;
+		}
+		self::migrateLegacyFiles();
+		update_option( self::LAYOUT_OPTION, self::LAYOUT_VERSION );
+	}
+
+	/**
+	 * Move the files of the old layouts (`{root}/{ab}/{sha256}.{ext}` and
+	 * `{root}/{ab}/{sha256}`) to `{store}/{ab}/{sha256}`, so no stored copy
+	 * keeps a sender-chosen (possibly executable) extension or a URL that can
+	 * be worked out from its content.
+	 */
+	public static function migrateLegacyFiles() {
+		$root = self::getRootDir();
+		if ( '' === $root || ! is_dir( untrailingslashit( $root ) ) ) {
+			return;
+		}
+		$store = self::getStoreDir();
+		if ( '' === $store ) {
+			return;
+		}
+
+		self::writeGuards();
+
+		foreach ( (array) glob( $root . '*', GLOB_ONLYDIR ) as $sub ) {
+			$shard = basename( $sub );
+			if ( ! preg_match( '/^[a-f0-9]{2}$/', $shard ) ) {
+				continue;
+			}
+
+			$entries = @scandir( $sub ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions -- best-effort filesystem cleanup.
+			foreach ( ( false === $entries ? array() : $entries ) as $name ) {
+				// The shard prefix check keeps legacy per-log folders (numeric
+				// names, original file names) out of this.
+				if ( ! preg_match( '/^([a-f0-9]{8,})(\.[a-z0-9]+)?$/', $name, $matches ) || 0 !== strpos( $matches[1], $shard ) ) {
+					continue;
+				}
+				$file = trailingslashit( $sub ) . $name;
+				if ( ! is_file( $file ) ) {
+					continue;
+				}
+
+				$target = $store . $shard . '/' . $matches[1];
+				if ( is_file( $target ) ) {
+					// Same bytes already stored under the new name.
+					@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions -- best-effort filesystem cleanup.
+				} elseif ( wp_mkdir_p( $store . $shard ) ) {
+					@rename( $file, $target ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions -- best-effort filesystem cleanup.
+				}
+			}
+
+			if ( self::isDirEmpty( $sub ) ) {
+				@rmdir( $sub ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions -- best-effort filesystem cleanup.
+			}
+		}
 	}
 
 	/**
@@ -183,7 +299,7 @@ class EmailLogAttachments {
 			}
 
 			$hash = hash( 'sha256', $content );
-			$path = self::pathForHash( $hash, $ext );
+			$path = self::pathForHash( $hash );
 			if ( '' === $path ) {
 				$meta[] = self::metaEntry( $name, '', $ext, $size, $type, $encoding, $disposition, $cid, 'error' );
 				continue;
@@ -232,7 +348,7 @@ class EmailLogAttachments {
 
 			$path = '';
 			if ( ! empty( $entry['hash'] ) ) {
-				$path = self::pathForHash( $entry['hash'], isset( $entry['ext'] ) ? $entry['ext'] : '' );
+				$path = self::pathForHash( $entry['hash'] );
 			} elseif ( ! empty( $entry['stored'] ) && '' !== $legacy_dir ) {
 				$path = $legacy_dir . basename( (string) $entry['stored'] );
 			}
@@ -312,20 +428,21 @@ class EmailLogAttachments {
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- integer id list, no user input.
 			$rows = $wpdb->get_col( "SELECT attachments FROM {$table} WHERE id IN ( {$id_list} ) AND attachments IS NOT NULL AND attachments <> ''" );
 
-			// Collect the (hash, ext) pairs those logs referenced.
+			// Collect the hashes those logs referenced.
 			$candidates = array();
 			foreach ( $rows as $row ) {
-				foreach ( self::extractHashes( $row ) as $hash => $ext ) {
-					$candidates[ $hash ] = $ext;
+				foreach ( self::extractHashes( $row ) as $hash ) {
+					$candidates[ $hash ] = true;
 				}
 			}
 
 			// Drop a shared file only if no OTHER log still references its hash.
-			foreach ( $candidates as $hash => $ext ) {
+			foreach ( array_keys( $candidates ) as $hash ) {
+				$hash = (string) $hash;
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- integer id list; hash is passed as a bound LIKE parameter.
 				$still_used = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE id NOT IN ( {$id_list} ) AND attachments LIKE %s LIMIT 1", '%' . $wpdb->esc_like( $hash ) . '%' ) );
 				if ( empty( $still_used ) ) {
-					self::removeHashFile( $hash, $ext );
+					self::removeHashFile( $hash );
 				}
 			}
 		}
@@ -362,25 +479,32 @@ class EmailLogAttachments {
 
 		global $wpdb;
 
-		$schema_ready = self::schemaReady();
+		// Retry any move the one-off upgrade migration could not do.
+		self::migrateLegacyFiles();
 
-		// Content addressed files: {root}/{ab}/{hash}.{ext}
+		// Legacy per-log folder (numeric): drop when its log is gone.
 		foreach ( (array) glob( $root . '*', GLOB_ONLYDIR ) as $sub ) {
 			$base = basename( $sub );
-
-			// Legacy per-log folder (numeric): drop when its log is gone.
-			if ( ctype_digit( $base ) ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- one-off cleanup lookup.
-				$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}yaysmtp_email_logs WHERE id = %d", absint( $base ) ) );
-				if ( empty( $exists ) ) {
-					self::rrmdir( trailingslashit( $sub ) );
-				}
+			if ( ! ctype_digit( $base ) ) {
 				continue;
 			}
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- one-off cleanup lookup.
+			$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}yaysmtp_email_logs WHERE id = %d", absint( $base ) ) );
+			if ( empty( $exists ) ) {
+				self::rrmdir( trailingslashit( $sub ) );
+			}
+		}
 
-			// Without the metadata column we cannot tell which shared files are
-			// still referenced, so leave them alone.
-			if ( ! $schema_ready || ! preg_match( '/^[a-f0-9]{2}$/', $base ) ) {
+		// Without the metadata column we cannot tell which shared files are
+		// still referenced, so leave them alone.
+		$store = self::getStoreDir();
+		if ( '' === $store || ! self::schemaReady() ) {
+			return;
+		}
+
+		// Content addressed files: {store}/{ab}/{hash}
+		foreach ( (array) glob( $store . '*', GLOB_ONLYDIR ) as $sub ) {
+			if ( ! preg_match( '/^[a-f0-9]{2}$/', basename( $sub ) ) ) {
 				continue;
 			}
 
@@ -443,10 +567,10 @@ class EmailLogAttachments {
 	}
 
 	/**
-	 * Pull the hash => ext map out of a serialized `attachments` column value.
+	 * Pull the content hashes out of a serialized `attachments` column value.
 	 *
 	 * @param string $raw Column value.
-	 * @return array<string,string>
+	 * @return array<int,string>
 	 */
 	private static function extractHashes( $raw ) {
 		$meta = maybe_unserialize( $raw );
@@ -458,21 +582,20 @@ class EmailLogAttachments {
 			if ( is_array( $entry ) && ! empty( $entry['hash'] ) ) {
 				$hash = preg_replace( '/[^a-f0-9]/', '', strtolower( (string) $entry['hash'] ) );
 				if ( '' !== $hash ) {
-					$out[ $hash ] = isset( $entry['ext'] ) ? (string) $entry['ext'] : '';
+					$out[] = $hash;
 				}
 			}
 		}
-		return $out;
+		return array_values( array_unique( $out ) );
 	}
 
 	/**
 	 * Delete one shared file and prune its shard folder if empty.
 	 *
 	 * @param string $hash Content hash.
-	 * @param string $ext  Extension without dot.
 	 */
-	private static function removeHashFile( $hash, $ext ) {
-		$path = self::pathForHash( $hash, $ext );
+	private static function removeHashFile( $hash ) {
+		$path = self::pathForHash( $hash );
 		if ( '' === $path ) {
 			return;
 		}
@@ -505,7 +628,8 @@ class EmailLogAttachments {
 	}
 
 	/**
-	 * Write the deny/index guard files on the attachments root.
+	 * Write the deny/index guard files on the attachments root. The empty
+	 * index.html also keeps the secret store folder name out of directory listings.
 	 */
 	private static function writeGuards() {
 		$root = self::getRootDir();
@@ -522,6 +646,13 @@ class EmailLogAttachments {
 			$rules  = "<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n";
 			$rules .= "<IfModule !mod_authz_core.c>\nOrder allow,deny\nDeny from all\n</IfModule>\n";
 			@file_put_contents( $root . '.htaccess', $rules ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions -- best-effort filesystem cleanup.
+		}
+		// IIS ignores .htaccess: refuse every request below this folder.
+		if ( ! is_file( $root . 'web.config' ) ) {
+			$rules  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration>\n\t<system.webServer>\n\t\t<security>\n\t\t\t<requestFiltering>\n";
+			$rules .= "\t\t\t\t<fileExtensions allowUnlisted=\"false\">\n\t\t\t\t\t<add fileExtension=\".\" allowed=\"false\" />\n\t\t\t\t</fileExtensions>\n";
+			$rules .= "\t\t\t</requestFiltering>\n\t\t</security>\n\t</system.webServer>\n</configuration>\n";
+			@file_put_contents( $root . 'web.config', $rules ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions -- best-effort filesystem cleanup.
 		}
 	}
 

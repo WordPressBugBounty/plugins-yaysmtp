@@ -8,14 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace YaySMTP\Monolog\Handler;
 
-namespace Monolog\Handler;
-
-use Monolog\Formatter\FormatterInterface;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Logger;
-use Monolog\ResettableInterface;
-
+use YaySMTP\Monolog\Formatter\FormatterInterface;
+use YaySMTP\Monolog\Formatter\LineFormatter;
+use YaySMTP\Monolog\Logger;
+use YaySMTP\Monolog\ResettableInterface;
 /**
  * Base Handler class providing the Handler structure
  *
@@ -24,24 +22,21 @@ use Monolog\ResettableInterface;
 abstract class AbstractHandler implements HandlerInterface, ResettableInterface
 {
     protected $level = Logger::DEBUG;
-    protected $bubble = true;
-
+    protected $bubble = \true;
     /**
      * @var FormatterInterface
      */
     protected $formatter;
     protected $processors = array();
-
     /**
      * @param int|string $level  The minimum logging level at which this handler will be triggered
      * @param bool       $bubble Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct($level = Logger::DEBUG, $bubble = true)
+    public function __construct($level = Logger::DEBUG, $bubble = \true)
     {
         $this->setLevel($level);
         $this->bubble = $bubble;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -49,7 +44,6 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
     {
         return $record['level'] >= $this->level;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -59,7 +53,6 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
             $this->handle($record);
         }
     }
-
     /**
      * Closes the handler.
      *
@@ -68,20 +61,17 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
     public function close()
     {
     }
-
     /**
      * {@inheritdoc}
      */
     public function pushProcessor($callback)
     {
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('Processors must be valid callables (callback or object with an __invoke method), '.var_export($callback, true).' given');
+            throw new \InvalidArgumentException('Processors must be valid callables (callback or object with an __invoke method), ' . var_export($callback, \true) . ' given');
         }
         array_unshift($this->processors, $callback);
-
         return $this;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -90,20 +80,16 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
         if (!$this->processors) {
             throw new \LogicException('You tried to pop from an empty processor stack.');
         }
-
         return array_shift($this->processors);
     }
-
     /**
      * {@inheritdoc}
      */
     public function setFormatter(FormatterInterface $formatter)
     {
         $this->formatter = $formatter;
-
         return $this;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -112,10 +98,8 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
         if (!$this->formatter) {
             $this->formatter = $this->getDefaultFormatter();
         }
-
         return $this->formatter;
     }
-
     /**
      * Sets minimum logging level at which this handler will be triggered.
      *
@@ -125,10 +109,8 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
     public function setLevel($level)
     {
         $this->level = Logger::toMonologLevel($level);
-
         return $this;
     }
-
     /**
      * Gets minimum logging level at which this handler will be triggered.
      *
@@ -138,7 +120,6 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
     {
         return $this->level;
     }
-
     /**
      * Sets the bubbling behavior.
      *
@@ -149,10 +130,8 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
     public function setBubble($bubble)
     {
         $this->bubble = $bubble;
-
         return $this;
     }
-
     /**
      * Gets the bubbling behavior.
      *
@@ -163,7 +142,6 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
     {
         return $this->bubble;
     }
-
     public function __destruct()
     {
         try {
@@ -174,7 +152,6 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
             // do nothing
         }
     }
-
     public function reset()
     {
         foreach ($this->processors as $processor) {
@@ -183,7 +160,6 @@ abstract class AbstractHandler implements HandlerInterface, ResettableInterface
             }
         }
     }
-
     /**
      * Gets the default formatter.
      *

@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Promise;
+namespace YaySMTP\GuzzleHttp\Promise;
 
 final class Create
 {
@@ -16,7 +16,6 @@ final class Create
         if ($value instanceof PromiseInterface) {
             return $value;
         }
-
         // Return a Guzzle promise that shadows the given promise.
         if (is_object($value) && method_exists($value, 'then')) {
             $wfn = method_exists($value, 'wait') ? [$value, 'wait'] : null;
@@ -25,10 +24,8 @@ final class Create
             $value->then([$promise, 'resolve'], [$promise, 'reject']);
             return $promise;
         }
-
         return new FulfilledPromise($value);
     }
-
     /**
      * Creates a rejected promise for a reason if the reason is not a promise.
      * If the provided reason is a promise, then it is returned as-is.
@@ -42,10 +39,8 @@ final class Create
         if ($reason instanceof PromiseInterface) {
             return $reason;
         }
-
         return new RejectedPromise($reason);
     }
-
     /**
      * Create an exception for a rejected promise value.
      *
@@ -58,10 +53,8 @@ final class Create
         if ($reason instanceof \Exception || $reason instanceof \Throwable) {
             return $reason;
         }
-
         return new RejectionException($reason);
     }
-
     /**
      * Returns an iterator for the given value.
      *
@@ -74,11 +67,9 @@ final class Create
         if ($value instanceof \Iterator) {
             return $value;
         }
-
         if (is_array($value)) {
             return new \ArrayIterator($value);
         }
-
         return new \ArrayIterator([$value]);
     }
 }

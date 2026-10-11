@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the league/oauth2-client library
  *
@@ -11,11 +12,9 @@
  * @link https://packagist.org/packages/league/oauth2-client Packagist
  * @link https://github.com/thephpleague/oauth2-client GitHub
  */
+namespace YaySMTP\League\OAuth2\Client\Tool;
 
-namespace League\OAuth2\Client\Tool;
-
-use GuzzleHttp\Psr7\Request;
-
+use YaySMTP\GuzzleHttp\Psr7\Request;
 /**
  * Used to produce PSR-7 Request instances.
  *
@@ -34,16 +33,10 @@ class RequestFactory
      *
      * @return Request
      */
-    public function getRequest(
-        $method,
-        $uri,
-        array $headers = [],
-        $body = null,
-        $version = '1.1'
-    ) {
+    public function getRequest($method, $uri, array $headers = [], $body = null, $version = '1.1')
+    {
         return new Request($method, $uri, $headers, $body, $version);
     }
-
     /**
      * Parses simplified options.
      *
@@ -54,15 +47,9 @@ class RequestFactory
     protected function parseOptions(array $options)
     {
         // Should match default values for getRequest
-        $defaults = [
-            'headers' => [],
-            'body'    => null,
-            'version' => '1.1',
-        ];
-
+        $defaults = ['headers' => [], 'body' => null, 'version' => '1.1'];
         return array_merge($defaults, $options);
     }
-
     /**
      * Creates a request using a simplified array of options.
      *
@@ -75,13 +62,6 @@ class RequestFactory
     public function getRequestWithOptions($method, $uri, array $options = [])
     {
         $options = $this->parseOptions($options);
-
-        return $this->getRequest(
-            $method,
-            $uri,
-            $options['headers'],
-            $options['body'],
-            $options['version']
-        );
+        return $this->getRequest($method, $uri, $options['headers'], $options['body'], $options['version']);
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+namespace YaySMTP;
+
 /*
  * Copyright 2014 Google Inc.
  *
@@ -14,25 +17,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 class Google_Service_Gmail_ListDelegatesResponse extends Google_Collection
 {
-  protected $collection_key = 'delegates';
-  protected $delegatesType = 'Google_Service_Gmail_Delegate';
-  protected $delegatesDataType = 'array';
-
-  /**
-   * @param Google_Service_Gmail_Delegate[]
-   */
-  public function setDelegates($delegates)
-  {
-    $this->delegates = $delegates;
-  }
-  /**
-   * @return Google_Service_Gmail_Delegate[]
-   */
-  public function getDelegates()
-  {
-    return $this->delegates;
-  }
+    protected $collection_key = 'delegates';
+    protected $delegatesType = 'YaySMTP\Google_Service_Gmail_Delegate';
+    protected $delegatesDataType = 'array';
+    /**
+     * @param Google_Service_Gmail_Delegate[]
+     */
+    public function setDelegates($delegates)
+    {
+        $this->delegates = $delegates;
+    }
+    /**
+     * @return Google_Service_Gmail_Delegate[]
+     */
+    public function getDelegates()
+    {
+        return $this->delegates;
+    }
 }
