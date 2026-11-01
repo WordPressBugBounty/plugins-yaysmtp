@@ -4,7 +4,7 @@ Tags: wp mail, email log, wp mail smtp, smtp, gmail smtp
 Requires at least: 5.5
 Requires PHP: 5.4
 Tested up to: 7.1
-Stable tag: 2.7.8
+Stable tag: 2.7.9
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -122,6 +122,9 @@ Pro is about support, not features. You get priority support for any sending or 
 4. Additional Settings for Email Delivery Summary and Fallback Options
 
 == Changelog ==
+
+= Nov 1, 2026 – Version 2.7.9 =
+- Fixed: Vulnerability with YaySMTP <= 2.7.8 - Authenticated (Administrator+) SQL Injection via 'params[searchKey]' Parameter
 
 = Oct 11, 2026 – Version 2.7.8 =
 - Added: Prefix vendor_google_microsoft namespaces with YaySMTP to avoid conflicts with other WordPress plugins

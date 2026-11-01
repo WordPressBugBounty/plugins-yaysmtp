@@ -239,6 +239,7 @@ class ImportSettingsOtherPlugins {
 		global $wpdb;
 		// From date and To date
 		$where_clause = array();
+		$query_params = array();
 		if ( ! empty( $params['from'] ) && ! empty( $params['to'] ) ) {
 			$start_date_obj  = new \DateTime( $params['from'] );
 			$end_date_Obj    = new \DateTime( $params['to'] );
@@ -252,11 +253,15 @@ class ImportSettingsOtherPlugins {
 
 		// Search value
 		if ( ! empty( $params['searchValue'] ) && ! empty( $params['searchKey'] ) ) {
-			$search_key     = ( ! empty( $params['searchKey'] ) ) ? $params['searchKey'] : "";
-			$search_value   = ( ! empty( $params['searchValue'] ) ) ? $params['searchValue'] : "";
-			$search_value   = $wpdb->esc_like( $search_value );		
-			$where_clause[] = $search_key . ' LIKE %s';
-			$query_params[] = '%' . $search_value . '%';
+			$allowed_search_keys = ['email_to', 'subject', 'body_content', 'root_name'];
+			$search_key          = ( ! empty( $params['searchKey'] ) ) ? $params['searchKey'] : "";
+
+			if ( in_array( $search_key, $allowed_search_keys, true ) ) {
+				$search_value   = ( ! empty( $params['searchValue'] ) ) ? $params['searchValue'] : "";
+				$search_value   = $wpdb->esc_like( $search_value );
+				$where_clause[] = "`" . $search_key . "` LIKE %s";
+				$query_params[] = '%' . $search_value . '%';
+			}
 		}
 
 		if ( $where_clause ) {
